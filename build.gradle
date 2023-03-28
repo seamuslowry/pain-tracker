@@ -4,6 +4,7 @@ buildscript {
         compose_material_version = '1.1.0-beta01'
         compose_compiler_version = '1.4.3'
         hilt_version = '2.44'
+        room_version = '2.5.1'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
@@ -12,4 +13,5 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.8.10' apply false
     id "com.diffplug.spotless" version "6.15.0" apply false
     id 'com.google.dagger.hilt.android' version '2.44' apply false
+    id 'com.google.devtools.ksp' version "1.8.10-1.0.9" apply false
 }
