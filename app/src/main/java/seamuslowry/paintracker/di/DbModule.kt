@@ -1,4 +1,4 @@
-package seamuslowry.paintracker.data.di
+package seamuslowry.paintracker.di
 
 import android.content.Context
 import androidx.room.Room
@@ -8,8 +8,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import seamuslowry.paintracker.data.PainTrackerDatabase
-import seamuslowry.paintracker.data.daos.TrackedDayDao
-import seamuslowry.paintracker.data.daos.TrackedItemDao
+import seamuslowry.paintracker.data.daos.ItemConfigurationDao
+import seamuslowry.paintracker.data.daos.ItemDao
+import seamuslowry.paintracker.data.daos.ReportDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -26,13 +27,19 @@ object DbModule {
 
     @Provides
     @Singleton
-    fun provideTrackedDayDao(
+    fun provideReportDao(
         db: PainTrackerDatabase,
-    ): TrackedDayDao = db.trackedDayDao()
+    ): ReportDao = db.reportDao()
 
     @Provides
     @Singleton
-    fun provideTrackedItemDao(
+    fun provideItemDao(
         db: PainTrackerDatabase,
-    ): TrackedItemDao = db.trackedItemDao()
+    ): ItemDao = db.itemDao()
+
+    @Provides
+    @Singleton
+    fun provideItemConfigurationDao(
+        db: PainTrackerDatabase,
+    ): ItemConfigurationDao = db.itemConfigurationDao()
 }

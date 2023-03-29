@@ -3,4 +3,4 @@ package seamuslowry.paintracker.data.daos
 import androidx.room.Dao
 
 @Dao
-interface TrackedItemDao
+interface ItemConfigurationDao

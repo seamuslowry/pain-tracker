@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class TrackedDay(
+data class Report(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 )
