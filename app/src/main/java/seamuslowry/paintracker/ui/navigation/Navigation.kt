@@ -12,11 +12,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import seamuslowry.paintracker.R
 import seamuslowry.paintracker.ui.screens.configuration.ConfigurationScreen
 import seamuslowry.paintracker.ui.screens.entry.EntryScreen
 import seamuslowry.paintracker.ui.screens.report.ReportScreen
@@ -33,12 +35,6 @@ data class NavBarData(
     val text: String,
 )
 
-val navigableScreens = listOf(
-    NavBarData(Screen.Entry, Icons.Filled.Assignment, "Entry"),
-    NavBarData(Screen.Report, Icons.Filled.DateRange, "Report"),
-    NavBarData(Screen.Configuration, Icons.Filled.Settings, "Settings"),
-)
-
 @Composable
 fun Navigation(
     startDestination: String,
@@ -46,6 +42,12 @@ fun Navigation(
     navController: NavHostController = rememberNavController(),
 ) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    val navigableScreens = listOf(
+        NavBarData(Screen.Entry, Icons.Filled.Assignment, stringResource(R.string.entry)),
+        NavBarData(Screen.Report, Icons.Filled.DateRange, stringResource(R.string.report)),
+        NavBarData(Screen.Configuration, Icons.Filled.Settings, stringResource(R.string.settings)),
+    )
 
     Scaffold(
         modifier = modifier,
