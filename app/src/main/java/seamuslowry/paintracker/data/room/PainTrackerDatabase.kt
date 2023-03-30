@@ -1,10 +1,10 @@
-package seamuslowry.paintracker.data
+package seamuslowry.paintracker.data.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import seamuslowry.paintracker.data.daos.ItemConfigurationDao
-import seamuslowry.paintracker.data.daos.ItemDao
-import seamuslowry.paintracker.data.daos.ReportDao
+import seamuslowry.paintracker.data.room.daos.ItemConfigurationDao
+import seamuslowry.paintracker.data.room.daos.ItemDao
+import seamuslowry.paintracker.data.room.daos.ReportDao
 import seamuslowry.paintracker.models.Item
 import seamuslowry.paintracker.models.ItemConfiguration
 import seamuslowry.paintracker.models.Report
