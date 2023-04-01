@@ -4,4 +4,7 @@
     <string name="entry">Entry</string>
     <string name="report">Report</string>
     <string name="settings">Settings</string>
+    <string name="confirm_configuration">Confirm tracker configuration</string>
+    <string name="discard_configuration">Discard tracker configuration</string>
+    <string name="name">Name</string>
 </resources>
