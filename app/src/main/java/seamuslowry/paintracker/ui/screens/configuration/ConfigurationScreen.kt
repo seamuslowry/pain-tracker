@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
@@ -17,29 +19,41 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.paintracker.R
@@ -83,35 +97,54 @@ fun AddConfigurationButton(
     onDiscard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+    val cardColor by animateColorAsState(
+        targetValue = if (itemConfiguration != null) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
+        animationSpec = tween(500, easing = FastOutSlowInEasing),
+    )
+
+    var size by remember { mutableStateOf(IntSize.Zero) }
+
+    Box(contentAlignment = Alignment.TopCenter, modifier = modifier.fillMaxWidth().padding(20.dp)) {
         AnimatedVisibility(
+            // enough to put this behind the button when shrinking
+            modifier = Modifier.padding(top = 3.dp).zIndex(0f).clip(RoundedCornerShape(15.dp)),
             visible = itemConfiguration != null,
             enter = expandIn(
-                expandFrom = Alignment.Center,
+                expandFrom = Alignment.TopCenter,
                 animationSpec = tween(durationMillis = 500),
             ),
             exit = shrinkOut(
-                shrinkTowards = Alignment.Center,
+                shrinkTowards = Alignment.TopCenter,
                 animationSpec = tween(durationMillis = 500),
-            ),
+                targetSize = { size.times(9).div(10) },
+            ) + fadeOut(animationSpec = tween(durationMillis = 500)),
         ) {
             AddConfigurationCard(
                 itemConfiguration = itemConfiguration ?: ItemConfiguration(),
                 onChange = onChange,
                 onSave = onSave,
                 onDiscard = onDiscard,
+                colors = CardDefaults.cardColors(containerColor = cardColor),
             )
         }
         AnimatedVisibility(
             visible = itemConfiguration == null,
             enter = fadeIn(
-                animationSpec = tween(delayMillis = 200),
+                animationSpec = tween(durationMillis = 400),
             ),
+            exit = fadeOut(),
+            modifier = Modifier.zIndex(1f),
         ) {
-            FilledIconButton(onClick = {
-                onChange(ItemConfiguration())
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item_config))
+            Button(
+                onClick = {
+                    onChange(ItemConfiguration())
+                },
+                modifier = Modifier.onSizeChanged {
+                    size = it
+                },
+            ) {
+                Icon(Icons.Filled.Build, contentDescription = stringResource(R.string.add_item_config), modifier = Modifier.scale(0.75f))
+                Text(text = stringResource(R.string.add_item_config), modifier = Modifier.padding(horizontal = 10.dp))
             }
         }
     }
@@ -125,8 +158,9 @@ fun AddConfigurationCard(
     onSave: () -> Unit,
     onDiscard: () -> Unit,
     modifier: Modifier = Modifier,
+    colors: CardColors = CardDefaults.cardColors(),
 ) {
-    Card(modifier = modifier.fillMaxWidth().padding(20.dp)) {
+    Card(modifier = modifier.fillMaxWidth(), colors = colors) {
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
