@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Pain Tracker</string>
-    <string name="add_item_config">Add item configuration</string>
+    <string name="add_item_config">Add tracker</string>
     <string name="entry">Entry</string>
     <string name="report">Report</string>
     <string name="settings">Settings</string>
