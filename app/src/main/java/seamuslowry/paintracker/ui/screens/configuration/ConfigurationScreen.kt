@@ -1,14 +1,19 @@
 package seamuslowry.paintracker.ui.screens.configuration
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -55,24 +60,42 @@ fun ConfigurationScreen(
         items(items = configurations, key = { it.id }) {
             Text(text = it.toString())
         }
-        item {
-            if (unsavedConfiguration == null) {
-                FilledIconButton(onClick = {
-                    viewModel.updateUnsaved(ItemConfiguration())
-                }) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item_config))
+        item("button") {
+            Box(contentAlignment = Alignment.Center) {
+                AnimatedVisibility(
+                    visible = unsavedConfiguration != null,
+                    enter = expandIn(
+                        expandFrom = Alignment.Center,
+                        animationSpec = tween(durationMillis = 500),
+                    ),
+                    exit = shrinkOut(
+                        shrinkTowards = Alignment.Center,
+                        animationSpec = tween(durationMillis = 500),
+                    ),
+                ) {
+                    AddConfigurationCard(
+                        itemConfiguration = unsavedConfiguration ?: ItemConfiguration(),
+                        onChange = viewModel::updateUnsaved,
+                        onSave = {
+                            scope.launch {
+                                viewModel.saveNew()
+                            }
+                        },
+                        onDiscard = { viewModel.updateUnsaved(null) },
+                    )
                 }
-            } else {
-                AddConfigurationCard(
-                    itemConfiguration = unsavedConfiguration,
-                    onChange = viewModel::updateUnsaved,
-                    onSave = {
-                        scope.launch {
-                            viewModel.saveNew()
-                        }
-                    },
-                    onDiscard = { viewModel.updateUnsaved(null) },
-                )
+                AnimatedVisibility(
+                    visible = unsavedConfiguration == null,
+                    enter = fadeIn(
+                        animationSpec = tween(delayMillis = 200),
+                    ),
+                ) {
+                    FilledIconButton(onClick = {
+                        viewModel.updateUnsaved(ItemConfiguration())
+                    }) {
+                        Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item_config))
+                    }
+                }
             }
         }
     }
@@ -116,7 +139,7 @@ fun AddConfigurationCard(
                 transitionSpec = {
                     val inModifier = (targetState.ordinal - initialState.ordinal).sign
                     val outModifier = -inModifier
-                    (slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut()).using(SizeTransform(clip = false))
+                    slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
                 },
             ) { targetType ->
                 Text(text = targetType.name, textAlign = TextAlign.Center)
