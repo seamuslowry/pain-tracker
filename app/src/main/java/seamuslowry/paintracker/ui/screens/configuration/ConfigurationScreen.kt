@@ -61,41 +61,57 @@ fun ConfigurationScreen(
             Text(text = it.toString())
         }
         item("button") {
-            Box(contentAlignment = Alignment.Center) {
-                AnimatedVisibility(
-                    visible = unsavedConfiguration != null,
-                    enter = expandIn(
-                        expandFrom = Alignment.Center,
-                        animationSpec = tween(durationMillis = 500),
-                    ),
-                    exit = shrinkOut(
-                        shrinkTowards = Alignment.Center,
-                        animationSpec = tween(durationMillis = 500),
-                    ),
-                ) {
-                    AddConfigurationCard(
-                        itemConfiguration = unsavedConfiguration ?: ItemConfiguration(),
-                        onChange = viewModel::updateUnsaved,
-                        onSave = {
-                            scope.launch {
-                                viewModel.saveNew()
-                            }
-                        },
-                        onDiscard = { viewModel.updateUnsaved(null) },
-                    )
-                }
-                AnimatedVisibility(
-                    visible = unsavedConfiguration == null,
-                    enter = fadeIn(
-                        animationSpec = tween(delayMillis = 200),
-                    ),
-                ) {
-                    FilledIconButton(onClick = {
-                        viewModel.updateUnsaved(ItemConfiguration())
-                    }) {
-                        Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item_config))
+            AddConfigurationButton(
+                itemConfiguration = unsavedConfiguration,
+                onChange = viewModel::updateUnsaved,
+                onSave = {
+                    scope.launch {
+                        viewModel.saveNew()
                     }
-                }
+                },
+                onDiscard = { viewModel.updateUnsaved(null) },
+            )
+        }
+    }
+}
+
+@Composable
+fun AddConfigurationButton(
+    itemConfiguration: ItemConfiguration?,
+    onChange: (itemConfiguration: ItemConfiguration) -> Unit,
+    onSave: () -> Unit,
+    onDiscard: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+        AnimatedVisibility(
+            visible = itemConfiguration != null,
+            enter = expandIn(
+                expandFrom = Alignment.Center,
+                animationSpec = tween(durationMillis = 500),
+            ),
+            exit = shrinkOut(
+                shrinkTowards = Alignment.Center,
+                animationSpec = tween(durationMillis = 500),
+            ),
+        ) {
+            AddConfigurationCard(
+                itemConfiguration = itemConfiguration ?: ItemConfiguration(),
+                onChange = onChange,
+                onSave = onSave,
+                onDiscard = onDiscard,
+            )
+        }
+        AnimatedVisibility(
+            visible = itemConfiguration == null,
+            enter = fadeIn(
+                animationSpec = tween(delayMillis = 200),
+            ),
+        ) {
+            FilledIconButton(onClick = {
+                onChange(ItemConfiguration())
+            }) {
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_item_config))
             }
         }
     }
