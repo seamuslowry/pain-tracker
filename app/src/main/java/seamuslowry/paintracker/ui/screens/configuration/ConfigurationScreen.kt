@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -99,7 +98,7 @@ fun AddConfigurationButton(
 ) {
     val cardColor by animateColorAsState(
         targetValue = if (itemConfiguration != null) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
-        animationSpec = tween(500, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
     )
 
     var size by remember { mutableStateOf(IntSize.Zero) }
