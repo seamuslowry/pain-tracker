@@ -1,5 +1,13 @@
 package seamuslowry.paintracker.ui.screens.configuration
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +39,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.paintracker.R
 import seamuslowry.paintracker.models.ItemConfiguration
+import seamuslowry.paintracker.models.TrackingType
 import seamuslowry.paintracker.models.relative
+import kotlin.math.sign
 
 @Composable
 fun ConfigurationScreen(
@@ -43,7 +53,7 @@ fun ConfigurationScreen(
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         items(items = configurations, key = { it.id }) {
-            Text(text = it.name)
+            Text(text = it.toString())
         }
         item {
             if (unsavedConfiguration == null) {
@@ -68,6 +78,7 @@ fun ConfigurationScreen(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AddConfigurationCard(
     itemConfiguration: ItemConfiguration,
@@ -93,15 +104,35 @@ fun AddConfigurationCard(
             }
         }
         Row(modifier = Modifier.padding(horizontal = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(-1))) }) {
+            IconButton(
+                onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(-1))) },
+                enabled = itemConfiguration.trackingType.ordinal > 0,
+            ) {
                 Icon(Icons.Filled.ArrowLeft, contentDescription = stringResource(R.string.change_tracking_type))
             }
-            Text(text = itemConfiguration.trackingType.name, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            IconButton(onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(1))) }) {
+            AnimatedContent(
+                modifier = Modifier.weight(1f),
+                targetState = itemConfiguration.trackingType,
+                transitionSpec = {
+                    val inModifier = (targetState.ordinal - initialState.ordinal).sign
+                    val outModifier = -inModifier
+                    (slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut()).using(SizeTransform(clip = false))
+                },
+            ) { targetType ->
+                Text(text = targetType.name, textAlign = TextAlign.Center)
+            }
+            IconButton(
+                onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(1))) },
+                enabled = itemConfiguration.trackingType.ordinal < TrackingType.values().size - 1,
+            ) {
                 Icon(Icons.Filled.ArrowRight, contentDescription = stringResource(R.string.change_tracking_type))
             }
         }
-        Button(onClick = onSave, modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+        Button(
+            enabled = itemConfiguration.name.isNotBlank(),
+            onClick = onSave,
+            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        ) {
             Text(text = stringResource(R.string.confirm_configuration))
         }
     }
