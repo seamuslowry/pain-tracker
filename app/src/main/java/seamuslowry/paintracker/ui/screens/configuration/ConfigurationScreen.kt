@@ -96,9 +96,10 @@ fun AddConfigurationButton(
     onDiscard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val duration = 500
     val cardColor by animateColorAsState(
         targetValue = if (itemConfiguration != null) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
-        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
     )
 
     var size by remember { mutableStateOf(IntSize.Zero) }
@@ -110,13 +111,13 @@ fun AddConfigurationButton(
             visible = itemConfiguration != null,
             enter = expandIn(
                 expandFrom = Alignment.TopCenter,
-                animationSpec = tween(durationMillis = 500),
+                animationSpec = tween(durationMillis = duration),
             ),
             exit = shrinkOut(
                 shrinkTowards = Alignment.TopCenter,
-                animationSpec = tween(durationMillis = 500),
+                animationSpec = tween(durationMillis = duration),
                 targetSize = { size.times(9).div(10) },
-            ) + fadeOut(animationSpec = tween(durationMillis = 500)),
+            ) + fadeOut(animationSpec = tween(durationMillis = duration)),
         ) {
             AddConfigurationCard(
                 itemConfiguration = itemConfiguration ?: ItemConfiguration(),
@@ -129,7 +130,7 @@ fun AddConfigurationButton(
         AnimatedVisibility(
             visible = itemConfiguration == null,
             enter = fadeIn(
-                animationSpec = tween(durationMillis = 400),
+                animationSpec = tween(durationMillis = duration.times(8).div(10)),
             ),
             exit = fadeOut(),
             modifier = Modifier.zIndex(1f),
