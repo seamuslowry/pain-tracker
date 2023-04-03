@@ -25,9 +25,9 @@ import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -80,7 +80,6 @@ fun ConfigurationScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddConfigurationButton(
     itemConfiguration: ItemConfiguration?,
@@ -89,14 +88,15 @@ fun AddConfigurationButton(
     onDiscard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val duration = 500
+    val mainDuration = 500
+    val extraDuration = 100
     val cardColor by animateColorAsState(
         targetValue = if (itemConfiguration != null) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
-        animationSpec = tween(durationMillis = duration),
+        animationSpec = tween(durationMillis = mainDuration),
     )
     val textColor by animateColorAsState(
-        targetValue = if (cardColor != MaterialTheme.colorScheme.primary) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
-        animationSpec = tween(durationMillis = duration.times(1).div(10)),
+        targetValue = if (itemConfiguration != null) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
+        animationSpec = tween(durationMillis = extraDuration, delayMillis = mainDuration),
     )
 
     Box(
@@ -106,21 +106,20 @@ fun AddConfigurationButton(
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
         ) {
-            Column(modifier = Modifier.animateContentSize(animationSpec = tween(durationMillis = duration))) {
+            Column(modifier = Modifier.animateContentSize(animationSpec = tween(durationMillis = mainDuration))) {
                 if (itemConfiguration == null) {
                     TextButton(
                         onClick = { onChange(ItemConfiguration()) },
+                        colors = ButtonDefaults.textButtonColors(contentColor = textColor),
                     ) {
                         Icon(
                             Icons.Filled.Build,
                             contentDescription = stringResource(R.string.add_item_config),
                             modifier = Modifier.scale(0.75f),
-                            tint = textColor,
                         )
                         Text(
                             text = stringResource(R.string.add_item_config),
                             modifier = Modifier.padding(horizontal = 10.dp),
-                            color = textColor,
                         )
                     }
                 } else {
