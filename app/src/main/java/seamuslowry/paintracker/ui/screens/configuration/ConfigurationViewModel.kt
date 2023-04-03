@@ -40,5 +40,5 @@ class ConfigurationViewModel @Inject constructor(private val repo: ItemConfigura
 }
 
 data class ConfigurationState(
-    val unsavedConfiguration: ItemConfiguration? = ItemConfiguration(),
+    val unsavedConfiguration: ItemConfiguration? = null,
 )

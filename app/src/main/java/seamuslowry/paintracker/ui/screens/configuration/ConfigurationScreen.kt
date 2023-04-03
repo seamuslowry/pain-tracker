@@ -11,7 +11,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -105,12 +105,12 @@ fun AddConfigurationButton(
     ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            onClick = { onChange(ItemConfiguration()) },
-            enabled = itemConfiguration == null,
         ) {
-            Column(modifier = Modifier.background(cardColor).padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp).animateContentSize(animationSpec = tween(durationMillis = duration))) {
+            Column(modifier = Modifier.animateContentSize(animationSpec = tween(durationMillis = duration))) {
                 if (itemConfiguration == null) {
-                    Row {
+                    TextButton(
+                        onClick = { onChange(ItemConfiguration()) },
+                    ) {
                         Icon(
                             Icons.Filled.Build,
                             contentDescription = stringResource(R.string.add_item_config),
@@ -143,12 +143,11 @@ fun AddConfigurationContent(
     onChange: (itemConfiguration: ItemConfiguration) -> Unit,
     onSave: () -> Unit,
     onDiscard: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
+        modifier = Modifier.padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
     ) {
         OutlinedTextField(
             value = itemConfiguration.name,
