@@ -9,4 +9,5 @@ data class ItemConfiguration(
     val id: Int = 0,
     val name: String = "",
     val trackingType: TrackingType = TrackingType.ONE_TO_TEN,
+    val active: Boolean = true,
 )

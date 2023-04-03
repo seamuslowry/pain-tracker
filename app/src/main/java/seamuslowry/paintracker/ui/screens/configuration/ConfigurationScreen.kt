@@ -1,27 +1,25 @@
 package seamuslowry.paintracker.ui.screens.configuration
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
@@ -29,8 +27,8 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,20 +37,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.paintracker.R
@@ -88,6 +80,7 @@ fun ConfigurationScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddConfigurationButton(
     itemConfiguration: ItemConfiguration?,
@@ -99,52 +92,45 @@ fun AddConfigurationButton(
     val duration = 500
     val cardColor by animateColorAsState(
         targetValue = if (itemConfiguration != null) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
-        animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = duration),
+    )
+    val textColor by animateColorAsState(
+        targetValue = if (cardColor != MaterialTheme.colorScheme.primary) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
+        animationSpec = tween(durationMillis = duration.times(1).div(10)),
     )
 
-    var size by remember { mutableStateOf(IntSize.Zero) }
-
-    Box(contentAlignment = Alignment.TopCenter, modifier = modifier.fillMaxWidth().padding(20.dp)) {
-        AnimatedVisibility(
-            // enough to put this behind the button when shrinking
-            modifier = Modifier.padding(top = 3.dp).zIndex(0f).clip(RoundedCornerShape(15.dp)),
-            visible = itemConfiguration != null,
-            enter = expandIn(
-                expandFrom = Alignment.TopCenter,
-                animationSpec = tween(durationMillis = duration),
-            ),
-            exit = shrinkOut(
-                shrinkTowards = Alignment.TopCenter,
-                animationSpec = tween(durationMillis = duration),
-                targetSize = { size.times(9).div(10) },
-            ) + fadeOut(animationSpec = tween(durationMillis = duration)),
+    Box(
+        contentAlignment = Alignment.TopCenter,
+        modifier = modifier.padding(20.dp).fillMaxWidth(),
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = cardColor),
+            onClick = { onChange(ItemConfiguration()) },
+            enabled = itemConfiguration == null,
         ) {
-            AddConfigurationCard(
-                itemConfiguration = itemConfiguration ?: ItemConfiguration(),
-                onChange = onChange,
-                onSave = onSave,
-                onDiscard = onDiscard,
-                colors = CardDefaults.cardColors(containerColor = cardColor),
-            )
-        }
-        AnimatedVisibility(
-            visible = itemConfiguration == null,
-            enter = fadeIn(
-                animationSpec = tween(durationMillis = duration.times(8).div(10)),
-            ),
-            exit = fadeOut(),
-            modifier = Modifier.zIndex(1f),
-        ) {
-            Button(
-                onClick = {
-                    onChange(ItemConfiguration())
-                },
-                modifier = Modifier.onSizeChanged {
-                    size = it
-                },
-            ) {
-                Icon(Icons.Filled.Build, contentDescription = stringResource(R.string.add_item_config), modifier = Modifier.scale(0.75f))
-                Text(text = stringResource(R.string.add_item_config), modifier = Modifier.padding(horizontal = 10.dp))
+            Column(modifier = Modifier.background(cardColor).padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp).animateContentSize(animationSpec = tween(durationMillis = duration))) {
+                if (itemConfiguration == null) {
+                    Row {
+                        Icon(
+                            Icons.Filled.Build,
+                            contentDescription = stringResource(R.string.add_item_config),
+                            modifier = Modifier.scale(0.75f),
+                            tint = textColor,
+                        )
+                        Text(
+                            text = stringResource(R.string.add_item_config),
+                            modifier = Modifier.padding(horizontal = 10.dp),
+                            color = textColor,
+                        )
+                    }
+                } else {
+                    AddConfigurationContent(
+                        itemConfiguration = itemConfiguration,
+                        onChange = onChange,
+                        onSave = onSave,
+                        onDiscard = onDiscard,
+                    )
+                }
             }
         }
     }
@@ -152,61 +138,58 @@ fun AddConfigurationButton(
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AddConfigurationCard(
+fun AddConfigurationContent(
     itemConfiguration: ItemConfiguration,
     onChange: (itemConfiguration: ItemConfiguration) -> Unit,
     onSave: () -> Unit,
     onDiscard: () -> Unit,
     modifier: Modifier = Modifier,
-    colors: CardColors = CardDefaults.cardColors(),
 ) {
-    Card(modifier = modifier.fillMaxWidth(), colors = colors) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
+        OutlinedTextField(
+            value = itemConfiguration.name,
+            onValueChange = { onChange(itemConfiguration.copy(name = it)) },
+            modifier = Modifier.weight(1f).padding(end = 5.dp),
+            label = { Text(text = stringResource(R.string.name)) },
+        )
+        IconButton(onClick = onDiscard) {
+            Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.discard_configuration))
+        }
+    }
+    Row(modifier = Modifier.padding(horizontal = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+        IconButton(
+            onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(-1))) },
+            enabled = itemConfiguration.trackingType.ordinal > 0,
         ) {
-            OutlinedTextField(
-                value = itemConfiguration.name,
-                onValueChange = { onChange(itemConfiguration.copy(name = it)) },
-                modifier = Modifier.weight(1f).padding(end = 5.dp),
-                label = { Text(text = stringResource(R.string.name)) },
-            )
-            IconButton(onClick = onDiscard) {
-                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.discard_configuration))
-            }
+            Icon(Icons.Filled.ArrowLeft, contentDescription = stringResource(R.string.change_tracking_type))
         }
-        Row(modifier = Modifier.padding(horizontal = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(
-                onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(-1))) },
-                enabled = itemConfiguration.trackingType.ordinal > 0,
-            ) {
-                Icon(Icons.Filled.ArrowLeft, contentDescription = stringResource(R.string.change_tracking_type))
-            }
-            AnimatedContent(
-                modifier = Modifier.weight(1f),
-                targetState = itemConfiguration.trackingType,
-                transitionSpec = {
-                    val inModifier = (targetState.ordinal - initialState.ordinal).sign
-                    val outModifier = -inModifier
-                    slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
-                },
-            ) { targetType ->
-                Text(text = targetType.name, textAlign = TextAlign.Center)
-            }
-            IconButton(
-                onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(1))) },
-                enabled = itemConfiguration.trackingType.ordinal < TrackingType.values().size - 1,
-            ) {
-                Icon(Icons.Filled.ArrowRight, contentDescription = stringResource(R.string.change_tracking_type))
-            }
+        AnimatedContent(
+            modifier = Modifier.weight(1f),
+            targetState = itemConfiguration.trackingType,
+            transitionSpec = {
+                val inModifier = (targetState.ordinal - initialState.ordinal).sign
+                val outModifier = -inModifier
+                slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
+            },
+        ) { targetType ->
+            Text(text = targetType.name, textAlign = TextAlign.Center)
         }
-        Button(
-            enabled = itemConfiguration.name.isNotBlank(),
-            onClick = onSave,
-            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        IconButton(
+            onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(1))) },
+            enabled = itemConfiguration.trackingType.ordinal < TrackingType.values().size - 1,
         ) {
-            Text(text = stringResource(R.string.confirm_configuration))
+            Icon(Icons.Filled.ArrowRight, contentDescription = stringResource(R.string.change_tracking_type))
         }
+    }
+    Button(
+        enabled = itemConfiguration.name.isNotBlank(),
+        onClick = onSave,
+        modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+    ) {
+        Text(text = stringResource(R.string.confirm_configuration))
     }
 }

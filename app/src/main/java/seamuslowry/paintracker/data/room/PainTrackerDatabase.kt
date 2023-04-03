@@ -9,7 +9,7 @@ import seamuslowry.paintracker.models.Item
 import seamuslowry.paintracker.models.ItemConfiguration
 import seamuslowry.paintracker.models.Report
 
-@Database(entities = [Report::class, Item::class, ItemConfiguration::class], version = 2, exportSchema = false)
+@Database(entities = [Report::class, Item::class, ItemConfiguration::class], version = 3, exportSchema = false)
 abstract class PainTrackerDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
     abstract fun reportDao(): ReportDao
