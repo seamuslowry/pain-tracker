@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
@@ -40,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -98,6 +101,10 @@ fun AddConfigurationButton(
         targetValue = if (itemConfiguration != null) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
         animationSpec = tween(durationMillis = extraDuration, delayMillis = mainDuration),
     )
+    val corner by animateIntAsState(
+        targetValue = if (itemConfiguration != null) 10 else 50,
+        animationSpec = tween(durationMillis = mainDuration),
+    )
 
     Box(
         contentAlignment = Alignment.TopCenter,
@@ -105,6 +112,7 @@ fun AddConfigurationButton(
     ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
+            modifier = Modifier.clip(RoundedCornerShape(corner)),
         ) {
             Column(modifier = Modifier.animateContentSize(animationSpec = tween(durationMillis = mainDuration))) {
                 if (itemConfiguration == null) {
