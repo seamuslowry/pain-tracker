@@ -60,12 +60,12 @@ import kotlin.math.sign
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
 ) {
-    val configurations by viewModel.configurations.collectAsState()
+    val report by viewModel.report.collectAsState()
     val unsavedConfiguration = viewModel.state.unsavedConfiguration
     val scope = rememberCoroutineScope()
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-        items(items = configurations, key = { it.id }) {
+        items(items = report.items, key = { it.id }) {
             Text(text = it.toString())
         }
         item("button") {

@@ -7,11 +7,12 @@ import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
 
 @Entity(
+    tableName = "item",
     foreignKeys = [
         ForeignKey(
             entity = Report::class,
             parentColumns = ["id"],
-            childColumns = ["day"],
+            childColumns = ["report"],
             onDelete = CASCADE,
         ),
         ForeignKey(
@@ -24,9 +25,10 @@ import androidx.room.PrimaryKey
 )
 data class Item(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     @ColumnInfo(index = true)
-    val day: Int,
+    val report: Long,
     @ColumnInfo(index = true)
-    val configuration: Int,
+    val configuration: Long,
+    val value: Double? = null,
 )

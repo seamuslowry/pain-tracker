@@ -7,10 +7,10 @@ import javax.inject.Inject
 
 interface ItemConfigurationRepo {
     fun getAll(): Flow<List<ItemConfiguration>>
-    suspend fun insert(itemConfiguration: ItemConfiguration)
+    suspend fun save(itemConfiguration: ItemConfiguration)
 }
 
 class RoomItemConfigurationRepo @Inject constructor(private val itemConfigurationDao: ItemConfigurationDao) : ItemConfigurationRepo {
     override fun getAll(): Flow<List<ItemConfiguration>> = itemConfigurationDao.getAll()
-    override suspend fun insert(itemConfiguration: ItemConfiguration) = itemConfigurationDao.insert(itemConfiguration)
+    override suspend fun save(itemConfiguration: ItemConfiguration) = itemConfigurationDao.upsert(itemConfiguration)
 }
