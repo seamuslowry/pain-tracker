@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -19,12 +18,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import seamuslowry.paintracker.R
-import seamuslowry.paintracker.ui.screens.configuration.ConfigurationScreen
 import seamuslowry.paintracker.ui.screens.entry.EntryScreen
 import seamuslowry.paintracker.ui.screens.report.ReportScreen
 
 sealed class Screen(val identifier: String) {
-    object Configuration : Screen("configuration")
     object Entry : Screen("entry")
     object Report : Screen("report")
 }
@@ -46,7 +43,6 @@ fun Navigation(
     val navigableScreens = listOf(
         NavBarData(Screen.Entry, Icons.Filled.Assignment, stringResource(R.string.entry)),
         NavBarData(Screen.Report, Icons.Filled.DateRange, stringResource(R.string.report)),
-        NavBarData(Screen.Configuration, Icons.Filled.Settings, stringResource(R.string.settings)),
     )
 
     Scaffold(
@@ -69,15 +65,15 @@ fun Navigation(
             startDestination = startDestination,
         ) {
             composable(
-                Screen.Configuration.identifier,
-            ) {
-                ConfigurationScreen()
-            }
-            composable(
                 Screen.Entry.identifier,
             ) {
                 EntryScreen()
             }
+//            composable(
+//                Screen.Entry.identifier,
+//            ) {
+//                EntryScreen()
+//            }
             composable(
                 Screen.Report.identifier,
             ) {

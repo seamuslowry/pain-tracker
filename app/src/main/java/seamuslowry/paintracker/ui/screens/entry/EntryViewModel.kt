@@ -1,4 +1,4 @@
-package seamuslowry.paintracker.ui.screens.configuration
+package seamuslowry.paintracker.ui.screens.entry
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,7 +14,7 @@ import seamuslowry.paintracker.models.ItemConfiguration
 import javax.inject.Inject
 
 @HiltViewModel
-class ConfigurationViewModel @Inject constructor(private val repo: ItemConfigurationRepo) : ViewModel() {
+class EntryViewModel @Inject constructor(private val repo: ItemConfigurationRepo) : ViewModel() {
     val configurations: StateFlow<List<ItemConfiguration>> = repo.getAll()
         .stateIn(
             scope = viewModelScope,
