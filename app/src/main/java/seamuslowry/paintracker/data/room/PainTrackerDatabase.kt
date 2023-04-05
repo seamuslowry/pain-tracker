@@ -1,15 +1,15 @@
-package seamuslowry.paintracker.data
+package seamuslowry.paintracker.data.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import seamuslowry.paintracker.data.daos.ItemConfigurationDao
-import seamuslowry.paintracker.data.daos.ItemDao
-import seamuslowry.paintracker.data.daos.ReportDao
+import seamuslowry.paintracker.data.room.daos.ItemConfigurationDao
+import seamuslowry.paintracker.data.room.daos.ItemDao
+import seamuslowry.paintracker.data.room.daos.ReportDao
 import seamuslowry.paintracker.models.Item
 import seamuslowry.paintracker.models.ItemConfiguration
 import seamuslowry.paintracker.models.Report
 
-@Database(entities = [Report::class, Item::class, ItemConfiguration::class], version = 1, exportSchema = false)
+@Database(entities = [Report::class, Item::class, ItemConfiguration::class], version = 3, exportSchema = false)
 abstract class PainTrackerDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
     abstract fun reportDao(): ReportDao

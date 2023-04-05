@@ -7,10 +7,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import seamuslowry.paintracker.data.PainTrackerDatabase
-import seamuslowry.paintracker.data.daos.ItemConfigurationDao
-import seamuslowry.paintracker.data.daos.ItemDao
-import seamuslowry.paintracker.data.daos.ReportDao
+import seamuslowry.paintracker.data.room.PainTrackerDatabase
+import seamuslowry.paintracker.data.room.daos.ItemConfigurationDao
+import seamuslowry.paintracker.data.room.daos.ItemDao
+import seamuslowry.paintracker.data.room.daos.ReportDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Pain Tracker</string>
+    <string name="add_item_config">Add tracker</string>
+    <string name="entry">Entry</string>
+    <string name="report">Report</string>
+    <string name="settings">Settings</string>
+    <string name="confirm_configuration">Save</string>
+    <string name="discard_configuration">Discard tracker configuration</string>
+    <string name="name">Name</string>
+    <string name="change_tracking_type">Change tracking type</string>
 </resources>

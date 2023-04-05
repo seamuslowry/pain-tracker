@@ -1,4 +1,4 @@
-package seamuslowry.paintracker.data.daos
+package seamuslowry.paintracker.data.room.daos
 
 import androidx.room.Dao
 
