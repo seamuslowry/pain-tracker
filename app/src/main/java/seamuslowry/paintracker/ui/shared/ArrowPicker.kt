@@ -50,9 +50,7 @@ fun ArrowPicker(
                 slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
             },
         ) { targetType ->
-            // TODO is this the right way to render content?
             content(targetType)
-//            Text(text = targetType.name, textAlign = TextAlign.Center)
         }
         IconButton(
             onClick = { onChange(value.plus(1)) },
