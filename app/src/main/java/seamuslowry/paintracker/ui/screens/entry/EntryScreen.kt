@@ -1,6 +1,5 @@
 package seamuslowry.paintracker.ui.screens.entry
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
@@ -158,7 +157,6 @@ fun AddConfigurationButton(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AddConfigurationContent(
     itemConfiguration: ItemConfiguration,
