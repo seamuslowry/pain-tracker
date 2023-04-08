@@ -1,17 +1,10 @@
 package seamuslowry.paintracker.ui.screens.entry
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,8 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowLeft
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
@@ -57,9 +48,8 @@ import kotlinx.coroutines.launch
 import seamuslowry.paintracker.R
 import seamuslowry.paintracker.models.ItemConfiguration
 import seamuslowry.paintracker.models.TrackingType
-import seamuslowry.paintracker.models.relative
+import seamuslowry.paintracker.ui.shared.ArrowPicker
 import java.time.LocalDate
-import kotlin.math.sign
 
 const val EPOCH_DAYS_TO_MILLIS = 86400000
 
@@ -191,30 +181,15 @@ fun AddConfigurationContent(
             Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.discard_configuration))
         }
     }
-    Row(modifier = Modifier.padding(horizontal = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(
-            onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(-1))) },
-            enabled = itemConfiguration.trackingType.ordinal > 0,
-        ) {
-            Icon(Icons.Filled.ArrowLeft, contentDescription = stringResource(R.string.change_tracking_type))
-        }
-        AnimatedContent(
-            modifier = Modifier.weight(1f),
-            targetState = itemConfiguration.trackingType,
-            transitionSpec = {
-                val inModifier = (targetState.ordinal - initialState.ordinal).sign
-                val outModifier = -inModifier
-                slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
-            },
-        ) { targetType ->
-            Text(text = targetType.name, textAlign = TextAlign.Center)
-        }
-        IconButton(
-            onClick = { onChange(itemConfiguration.copy(trackingType = itemConfiguration.trackingType.relative(1))) },
-            enabled = itemConfiguration.trackingType.ordinal < TrackingType.values().size - 1,
-        ) {
-            Icon(Icons.Filled.ArrowRight, contentDescription = stringResource(R.string.change_tracking_type))
-        }
+    ArrowPicker(
+        value = itemConfiguration.trackingType.ordinal,
+        onChange = { onChange(itemConfiguration.copy(trackingType = TrackingType.values()[it])) },
+        range = IntRange(0, TrackingType.values().size - 1),
+        // TODO make these strings better
+        leftResource = R.string.change_tracking_type,
+        rightResource = R.string.change_tracking_type,
+    ) {
+        Text(text = TrackingType.values()[it].name, textAlign = TextAlign.Center)
     }
     Button(
         enabled = itemConfiguration.name.isNotBlank(),
