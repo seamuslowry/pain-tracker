@@ -5,16 +5,11 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
+import java.time.LocalDate
 
 @Entity(
     tableName = "item",
     foreignKeys = [
-        ForeignKey(
-            entity = Report::class,
-            parentColumns = ["id"],
-            childColumns = ["report"],
-            onDelete = CASCADE,
-        ),
         ForeignKey(
             entity = ItemConfiguration::class,
             parentColumns = ["id"],
@@ -26,8 +21,7 @@ import androidx.room.PrimaryKey
 data class Item(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    @ColumnInfo(index = true)
-    val report: Long,
+    val date: LocalDate,
     @ColumnInfo(index = true)
     val configuration: Long,
     val value: Double? = null,

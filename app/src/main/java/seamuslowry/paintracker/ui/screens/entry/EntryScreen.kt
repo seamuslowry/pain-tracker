@@ -68,7 +68,7 @@ const val EPOCH_DAYS_TO_MILLIS = 86400000
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
 ) {
-    val reports by viewModel.reports.collectAsState()
+    val items by viewModel.items.collectAsState()
     val state = viewModel.state
     val date = viewModel.date.collectAsState().value
     val scope = rememberCoroutineScope()
@@ -88,10 +88,9 @@ fun EntryScreen(
                 state = datePickerState,
             )
         }
-        items(items = reports, key = { it.report.id }) {
+        items(items = items, key = { it.id }) {
             Column {
-                Text(text = it.report.date.toString())
-                Text(text = it.items.toString())
+                Text(text = it.toString())
             }
         }
         item("button") {

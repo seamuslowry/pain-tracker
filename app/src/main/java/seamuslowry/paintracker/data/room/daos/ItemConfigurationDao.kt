@@ -13,5 +13,5 @@ interface ItemConfigurationDao {
     fun getAll(): Flow<List<ItemConfiguration>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(itemConfiguration: ItemConfiguration)
+    suspend fun upsert(itemConfiguration: ItemConfiguration): Long
 }

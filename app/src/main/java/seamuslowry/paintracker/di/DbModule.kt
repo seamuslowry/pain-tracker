@@ -10,7 +10,6 @@ import dagger.hilt.components.SingletonComponent
 import seamuslowry.paintracker.data.room.PainTrackerDatabase
 import seamuslowry.paintracker.data.room.daos.ItemConfigurationDao
 import seamuslowry.paintracker.data.room.daos.ItemDao
-import seamuslowry.paintracker.data.room.daos.ReportDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -24,12 +23,6 @@ object DbModule {
         .databaseBuilder(context, PainTrackerDatabase::class.java, "pain_tracker_database")
         .fallbackToDestructiveMigration()
         .build()
-
-    @Provides
-    @Singleton
-    fun provideReportDao(
-        db: PainTrackerDatabase,
-    ): ReportDao = db.reportDao()
 
     @Provides
     @Singleton

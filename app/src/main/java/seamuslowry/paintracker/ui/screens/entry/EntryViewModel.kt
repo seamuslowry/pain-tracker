@@ -1,5 +1,6 @@
 package seamuslowry.paintracker.ui.screens.entry
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,19 +17,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import seamuslowry.paintracker.data.repos.ItemConfigurationRepo
 import seamuslowry.paintracker.data.repos.ItemRepo
-import seamuslowry.paintracker.data.repos.ReportRepo
 import seamuslowry.paintracker.models.Item
 import seamuslowry.paintracker.models.ItemConfiguration
-import seamuslowry.paintracker.models.Report
-import seamuslowry.paintracker.models.ReportWithItems
 import java.time.LocalDate
 import javax.inject.Inject
+
+const val TAG = "EntryViewModel"
 
 @HiltViewModel
 class EntryViewModel @Inject constructor(
     private val itemConfigurationRepo: ItemConfigurationRepo,
     private val itemRepo: ItemRepo,
-    private val reportRepo: ReportRepo,
 ) : ViewModel() {
     var state by mutableStateOf(ConfigurationState())
         private set
@@ -36,35 +35,32 @@ class EntryViewModel @Inject constructor(
     var date = MutableStateFlow(LocalDate.now())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val reports: StateFlow<List<ReportWithItems>> = date.flatMapLatest { reportRepo.get(it) }
+    val items: StateFlow<List<Item>> = date
+        .flatMapLatest {
+            viewModelScope.launch { ensureItems(date.value) }
+            itemRepo.get(it)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = emptyList(),
         )
 
-    init {
-        viewModelScope.launch {
-            ensureReport(date.value)
-        }
-    }
-
-    private suspend fun ensureReport(date: LocalDate) {
-        val dateReport = reportRepo.get(date).firstOrNull()?.lastOrNull()
-        val items = dateReport?.items.orEmpty()
+    private suspend fun ensureItems(date: LocalDate) {
+        Log.d(TAG, "Ensuring items created on $date")
+        val items = itemRepo.get(date).firstOrNull().orEmpty()
 
         val configurations = itemConfigurationRepo.getAll().firstOrNull()
             ?.filter { config -> items.firstOrNull { item -> item.configuration == config.id } == null }
             .orEmpty()
 
-        val missingItems = configurations.map { Item(report = dateReport?.report?.id ?: reportRepo.save(Report(date = date)), configuration = it.id) }
+        val missingItems = configurations.map { Item(date = date, configuration = it.id) }
 
         itemRepo.save(*missingItems.toTypedArray())
     }
 
     fun changeDate(input: LocalDate) {
         date.value = input
-        viewModelScope.launch { ensureReport(input) }
     }
 
     fun updateUnsaved(itemConfiguration: ItemConfiguration?) {
@@ -72,8 +68,11 @@ class EntryViewModel @Inject constructor(
     }
 
     suspend fun saveNew() {
-        state.unsavedConfiguration?.let { itemConfigurationRepo.save(it) }
-        state = state.copy(unsavedConfiguration = null)
+        state.unsavedConfiguration?.let {
+            val newConfigurationId = itemConfigurationRepo.save(it)
+            itemRepo.save(Item(date = date.value, configuration = newConfigurationId))
+            state = state.copy(unsavedConfiguration = null)
+        }
     }
 
     companion object {
