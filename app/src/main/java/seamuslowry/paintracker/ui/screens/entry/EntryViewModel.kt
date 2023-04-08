@@ -6,10 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import seamuslowry.paintracker.data.repos.ItemConfigurationRepo
@@ -31,31 +33,28 @@ class EntryViewModel @Inject constructor(
     var state by mutableStateOf(ConfigurationState())
         private set
 
-    val report: StateFlow<ReportWithItems> = reportRepo.get(state.date)
-        .map {
-            it.last()
-        }
+    var date = MutableStateFlow(LocalDate.now())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val reports: StateFlow<List<ReportWithItems>> = date.flatMapLatest { reportRepo.get(it) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = ReportWithItems(
-                Report(),
-                emptyList(),
-            ),
+            initialValue = emptyList(),
         )
 
     init {
         viewModelScope.launch {
-            ensureReport(state.date)
+            ensureReport(date.value)
         }
     }
 
     private suspend fun ensureReport(date: LocalDate) {
-        val dateReport = reportRepo.get(date).firstOrNull()?.last()
+        val dateReport = reportRepo.get(date).firstOrNull()?.lastOrNull()
         val items = dateReport?.items.orEmpty()
 
         val configurations = itemConfigurationRepo.getAll().firstOrNull()
-            ?.filter { config -> items.any { item -> item.configuration == config.id } }
+            ?.filter { config -> items.firstOrNull { item -> item.configuration == config.id } == null }
             .orEmpty()
 
         val missingItems = configurations.map { Item(report = dateReport?.report?.id ?: reportRepo.save(Report(date = date)), configuration = it.id) }
@@ -63,9 +62,9 @@ class EntryViewModel @Inject constructor(
         itemRepo.save(*missingItems.toTypedArray())
     }
 
-    fun changeDate(date: LocalDate) {
-        state = state.copy(date = date)
-        viewModelScope.launch { ensureReport(date) }
+    fun changeDate(input: LocalDate) {
+        date.value = input
+        viewModelScope.launch { ensureReport(input) }
     }
 
     fun updateUnsaved(itemConfiguration: ItemConfiguration?) {
@@ -84,5 +83,4 @@ class EntryViewModel @Inject constructor(
 
 data class ConfigurationState(
     val unsavedConfiguration: ItemConfiguration? = null,
-    val date: LocalDate = LocalDate.now(),
 )

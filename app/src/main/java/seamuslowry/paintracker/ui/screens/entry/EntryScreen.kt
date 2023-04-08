@@ -30,13 +30,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,23 +58,45 @@ import seamuslowry.paintracker.R
 import seamuslowry.paintracker.models.ItemConfiguration
 import seamuslowry.paintracker.models.TrackingType
 import seamuslowry.paintracker.models.relative
+import java.time.LocalDate
 import kotlin.math.sign
 
+const val EPOCH_DAYS_TO_MILLIS = 86400000
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
 ) {
-    val report by viewModel.report.collectAsState()
-    val unsavedConfiguration = viewModel.state.unsavedConfiguration
+    val reports by viewModel.reports.collectAsState()
+    val state = viewModel.state
+    val date = viewModel.date.collectAsState().value
     val scope = rememberCoroutineScope()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = date.toEpochDay() * EPOCH_DAYS_TO_MILLIS,
+    )
+
+    LaunchedEffect(key1 = datePickerState.selectedDateMillis) {
+        datePickerState.selectedDateMillis?.let {
+            viewModel.changeDate(LocalDate.ofEpochDay(it / EPOCH_DAYS_TO_MILLIS))
+        }
+    }
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-        items(items = report.items, key = { it.id }) {
-            Text(text = it.toString())
+        item("date") {
+            DatePicker(
+                state = datePickerState,
+            )
+        }
+        items(items = reports, key = { it.report.id }) {
+            Column {
+                Text(text = it.report.date.toString())
+                Text(text = it.items.toString())
+            }
         }
         item("button") {
             AddConfigurationButton(
-                itemConfiguration = unsavedConfiguration,
+                itemConfiguration = state.unsavedConfiguration,
                 onChange = viewModel::updateUnsaved,
                 onSave = {
                     scope.launch {
