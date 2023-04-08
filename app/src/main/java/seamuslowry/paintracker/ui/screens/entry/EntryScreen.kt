@@ -184,7 +184,6 @@ fun AddConfigurationContent(
         onChange = { onChange(itemConfiguration.copy(trackingType = TrackingType.values()[it])) },
         range = IntRange(0, TrackingType.values().size - 1),
         modifier = Modifier.padding(5.dp),
-        // TODO make these strings better
         leftResource = R.string.change_tracking_type,
         rightResource = R.string.change_tracking_type,
     ) {
