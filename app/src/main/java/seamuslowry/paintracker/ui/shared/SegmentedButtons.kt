@@ -11,10 +11,10 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun SegmentedButtons(
-    value: Long,
     values: List<Long>,
     onChange: (value: Long) -> Unit,
     modifier: Modifier = Modifier,
+    value: Long? = null,
 ) {
     Row(modifier = modifier) {
         values.forEachIndexed { index, buttonValue ->

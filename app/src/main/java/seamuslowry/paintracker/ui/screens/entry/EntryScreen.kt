@@ -58,8 +58,8 @@ fun EntryScreen(
     val state = viewModel.state
     val date = viewModel.date.collectAsState().value
     val scope = rememberCoroutineScope()
-    var value by remember {
-        mutableStateOf(1L)
+    var value: Long? by remember {
+        mutableStateOf(null)
     }
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
