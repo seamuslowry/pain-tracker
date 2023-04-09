@@ -4,16 +4,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun SegmentedButtons(
-    values: List<Long>,
-    onChange: (value: Long) -> Unit,
+fun <T> SegmentedButtons(
+    values: List<T>,
+    onChange: (value: T) -> Unit,
     modifier: Modifier = Modifier,
-    value: Long? = null,
+    value: T? = null,
+    buttonContent: @Composable (value: T) -> Unit,
 ) {
     Row(modifier = modifier) {
         values.forEach {
@@ -34,7 +34,7 @@ fun SegmentedButtons(
                     bottomEndPercent = endPercentage,
                 ),
             ) {
-                Text(text = it.toString())
+                buttonContent(it)
             }
         }
     }

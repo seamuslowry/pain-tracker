@@ -64,7 +64,9 @@ fun EntryScreen(
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         item("buttons") {
-            SegmentedButtons(value = value, values = listOf(1, 2, 3), onChange = { value = it })
+            SegmentedButtons(value = value, values = listOf(1, 2, 3), onChange = { value = it }) {
+                Text(text = it.toString())
+            }
         }
         item("date") {
             ArrowPicker(
