@@ -24,13 +24,13 @@ import kotlin.math.sign
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ArrowPicker(
-    value: Int,
-    onChange: (newValue: Int) -> Unit,
-    range: IntRange,
+    value: Long,
+    onChange: (newValue: Long) -> Unit,
+    range: LongRange,
     @StringRes leftResource: Int,
     @StringRes rightResource: Int,
     modifier: Modifier = Modifier,
-    content: @Composable (value: Int) -> Unit,
+    content: @Composable (value: Long) -> Unit,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         IconButton(

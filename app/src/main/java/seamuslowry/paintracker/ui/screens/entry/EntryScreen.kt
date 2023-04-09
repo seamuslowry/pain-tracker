@@ -20,17 +20,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,9 +46,6 @@ import seamuslowry.paintracker.models.TrackingType
 import seamuslowry.paintracker.ui.shared.ArrowPicker
 import java.time.LocalDate
 
-const val EPOCH_DAYS_TO_MILLIS = 86400000
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
@@ -61,21 +54,21 @@ fun EntryScreen(
     val state = viewModel.state
     val date = viewModel.date.collectAsState().value
     val scope = rememberCoroutineScope()
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = date.toEpochDay() * EPOCH_DAYS_TO_MILLIS,
-    )
-
-    LaunchedEffect(key1 = datePickerState.selectedDateMillis) {
-        datePickerState.selectedDateMillis?.let {
-            viewModel.changeDate(LocalDate.ofEpochDay(it / EPOCH_DAYS_TO_MILLIS))
-        }
-    }
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         item("date") {
-            DatePicker(
-                state = datePickerState,
-            )
+            ArrowPicker(
+                value = date.toEpochDay(),
+                onChange = { viewModel.changeDate(LocalDate.ofEpochDay(it)) },
+                range = LongRange(
+                    LocalDate.now().minusYears(1).toEpochDay(),
+                    LocalDate.now().toEpochDay(),
+                ),
+                leftResource = R.string.change_date,
+                rightResource = R.string.change_date,
+            ) {
+                Text(text = LocalDate.ofEpochDay(it).toString(), textAlign = TextAlign.Center)
+            }
         }
         items(items = items, key = { it.id }) {
             Column {
@@ -180,14 +173,14 @@ fun AddConfigurationContent(
         }
     }
     ArrowPicker(
-        value = itemConfiguration.trackingType.ordinal,
-        onChange = { onChange(itemConfiguration.copy(trackingType = TrackingType.values()[it])) },
-        range = IntRange(0, TrackingType.values().size - 1),
+        value = itemConfiguration.trackingType.ordinal.toLong(),
+        onChange = { onChange(itemConfiguration.copy(trackingType = TrackingType.values()[it.toInt()])) },
+        range = LongRange(0, (TrackingType.values().size - 1).toLong()),
         modifier = Modifier.padding(5.dp),
         leftResource = R.string.change_tracking_type,
         rightResource = R.string.change_tracking_type,
     ) {
-        Text(text = TrackingType.values()[it].name, textAlign = TextAlign.Center)
+        Text(text = TrackingType.values()[it.toInt()].name, textAlign = TextAlign.Center)
     }
     Button(
         enabled = itemConfiguration.name.isNotBlank(),

@@ -8,4 +8,5 @@
     <string name="discard_configuration">Discard tracker configuration</string>
     <string name="name">Name</string>
     <string name="change_tracking_type">Change tracking type</string>
+    <string name="change_date">Change date</string>
 </resources>
