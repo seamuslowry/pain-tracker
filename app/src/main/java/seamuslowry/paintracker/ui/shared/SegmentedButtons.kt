@@ -7,14 +7,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
 fun SegmentedButtons(
     value: Long,
     values: List<Long>,
     onChange: (value: Long) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Row {
+    Row(modifier = modifier) {
         values.forEachIndexed { index, buttonValue ->
             val startPercentage = if (index == 0) 50 else 0
             val endPercentage = if (index == values.size - 1) 50 else 0
