@@ -16,17 +16,17 @@ fun SegmentedButtons(
     value: Long? = null,
 ) {
     Row(modifier = modifier) {
-        values.forEachIndexed { index, buttonValue ->
-            val startPercentage = if (index == 0) 50 else 0
-            val endPercentage = if (index == values.size - 1) 50 else 0
-            val colors = if (value == buttonValue) {
+        values.forEach {
+            val startPercentage = if (it == values.first()) 50 else 0
+            val endPercentage = if (it == values.last()) 50 else 0
+            val colors = if (value == it) {
                 ButtonDefaults.buttonColors()
             } else {
                 ButtonDefaults.outlinedButtonColors()
             }
             OutlinedButton(
                 colors = colors,
-                onClick = { onChange(buttonValue) },
+                onClick = { onChange(it) },
                 shape = RoundedCornerShape(
                     topStartPercent = startPercentage,
                     bottomStartPercent = startPercentage,
@@ -34,7 +34,7 @@ fun SegmentedButtons(
                     bottomEndPercent = endPercentage,
                 ),
             ) {
-                Text(text = buttonValue.toString())
+                Text(text = it.toString())
             }
         }
     }
