@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -29,10 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,10 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.paintracker.R
+import seamuslowry.paintracker.models.Item
 import seamuslowry.paintracker.models.ItemConfiguration
 import seamuslowry.paintracker.models.TrackingType
 import seamuslowry.paintracker.ui.shared.ArrowPicker
-import seamuslowry.paintracker.ui.shared.OneToTenEntry
 import seamuslowry.paintracker.ui.shared.TrackerEntry
 import java.time.LocalDate
 
@@ -56,17 +54,15 @@ fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
 ) {
     val items by viewModel.items.collectAsState()
+    val itemsLoading by viewModel.itemsLoading.collectAsState()
     val state = viewModel.state
     val date = viewModel.date.collectAsState().value
     val scope = rememberCoroutineScope()
-    var value: Int? by remember {
-        mutableStateOf(null)
-    }
 
-    LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-        item("buttons") {
-            OneToTenEntry(value = value, onChange = { value = it }, modifier = Modifier.padding(horizontal = 20.dp))
-        }
+    LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         item("date") {
             ArrowPicker(
                 value = date.toEpochDay(),
@@ -83,8 +79,11 @@ fun EntryScreen(
         }
         items(items = items, key = { it.id }) {
             Column {
-                Text(text = it.toString())
+                ItemEntry(item = it, onChange = {})
             }
+        }
+        items(items = (0 until itemsLoading).toList(), key = { it }) {
+            Text(text = "Loading $it")
         }
         item("button") {
             AddConfigurationButton(
@@ -98,6 +97,37 @@ fun EntryScreen(
                 onDiscard = { viewModel.updateUnsaved(null) },
             )
         }
+    }
+}
+
+@Composable
+fun ItemEntry(
+    item: Item,
+    onChange: (item: Item) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.padding(20.dp),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
+        ) {
+            Text(text = item.id.toString())
+            IconButton(onClick = {}) {
+                Icon(
+                    Icons.Filled.MoreVert,
+                    contentDescription = stringResource(R.string.tracker_options),
+                )
+            }
+        }
+        TrackerEntry(
+            trackerType = TrackingType.ONE_TO_TEN,
+            value = item.value,
+            onChange = { onChange(item.copy(value = it)) },
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+        )
     }
 }
 
@@ -132,7 +162,11 @@ fun AddConfigurationButton(
             colors = CardDefaults.cardColors(containerColor = cardColor),
             modifier = Modifier.clip(RoundedCornerShape(corner)),
         ) {
-            Column(modifier = Modifier.animateContentSize(animationSpec = tween(durationMillis = mainDuration))) {
+            Column(
+                modifier = Modifier.animateContentSize(
+                    animationSpec = tween(durationMillis = mainDuration),
+                ),
+            ) {
                 if (itemConfiguration == null) {
                     TextButton(
                         onClick = { onChange(ItemConfiguration()) },
@@ -180,12 +214,17 @@ fun AddConfigurationContent(
             label = { Text(text = stringResource(R.string.name)) },
         )
         IconButton(onClick = onDiscard) {
-            Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.discard_configuration))
+            Icon(
+                Icons.Filled.Delete,
+                contentDescription = stringResource(R.string.discard_configuration),
+            )
         }
     }
     ArrowPicker(
         value = itemConfiguration.trackingType.ordinal.toLong(),
-        onChange = { onChange(itemConfiguration.copy(trackingType = TrackingType.values()[it.toInt()])) },
+        onChange = {
+            onChange(itemConfiguration.copy(trackingType = TrackingType.values()[it.toInt()]))
+        },
         range = LongRange(0, (TrackingType.values().size - 1).toLong()),
         modifier = Modifier.padding(5.dp),
         leftResource = R.string.change_tracking_type,
@@ -200,6 +239,9 @@ fun AddConfigurationContent(
         onClick = onSave,
         modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
     ) {
-        Text(text = stringResource(R.string.confirm_configuration), modifier = Modifier.padding(0.dp))
+        Text(
+            text = stringResource(R.string.confirm_configuration),
+            modifier = Modifier.padding(0.dp),
+        )
     }
 }

@@ -24,5 +24,5 @@ data class Item(
     val date: LocalDate,
     @ColumnInfo(index = true)
     val configuration: Long,
-    val value: Double? = null,
+    val value: Int? = null,
 )

@@ -8,7 +8,7 @@ import seamuslowry.paintracker.data.room.daos.ItemDao
 import seamuslowry.paintracker.models.Item
 import seamuslowry.paintracker.models.ItemConfiguration
 
-@Database(entities = [Item::class, ItemConfiguration::class], version = 5, exportSchema = false)
+@Database(entities = [Item::class, ItemConfiguration::class], version = 6, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class PainTrackerDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao

@@ -11,6 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -34,6 +35,13 @@ class EntryViewModel @Inject constructor(
 
     var date = MutableStateFlow(LocalDate.now())
 
+    private val configurations: StateFlow<List<ItemConfiguration>> = itemConfigurationRepo.getAll()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = emptyList(),
+        )
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val items: StateFlow<List<Item>> = date
         .flatMapLatest {
@@ -44,6 +52,15 @@ class EntryViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = emptyList(),
+        )
+
+    val itemsLoading = combine(items, configurations) { items, configs ->
+        configs.size - items.size
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = 0,
         )
 
     private suspend fun ensureItems(date: LocalDate) {
