@@ -47,7 +47,8 @@ import seamuslowry.paintracker.R
 import seamuslowry.paintracker.models.ItemConfiguration
 import seamuslowry.paintracker.models.TrackingType
 import seamuslowry.paintracker.ui.shared.ArrowPicker
-import seamuslowry.paintracker.ui.shared.SegmentedButtons
+import seamuslowry.paintracker.ui.shared.OneToTenEntry
+import seamuslowry.paintracker.ui.shared.TrackerEntry
 import java.time.LocalDate
 
 @Composable
@@ -58,15 +59,13 @@ fun EntryScreen(
     val state = viewModel.state
     val date = viewModel.date.collectAsState().value
     val scope = rememberCoroutineScope()
-    var value: Long? by remember {
+    var value: Int? by remember {
         mutableStateOf(null)
     }
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         item("buttons") {
-            SegmentedButtons(value = value, values = listOf(1, 2, 3), onChange = { value = it }) {
-                Text(text = it.toString())
-            }
+            OneToTenEntry(value = value, onChange = { value = it }, modifier = Modifier.padding(horizontal = 20.dp))
         }
         item("date") {
             ArrowPicker(
@@ -192,13 +191,15 @@ fun AddConfigurationContent(
         leftResource = R.string.change_tracking_type,
         rightResource = R.string.change_tracking_type,
     ) {
-        Text(text = TrackingType.values()[it.toInt()].name, textAlign = TextAlign.Center)
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            TrackerEntry(trackerType = TrackingType.values()[it.toInt()], enabled = false)
+        }
     }
     Button(
         enabled = itemConfiguration.name.isNotBlank(),
         onClick = onSave,
         modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
     ) {
-        Text(text = stringResource(R.string.confirm_configuration))
+        Text(text = stringResource(R.string.confirm_configuration), modifier = Modifier.padding(0.dp))
     }
 }

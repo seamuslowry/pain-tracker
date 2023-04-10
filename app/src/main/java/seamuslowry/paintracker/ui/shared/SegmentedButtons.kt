@@ -1,5 +1,6 @@
 package seamuslowry.paintracker.ui.shared
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
@@ -13,6 +14,7 @@ fun <T> SegmentedButtons(
     onChange: (value: T) -> Unit,
     modifier: Modifier = Modifier,
     value: T? = null,
+    enabled: Boolean = true,
     buttonContent: @Composable (value: T) -> Unit,
 ) {
     Row(modifier = modifier) {
@@ -25,8 +27,11 @@ fun <T> SegmentedButtons(
                 ButtonDefaults.outlinedButtonColors()
             }
             OutlinedButton(
+                contentPadding = PaddingValues(),
                 colors = colors,
+                enabled = enabled,
                 onClick = { onChange(it) },
+                modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(
                     topStartPercent = startPercentage,
                     bottomStartPercent = startPercentage,

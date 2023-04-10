@@ -9,4 +9,6 @@
     <string name="name">Name</string>
     <string name="change_tracking_type">Change tracking type</string>
     <string name="change_date">Change date</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
