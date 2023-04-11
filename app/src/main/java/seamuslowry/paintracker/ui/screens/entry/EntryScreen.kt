@@ -40,6 +40,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material3.fade
+import com.google.accompanist.placeholder.material3.placeholder
 import kotlinx.coroutines.launch
 import seamuslowry.paintracker.R
 import seamuslowry.paintracker.models.Item
@@ -78,12 +81,10 @@ fun EntryScreen(
             }
         }
         items(items = items, key = { it.id }) {
-            Column {
-                ItemEntry(item = it, onChange = {})
-            }
+            ItemEntry(item = it, onChange = {})
         }
         items(items = (0 until itemsLoading).toList(), key = { it }) {
-            Text(text = "Loading $it")
+            ItemEntry()
         }
         item("button") {
             AddConfigurationButton(
@@ -102,19 +103,25 @@ fun EntryScreen(
 
 @Composable
 fun ItemEntry(
-    item: Item,
-    onChange: (item: Item) -> Unit,
     modifier: Modifier = Modifier,
+    item: Item? = null,
+    onChange: (item: Item) -> Unit = {},
 ) {
     Card(
-        modifier = modifier.padding(20.dp),
+        modifier = modifier
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+            .placeholder(
+                visible = item == null,
+                highlight = PlaceholderHighlight.fade(),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+            ),
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
         ) {
-            Text(text = item.id.toString())
+            Text(text = item?.id.toString())
             IconButton(onClick = {}) {
                 Icon(
                     Icons.Filled.MoreVert,
@@ -124,8 +131,8 @@ fun ItemEntry(
         }
         TrackerEntry(
             trackerType = TrackingType.ONE_TO_TEN,
-            value = item.value,
-            onChange = { onChange(item.copy(value = it)) },
+            value = item?.value,
+            onChange = { value -> item?.let { onChange(item.copy(value = value)) } },
             modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
         )
     }
