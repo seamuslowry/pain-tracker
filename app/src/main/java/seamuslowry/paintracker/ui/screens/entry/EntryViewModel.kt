@@ -16,10 +16,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import seamuslowry.paintracker.data.repos.ItemConfigurationRepo
 import seamuslowry.paintracker.data.repos.ItemRepo
 import seamuslowry.paintracker.models.Item
 import seamuslowry.paintracker.models.ItemConfiguration
+import seamuslowry.paintracker.models.ItemWithConfiguration
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -43,10 +45,10 @@ class EntryViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val items: StateFlow<List<Item>> = date
+    val items: StateFlow<List<ItemWithConfiguration>> = date
         .flatMapLatest {
             viewModelScope.launch { ensureItems(date.value) }
-            itemRepo.get(it)
+            itemRepo.getFull(it)
         }
         .stateIn(
             scope = viewModelScope,
@@ -84,12 +86,16 @@ class EntryViewModel @Inject constructor(
         state = state.copy(unsavedConfiguration = itemConfiguration)
     }
 
-    suspend fun saveNew() {
+    suspend fun saveNewConfiguration() {
         state.unsavedConfiguration?.let {
             val newConfigurationId = itemConfigurationRepo.save(it)
             itemRepo.save(Item(date = date.value, configuration = newConfigurationId))
             state = state.copy(unsavedConfiguration = null)
         }
+    }
+
+    fun saveItem(item: Item) {
+        runBlocking { itemRepo.save(item) }
     }
 
     companion object {

@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 import seamuslowry.paintracker.R
 import seamuslowry.paintracker.models.Item
 import seamuslowry.paintracker.models.ItemConfiguration
+import seamuslowry.paintracker.models.ItemWithConfiguration
 import seamuslowry.paintracker.models.TrackingType
 import seamuslowry.paintracker.ui.shared.ArrowPicker
 import seamuslowry.paintracker.ui.shared.TrackerEntry
@@ -80,8 +81,8 @@ fun EntryScreen(
                 Text(text = LocalDate.ofEpochDay(it).toString(), textAlign = TextAlign.Center)
             }
         }
-        items(items = items, key = { it.id }) {
-            ItemEntry(item = it, onChange = {})
+        items(items = items, key = { it.item.id }) {
+            ItemEntry(itemWithConfiguration = it, onChange = viewModel::saveItem)
         }
         items(items = (0 until itemsLoading).toList(), key = { it }) {
             ItemEntry()
@@ -92,7 +93,7 @@ fun EntryScreen(
                 onChange = viewModel::updateUnsaved,
                 onSave = {
                     scope.launch {
-                        viewModel.saveNew()
+                        viewModel.saveNewConfiguration()
                     }
                 },
                 onDiscard = { viewModel.updateUnsaved(null) },
@@ -104,14 +105,17 @@ fun EntryScreen(
 @Composable
 fun ItemEntry(
     modifier: Modifier = Modifier,
-    item: Item? = null,
+    itemWithConfiguration: ItemWithConfiguration? = null,
     onChange: (item: Item) -> Unit = {},
 ) {
+    val item = itemWithConfiguration?.item
+    val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
+
     Card(
         modifier = modifier
             .padding(horizontal = 20.dp, vertical = 10.dp)
             .placeholder(
-                visible = item == null,
+                visible = itemWithConfiguration == null,
                 highlight = PlaceholderHighlight.fade(),
                 color = MaterialTheme.colorScheme.surfaceVariant,
             ),
@@ -121,7 +125,7 @@ fun ItemEntry(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
         ) {
-            Text(text = item?.id.toString())
+            Text(text = configuration.name.ifEmpty { "Default" })
             IconButton(onClick = {}) {
                 Icon(
                     Icons.Filled.MoreVert,
@@ -130,7 +134,7 @@ fun ItemEntry(
             }
         }
         TrackerEntry(
-            trackerType = TrackingType.ONE_TO_TEN,
+            trackerType = configuration.trackingType,
             value = item?.value,
             onChange = { value -> item?.let { onChange(item.copy(value = value)) } },
             modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
