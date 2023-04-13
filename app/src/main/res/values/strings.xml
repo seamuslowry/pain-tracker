@@ -12,4 +12,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="tracker_options">Tracker Options</string>
+    <string name="default_name">Default</string>
+    <string name="delete">Delete</string>
 </resources>

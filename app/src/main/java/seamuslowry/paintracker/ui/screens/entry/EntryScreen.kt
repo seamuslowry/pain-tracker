@@ -21,6 +21,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +32,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -82,7 +87,7 @@ fun EntryScreen(
             }
         }
         items(items = items, key = { it.item.id }) {
-            ItemEntry(itemWithConfiguration = it, onChange = viewModel::saveItem)
+            ItemEntry(itemWithConfiguration = it, onChange = viewModel::saveItem, onDelete = viewModel::deleteConfiguration)
         }
         items(items = (0 until itemsLoading).toList(), key = { it }) {
             ItemEntry()
@@ -107,7 +112,9 @@ fun ItemEntry(
     modifier: Modifier = Modifier,
     itemWithConfiguration: ItemWithConfiguration? = null,
     onChange: (item: Item) -> Unit = {},
+    onDelete: (itemConfiguration: ItemConfiguration) -> Unit = {},
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
     val item = itemWithConfiguration?.item
     val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
 
@@ -125,12 +132,15 @@ fun ItemEntry(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
         ) {
-            Text(text = configuration.name.ifEmpty { "Default" })
-            IconButton(onClick = {}) {
-                Icon(
-                    Icons.Filled.MoreVert,
-                    contentDescription = stringResource(R.string.tracker_options),
-                )
+            Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
+            Box {
+                IconButton(onClick = { menuExpanded = true }) {
+                    Icon(
+                        Icons.Filled.MoreVert,
+                        contentDescription = stringResource(R.string.tracker_options),
+                    )
+                }
+                ItemEntryMenu(expanded = menuExpanded, onDismiss = { menuExpanded = false }, onDelete = { onDelete(configuration) })
             }
         }
         TrackerEntry(
@@ -138,6 +148,25 @@ fun ItemEntry(
             value = item?.value,
             onChange = { value -> item?.let { onChange(item.copy(value = value)) } },
             modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+        )
+    }
+}
+
+@Composable
+fun ItemEntryMenu(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+        modifier = modifier,
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.delete)) },
+            onClick = onDelete,
         )
     }
 }

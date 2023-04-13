@@ -82,6 +82,10 @@ class EntryViewModel @Inject constructor(
         date.value = input
     }
 
+    fun deleteConfiguration(configuration: ItemConfiguration) {
+        runBlocking { itemConfigurationRepo.delete(configuration) }
+    }
+
     fun updateUnsaved(itemConfiguration: ItemConfiguration?) {
         state = state.copy(unsavedConfiguration = itemConfiguration)
     }
