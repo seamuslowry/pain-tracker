@@ -171,15 +171,23 @@ fun ItemEntry(
             Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
             Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
                 IconButton(onClick = {
-                    deleteConfirmationNeeded = true
-                    menuExpanded = false
+                    menuExpanded = true
                 }) {
                     Icon(
                         Icons.Filled.MoreVert,
                         contentDescription = stringResource(R.string.tracker_options),
                     )
                 }
-                ItemEntryMenu(expanded = menuExpanded, onDismiss = { menuExpanded = false }, onDelete = { onDelete(configuration) })
+                ItemEntryMenu(
+                    expanded = menuExpanded,
+                    onDismiss = {
+                        menuExpanded = false
+                    },
+                    onDeleteRequest = {
+                        menuExpanded = false
+                        deleteConfirmationNeeded = true
+                    },
+                )
             }
         }
         TrackerEntry(
@@ -195,7 +203,7 @@ fun ItemEntry(
 fun ItemEntryMenu(
     expanded: Boolean,
     onDismiss: () -> Unit,
-    onDelete: () -> Unit,
+    onDeleteRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DropdownMenu(
@@ -205,7 +213,7 @@ fun ItemEntryMenu(
     ) {
         DropdownMenuItem(
             text = { Text(stringResource(R.string.delete)) },
-            onClick = onDelete,
+            onClick = onDeleteRequest,
         )
     }
 }
