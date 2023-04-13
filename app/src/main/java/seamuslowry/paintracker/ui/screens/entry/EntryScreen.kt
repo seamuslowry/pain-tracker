@@ -69,6 +69,8 @@ fun EntryScreen(
     val date = viewModel.date.collectAsState().value
     val scope = rememberCoroutineScope()
 
+    // TODO animate placing of items
+    // TODO animate date changing?
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
@@ -88,7 +90,11 @@ fun EntryScreen(
             }
         }
         items(items = items, key = { it.item.id }) {
-            ItemEntry(itemWithConfiguration = it, onChange = viewModel::saveItem, onDelete = viewModel::deleteConfiguration)
+            ItemEntry(
+                itemWithConfiguration = it,
+                onChange = viewModel::saveItem,
+                onDelete = viewModel::deleteConfiguration,
+            )
         }
         items(items = (0 until itemsLoading).toList(), key = { it }) {
             ItemEntry()
