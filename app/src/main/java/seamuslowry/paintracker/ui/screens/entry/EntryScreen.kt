@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -115,8 +117,42 @@ fun ItemEntry(
     onDelete: (itemConfiguration: ItemConfiguration) -> Unit = {},
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
+    var deleteConfirmationNeeded by remember { mutableStateOf(false) }
     val item = itemWithConfiguration?.item
     val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
+
+    if (deleteConfirmationNeeded) {
+        AlertDialog(
+            onDismissRequest = {
+                deleteConfirmationNeeded = false
+            },
+            title = {
+                Text(text = stringResource(R.string.confirm_deletion))
+            },
+            text = {
+                Text(text = stringResource(R.string.confirm_deletion_detail))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deleteConfirmationNeeded = false
+                        onDelete(configuration)
+                    },
+                ) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        deleteConfirmationNeeded = false
+                    },
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
 
     Card(
         modifier = modifier
@@ -133,8 +169,11 @@ fun ItemEntry(
             modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
         ) {
             Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
-            Box {
-                IconButton(onClick = { menuExpanded = true }) {
+            Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                IconButton(onClick = {
+                    deleteConfirmationNeeded = true
+                    menuExpanded = false
+                }) {
                     Icon(
                         Icons.Filled.MoreVert,
                         contentDescription = stringResource(R.string.tracker_options),
