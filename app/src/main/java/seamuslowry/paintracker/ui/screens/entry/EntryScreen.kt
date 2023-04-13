@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -116,10 +115,50 @@ fun ItemEntry(
     onChange: (item: Item) -> Unit = {},
     onDelete: (itemConfiguration: ItemConfiguration) -> Unit = {},
 ) {
-    var menuExpanded by remember { mutableStateOf(false) }
-    var deleteConfirmationNeeded by remember { mutableStateOf(false) }
     val item = itemWithConfiguration?.item
     val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
+
+    Card(
+        modifier = modifier
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+            .placeholder(
+                visible = itemWithConfiguration == null,
+                highlight = PlaceholderHighlight.fade(),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+            ),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
+        ) {
+            Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
+            ItemEntryMenu(onEvent = {
+                when (it) {
+                    ItemEntryMenuAction.DELETE -> onDelete(configuration)
+                }
+            })
+        }
+        TrackerEntry(
+            trackerType = configuration.trackingType,
+            value = item?.value,
+            onChange = { value -> item?.let { onChange(item.copy(value = value)) } },
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+        )
+    }
+}
+
+enum class ItemEntryMenuAction {
+    DELETE,
+}
+
+@Composable
+fun ItemEntryMenu(
+    onEvent: (action: ItemEntryMenuAction) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var deleteConfirmationNeeded by remember { mutableStateOf(false) }
 
     if (deleteConfirmationNeeded) {
         AlertDialog(
@@ -136,7 +175,7 @@ fun ItemEntry(
                 TextButton(
                     onClick = {
                         deleteConfirmationNeeded = false
-                        onDelete(configuration)
+                        onEvent(ItemEntryMenuAction.DELETE)
                     },
                 ) {
                     Text(stringResource(R.string.confirm))
@@ -154,67 +193,28 @@ fun ItemEntry(
         )
     }
 
-    Card(
-        modifier = modifier
-            .padding(horizontal = 20.dp, vertical = 10.dp)
-            .placeholder(
-                visible = itemWithConfiguration == null,
-                highlight = PlaceholderHighlight.fade(),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
-        ) {
-            Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
-            Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
-                IconButton(onClick = {
-                    menuExpanded = true
-                }) {
-                    Icon(
-                        Icons.Filled.MoreVert,
-                        contentDescription = stringResource(R.string.tracker_options),
-                    )
-                }
-                ItemEntryMenu(
-                    expanded = menuExpanded,
-                    onDismiss = {
-                        menuExpanded = false
-                    },
-                    onDeleteRequest = {
-                        menuExpanded = false
-                        deleteConfirmationNeeded = true
-                    },
-                )
-            }
+    Box {
+        IconButton(onClick = {
+            expanded = true
+        }) {
+            Icon(
+                Icons.Filled.MoreVert,
+                contentDescription = stringResource(R.string.tracker_options),
+            )
         }
-        TrackerEntry(
-            trackerType = configuration.trackingType,
-            value = item?.value,
-            onChange = { value -> item?.let { onChange(item.copy(value = value)) } },
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
-        )
-    }
-}
-
-@Composable
-fun ItemEntryMenu(
-    expanded: Boolean,
-    onDismiss: () -> Unit,
-    onDeleteRequest: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismiss,
-        modifier = modifier,
-    ) {
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.delete)) },
-            onClick = onDeleteRequest,
-        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = modifier,
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.delete)) },
+                onClick = {
+                    expanded = false
+                    deleteConfirmationNeeded = true
+                },
+            )
+        }
     }
 }
 
