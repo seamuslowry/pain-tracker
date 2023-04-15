@@ -69,8 +69,6 @@ fun EntryScreen(
     val date = viewModel.date.collectAsState().value
     val scope = rememberCoroutineScope()
 
-    // TODO animate placing of items
-    // TODO animate date changing?
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),

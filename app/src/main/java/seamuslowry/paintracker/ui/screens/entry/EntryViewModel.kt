@@ -8,12 +8,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -49,6 +52,14 @@ class EntryViewModel @Inject constructor(
         .flatMapLatest {
             viewModelScope.launch { ensureItems(date.value) }
             itemRepo.getFull(it)
+        }
+        // keep track of the previous value to delay if it would be too jumpy
+        .runningFold(
+            Pair(emptyList<ItemWithConfiguration>(), emptyList<ItemWithConfiguration>()),
+        ) { lastValue, newValue -> Pair(lastValue.second, newValue) }
+        .map {
+            if (it.first.isEmpty()) { delay(500) }
+            it.second
         }
         .stateIn(
             scope = viewModelScope,
