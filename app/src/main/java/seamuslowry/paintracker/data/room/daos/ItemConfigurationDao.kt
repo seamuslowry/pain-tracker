@@ -1,6 +1,7 @@
 package seamuslowry.paintracker.data.room.daos
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -13,5 +14,8 @@ interface ItemConfigurationDao {
     fun getAll(): Flow<List<ItemConfiguration>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(itemConfiguration: ItemConfiguration)
+    suspend fun upsert(itemConfiguration: ItemConfiguration): Long
+
+    @Delete
+    suspend fun delete(itemConfiguration: ItemConfiguration)
 }

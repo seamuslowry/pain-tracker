@@ -8,4 +8,14 @@
     <string name="discard_configuration">Discard tracker configuration</string>
     <string name="name">Name</string>
     <string name="change_tracking_type">Change tracking type</string>
+    <string name="change_date">Change date</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="tracker_options">Tracker Options</string>
+    <string name="default_name">Default</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_deletion">Confirm Deletion</string>
+    <string name="confirm_deletion_detail">Deleting this tracked item will delete all tracked items of this type.</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
 </resources>
