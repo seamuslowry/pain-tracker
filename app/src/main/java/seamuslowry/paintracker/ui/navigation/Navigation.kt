@@ -69,11 +69,6 @@ fun Navigation(
             ) {
                 EntryScreen()
             }
-//            composable(
-//                Screen.Entry.identifier,
-//            ) {
-//                EntryScreen()
-//            }
             composable(
                 Screen.Report.identifier,
             ) {
