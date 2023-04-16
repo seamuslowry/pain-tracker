@@ -7,7 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import seamuslowry.daytracker.data.room.PainTrackerDatabase
+import seamuslowry.daytracker.data.room.DayTrackerDatabase
 import seamuslowry.daytracker.data.room.daos.ItemConfigurationDao
 import seamuslowry.daytracker.data.room.daos.ItemDao
 import javax.inject.Singleton
@@ -17,22 +17,22 @@ import javax.inject.Singleton
 object DbModule {
     @Provides
     @Singleton
-    fun providePainTrackerDb(
+    fun provideDayTrackerDb(
         @ApplicationContext context: Context,
-    ): PainTrackerDatabase = Room
-        .databaseBuilder(context, PainTrackerDatabase::class.java, "pain_tracker_database")
+    ): DayTrackerDatabase = Room
+        .databaseBuilder(context, DayTrackerDatabase::class.java, "pain_tracker_database")
         .fallbackToDestructiveMigration()
         .build()
 
     @Provides
     @Singleton
     fun provideItemDao(
-        db: PainTrackerDatabase,
+        db: DayTrackerDatabase,
     ): ItemDao = db.itemDao()
 
     @Provides
     @Singleton
     fun provideItemConfigurationDao(
-        db: PainTrackerDatabase,
+        db: DayTrackerDatabase,
     ): ItemConfigurationDao = db.itemConfigurationDao()
 }

@@ -10,7 +10,7 @@ import seamuslowry.daytracker.models.ItemConfiguration
 
 @Database(entities = [Item::class, ItemConfiguration::class], version = 6, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class PainTrackerDatabase : RoomDatabase() {
+abstract class DayTrackerDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
     abstract fun itemConfigurationDao(): ItemConfigurationDao
 }
