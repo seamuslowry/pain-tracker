@@ -58,7 +58,7 @@ class EntryViewModel @Inject constructor(
         .runningFold(
             Pair(emptyList<ItemWithConfiguration>(), emptyList<ItemWithConfiguration>()),
         ) { lastValue, newValue -> Pair(lastValue.second, newValue) }
-        .debounce { if (it.second.size > it.first.size) 500 else 0 }
+        .debounce { if (it.second.size > it.first.size) 300 else 0 }
         .map {
             it.second
         }
