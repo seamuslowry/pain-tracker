@@ -20,7 +20,7 @@ object DbModule {
     fun provideDayTrackerDb(
         @ApplicationContext context: Context,
     ): DayTrackerDatabase = Room
-        .databaseBuilder(context, DayTrackerDatabase::class.java, "pain_tracker_database")
+        .databaseBuilder(context, DayTrackerDatabase::class.java, "day_tracker_database")
         .fallbackToDestructiveMigration()
         .build()
 
