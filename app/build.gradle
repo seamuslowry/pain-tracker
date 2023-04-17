@@ -18,11 +18,11 @@ spotless {
 }
 
 android {
-    namespace 'seamuslowry.paintracker'
+    namespace 'seamuslowry.daytracker'
     compileSdk 33
 
     defaultConfig {
-        applicationId "seamuslowry.paintracker"
+        applicationId "seamuslowry.daytracker"
         minSdk 29
         targetSdk 33
         versionCode 1
