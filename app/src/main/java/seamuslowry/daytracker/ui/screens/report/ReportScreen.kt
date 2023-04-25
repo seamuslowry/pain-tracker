@@ -1,6 +1,5 @@
 package seamuslowry.daytracker.ui.screens.report
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -13,26 +12,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import seamuslowry.daytracker.R
-
-enum class DisplayOption(@StringRes val label: Int) {
-    MONTH(R.string.display_month),
-    WEEK(R.string.display_week),
-}
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun ReportScreen() {
-    DisplaySelection(modifier = Modifier.fillMaxWidth())
+fun ReportScreen(
+    viewModel: ReportViewModel = hiltViewModel(),
+) {
+    val state = viewModel.state
+    DisplaySelection(
+        selected = state.selectedOption,
+        onSelect = viewModel::select,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun DisplaySelection(
+    selected: DisplayOption,
+    onSelect: (d: DisplayOption) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(modifier = modifier, horizontalArrangement = Arrangement.Center) {
         DisplayOption.values().forEach {
-            FilterChip(selected = false, modifier = Modifier.padding(horizontal = 4.dp), onClick = { /*TODO*/ }, label = { Text(text = stringResource(it.label)) })
+            FilterChip(selected = selected == it, modifier = Modifier.padding(horizontal = 4.dp), onClick = { onSelect(it) }, label = { Text(text = stringResource(it.label)) })
         }
     }
 }
