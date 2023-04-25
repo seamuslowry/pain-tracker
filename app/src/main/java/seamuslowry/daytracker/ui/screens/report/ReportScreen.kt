@@ -19,6 +19,7 @@ fun ReportScreen(
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state
+
     DisplaySelection(
         selected = state.selectedOption,
         onSelect = viewModel::select,
