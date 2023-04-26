@@ -9,9 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import seamuslowry.daytracker.R
 import java.time.LocalDate
 import java.time.temporal.ChronoField
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-
-const val TAG = "ReportViewModel"
 
 @HiltViewModel
 class ReportViewModel @Inject constructor() : ViewModel() {
@@ -21,25 +20,28 @@ class ReportViewModel @Inject constructor() : ViewModel() {
     fun select(option: DisplayOption) {
         state = state.copy(selectedOption = option)
     }
+
+    fun increment() {
+        state = state.copy(anchorDate = state.anchorDate.plus(1, state.selectedOption.unit))
+    }
+
+    fun decrement() {
+        state = state.copy(anchorDate = state.anchorDate.minus(1, state.selectedOption.unit))
+    }
 }
 
-enum class DisplayOption(@StringRes val label: Int) {
-    MONTH(R.string.display_month),
-    WEEK(R.string.display_week),
+enum class DisplayOption(@StringRes val label: Int, val field: ChronoField, val unit: ChronoUnit) {
+    MONTH(R.string.display_month, ChronoField.DAY_OF_MONTH, ChronoUnit.MONTHS),
+    WEEK(R.string.display_week, ChronoField.DAY_OF_WEEK, ChronoUnit.WEEKS),
 }
 
 data class ReportState(
     val selectedOption: DisplayOption = DisplayOption.MONTH,
-    private val anchorDate: LocalDate = LocalDate.now(),
+    val anchorDate: LocalDate = LocalDate.now(),
 ) {
     val dateRange: ClosedRange<LocalDate>
         get() {
-            return when (selectedOption) {
-                DisplayOption.MONTH -> {
-                    val range = anchorDate.range(ChronoField.DAY_OF_MONTH)
-                    anchorDate.withDayOfMonth(range.minimum.toInt())..anchorDate.withDayOfMonth(range.maximum.toInt())
-                }
-                DisplayOption.WEEK -> anchorDate.with(ChronoField.DAY_OF_WEEK, 1)..anchorDate.with(ChronoField.DAY_OF_WEEK, 7)
-            }
+            val range = anchorDate.range(selectedOption.field)
+            return anchorDate.with(selectedOption.field, range.minimum)..anchorDate.with(selectedOption.field, range.maximum)
         }
 }

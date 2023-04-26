@@ -28,8 +28,8 @@ fun ReportScreen(
     Column(modifier = Modifier.fillMaxWidth()) {
         ArrowPicker(
             value = state.dateRange,
-            onIncrement = {},
-            onDecrement = {},
+            onIncrement = { viewModel.increment() },
+            onDecrement = { viewModel.decrement() },
             compare = { a, b -> a.start.compareTo(b.start) },
             incrementEnabled = state.dateRange.endInclusive < LocalDate.now(),
             // TODO this should actually be based on what items are available
