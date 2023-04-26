@@ -1,6 +1,7 @@
 package seamuslowry.daytracker.ui.screens.report
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,8 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import seamuslowry.daytracker.R
+import seamuslowry.daytracker.ui.shared.ArrowPicker
+import java.time.LocalDate
 
 @Composable
 fun ReportScreen(
@@ -20,11 +25,26 @@ fun ReportScreen(
 ) {
     val state = viewModel.state
 
-    DisplaySelection(
-        selected = state.selectedOption,
-        onSelect = viewModel::select,
-        modifier = Modifier.fillMaxWidth(),
-    )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ArrowPicker(
+            value = state.dateRange,
+            onIncrement = {},
+            onDecrement = {},
+            compare = { a, b -> a.start.compareTo(b.start) },
+            incrementEnabled = state.dateRange.endInclusive < LocalDate.now(),
+            // TODO this should actually be based on what items are available
+            decrementEnabled = state.dateRange.start > LocalDate.now().minusYears(1),
+            incrementResource = R.string.change_date_range,
+            decrementResource = R.string.change_date_range,
+        ) {
+            Text(text = it.toString(), textAlign = TextAlign.Center)
+        }
+        DisplaySelection(
+            selected = state.selectedOption,
+            onSelect = viewModel::select,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)

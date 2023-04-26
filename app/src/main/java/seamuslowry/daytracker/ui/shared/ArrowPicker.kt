@@ -23,27 +23,30 @@ import kotlin.math.sign
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ArrowPicker(
-    value: Long,
-    onChange: (newValue: Long) -> Unit,
-    range: LongRange,
-    @StringRes leftResource: Int,
-    @StringRes rightResource: Int,
+fun <T> ArrowPicker(
+    value: T,
+    onIncrement: (oldValue: T) -> Unit,
+    onDecrement: (oldValue: T) -> Unit,
+    compare: (leftValue: T, rightValue: T) -> Int,
+    @StringRes incrementResource: Int,
+    @StringRes decrementResource: Int,
     modifier: Modifier = Modifier,
-    content: @Composable (value: Long) -> Unit,
+    incrementEnabled: Boolean = true,
+    decrementEnabled: Boolean = true,
+    content: @Composable (value: T) -> Unit,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         IconButton(
-            onClick = { onChange(value.minus(1)) },
-            enabled = value > range.first,
+            onClick = { onDecrement(value) },
+            enabled = decrementEnabled,
         ) {
-            Icon(Icons.Filled.ArrowLeft, contentDescription = stringResource(leftResource))
+            Icon(Icons.Filled.ArrowLeft, contentDescription = stringResource(incrementResource))
         }
         AnimatedContent(
             modifier = Modifier.weight(1f),
             targetState = value,
             transitionSpec = {
-                val inModifier = (targetState - initialState).sign
+                val inModifier = compare(targetState, initialState).sign
                 val outModifier = -inModifier
                 slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
             },
@@ -51,10 +54,59 @@ fun ArrowPicker(
             content(targetType)
         }
         IconButton(
-            onClick = { onChange(value.plus(1)) },
-            enabled = value < range.last,
+            onClick = { onIncrement(value) },
+            enabled = incrementEnabled,
         ) {
-            Icon(Icons.Filled.ArrowRight, contentDescription = stringResource(rightResource))
+            Icon(Icons.Filled.ArrowRight, contentDescription = stringResource(decrementResource))
         }
     }
+}
+
+@Composable
+fun <T : Comparable<T>> ArrowPicker(
+    value: T,
+    onIncrement: (oldValue: T) -> Unit,
+    onDecrement: (oldValue: T) -> Unit,
+    @StringRes incrementResource: Int,
+    @StringRes decrementResource: Int,
+    modifier: Modifier = Modifier,
+    incrementEnabled: Boolean = true,
+    decrementEnabled: Boolean = true,
+    content: @Composable (value: T) -> Unit,
+) {
+    ArrowPicker(
+        value = value,
+        onIncrement = onIncrement,
+        onDecrement = onDecrement,
+        incrementResource = incrementResource,
+        decrementResource = decrementResource,
+        modifier = modifier,
+        incrementEnabled = incrementEnabled,
+        decrementEnabled = decrementEnabled,
+        compare = Comparable<T>::compareTo,
+        content = content,
+    )
+}
+
+@Composable
+fun ArrowPicker(
+    value: Long,
+    onChange: (value: Long) -> Unit,
+    range: LongRange,
+    @StringRes incrementResource: Int,
+    @StringRes decrementResource: Int,
+    modifier: Modifier = Modifier,
+    content: @Composable (value: Long) -> Unit,
+) {
+    ArrowPicker(
+        value = value,
+        onIncrement = { onChange(it.plus(1)) },
+        onDecrement = { onChange(it.minus(1)) },
+        incrementEnabled = value < range.last,
+        decrementEnabled = value > range.first,
+        incrementResource = incrementResource,
+        decrementResource = decrementResource,
+        modifier = modifier,
+        content = content,
+    )
 }

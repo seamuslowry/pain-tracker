@@ -20,4 +20,5 @@
     <string name="cancel">Cancel</string>
     <string name="display_month">Monthly</string>
     <string name="display_week">Weekly</string>
+    <string name="change_date_range">Change date range</string>
 </resources>
