@@ -10,6 +10,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -24,6 +26,7 @@ fun ReportScreen(
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state
+    val earliestDate by viewModel.earliestDate.collectAsState()
 
     Column(modifier = Modifier.fillMaxWidth()) {
         ArrowPicker(
@@ -32,8 +35,7 @@ fun ReportScreen(
             onDecrement = { viewModel.decrement() },
             compare = { a, b -> a.start.compareTo(b.start) },
             incrementEnabled = state.dateRange.endInclusive < LocalDate.now(),
-            // TODO this should actually be based on what items are available
-            decrementEnabled = state.dateRange.start > LocalDate.now().minusYears(1),
+            decrementEnabled = state.dateRange.start > earliestDate,
             incrementResource = R.string.change_date_range,
             decrementResource = R.string.change_date_range,
         ) {

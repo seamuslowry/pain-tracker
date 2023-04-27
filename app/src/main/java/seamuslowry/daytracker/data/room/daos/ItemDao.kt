@@ -15,6 +15,9 @@ interface ItemDao {
     @Query("select * from item")
     fun getAll(): Flow<List<Item>>
 
+    @Query("select min(date) from item")
+    fun getEarliestDate(): Flow<LocalDate>
+
     @Query("select * from item where date = :date")
     fun get(date: LocalDate): Flow<List<Item>>
 
