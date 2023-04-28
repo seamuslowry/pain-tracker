@@ -66,7 +66,7 @@ fun EntryScreen(
     val items by viewModel.items.collectAsState()
     val itemsLoading by viewModel.itemsLoading.collectAsState()
     val state = viewModel.state
-    val date = viewModel.date.collectAsState().value
+    val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
 
     LazyColumn(

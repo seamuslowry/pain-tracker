@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
@@ -25,7 +27,8 @@ import java.time.LocalDate
 fun ReportScreen(
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
-    val state = viewModel.state
+    val state by viewModel.state.collectAsState()
+    val items by viewModel.items.collectAsState()
     val earliestDate by viewModel.earliestDate.collectAsState()
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -46,6 +49,11 @@ fun ReportScreen(
             onSelect = viewModel::select,
             modifier = Modifier.fillMaxWidth(),
         )
+        LazyColumn {
+            items(items = items, key = { it.item.id }) {
+                Text(text = it.toString())
+            }
+        }
     }
 }
 

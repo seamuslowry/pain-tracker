@@ -1,17 +1,17 @@
 package seamuslowry.daytracker.ui.screens.report
 
 import androidx.annotation.StringRes
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemRepo
+import seamuslowry.daytracker.models.ItemWithConfiguration
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class ReportViewModel @Inject constructor(
     itemRepo: ItemRepo,
 ) : ViewModel() {
-    var state by mutableStateOf(ReportState())
+    var state = MutableStateFlow(ReportState())
         private set
 
     val earliestDate: StateFlow<LocalDate> = itemRepo.getEarliest()
@@ -31,16 +31,26 @@ class ReportViewModel @Inject constructor(
             initialValue = LocalDate.now(),
         )
 
+    val items: StateFlow<List<ItemWithConfiguration>> = state
+        .flatMapLatest {
+            itemRepo.getFull(it.dateRange.start, it.dateRange.endInclusive)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = emptyList(),
+        )
+
     fun select(option: DisplayOption) {
-        state = state.copy(selectedOption = option)
+        state.value = state.value.copy(selectedOption = option)
     }
 
     fun increment() {
-        state = state.copy(anchorDate = state.anchorDate.plus(1, state.selectedOption.unit))
+        state.value = state.value.copy(anchorDate = state.value.anchorDate.plus(1, state.value.selectedOption.unit))
     }
 
     fun decrement() {
-        state = state.copy(anchorDate = state.anchorDate.minus(1, state.selectedOption.unit))
+        state.value = state.value.copy(anchorDate = state.value.anchorDate.minus(1, state.value.selectedOption.unit))
     }
 
     companion object {
