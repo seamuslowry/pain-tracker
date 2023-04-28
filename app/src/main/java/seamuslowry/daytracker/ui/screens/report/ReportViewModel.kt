@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +32,7 @@ class ReportViewModel @Inject constructor(
             initialValue = LocalDate.now(),
         )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val items: StateFlow<List<ItemWithConfiguration>> = state
         .flatMapLatest {
             itemRepo.getFull(it.dateRange.start, it.dateRange.endInclusive)
