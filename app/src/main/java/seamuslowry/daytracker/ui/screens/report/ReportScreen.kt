@@ -28,7 +28,7 @@ fun ReportScreen(
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
-    val items by viewModel.items.collectAsState()
+    val groupedItems by viewModel.groupedItems.collectAsState()
     val earliestDate by viewModel.earliestDate.collectAsState()
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -50,8 +50,8 @@ fun ReportScreen(
             modifier = Modifier.fillMaxWidth(),
         )
         LazyColumn {
-            items(items = items, key = { it.item.id }) {
-                Text(text = it.toString())
+            items(items = groupedItems.keys.toList(), key = { it.id }) {
+                Text(text = groupedItems[it].toString())
             }
         }
     }

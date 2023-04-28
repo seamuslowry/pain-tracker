@@ -9,10 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemRepo
-import seamuslowry.daytracker.models.ItemWithConfiguration
+import seamuslowry.daytracker.models.Item
+import seamuslowry.daytracker.models.ItemConfiguration
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -33,14 +35,20 @@ class ReportViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val items: StateFlow<List<ItemWithConfiguration>> = state
+    val groupedItems: StateFlow<Map<ItemConfiguration, List<Item>>> = state
         .flatMapLatest {
             itemRepo.getFull(it.dateRange.start, it.dateRange.endInclusive)
+        }
+        .map {
+            it.groupBy(
+                keySelector = { itemWithConfiguration -> itemWithConfiguration.configuration },
+                valueTransform = { itemWithConfiguration -> itemWithConfiguration.item },
+            )
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = emptyList(),
+            initialValue = emptyMap(),
         )
 
     fun select(option: DisplayOption) {
