@@ -5,7 +5,7 @@ import seamuslowry.daytracker.R
 
 enum class YesNoOption(val value: Int, @StringRes val text: Int) {
     NO(0, R.string.no),
-    YES(1, R.string.yes),
+    YES(2, R.string.yes),
 }
 
 data class Option(val value: Int, @StringRes val text: Int? = null)
