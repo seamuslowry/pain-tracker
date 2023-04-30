@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemRepo
-import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
 import java.time.LocalDate
 import java.time.temporal.ChronoField
@@ -35,7 +34,7 @@ class ReportViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val groupedItems: StateFlow<Map<ItemConfiguration, List<Item>>> = state
+    val groupedItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = state
         .flatMapLatest {
             itemRepo.getFull(it.dateRange.start, it.dateRange.endInclusive)
         }
@@ -44,6 +43,15 @@ class ReportViewModel @Inject constructor(
                 keySelector = { itemWithConfiguration -> itemWithConfiguration.configuration },
                 valueTransform = { itemWithConfiguration -> itemWithConfiguration.item },
             )
+                .mapValues { entry ->
+                    val sorted = entry.value.sortedBy { item -> item.date }
+                    val earliestRecorded = sorted.first()
+
+                    val blanks = List(earliestRecorded.date.dayOfWeek.value) { DateDisplay() }
+                    val recorded = sorted.map { item -> DateDisplay(item.value?.toDouble()?.div(entry.key.trackingType.options.size)) }
+
+                    (blanks + recorded).chunked(7)
+                }
         }
         .stateIn(
             scope = viewModelScope,
@@ -72,6 +80,10 @@ enum class DisplayOption(@StringRes val label: Int, val field: ChronoField, val 
     MONTH(R.string.display_month, ChronoField.DAY_OF_MONTH, ChronoUnit.MONTHS),
     WEEK(R.string.display_week, ChronoField.DAY_OF_WEEK, ChronoUnit.WEEKS),
 }
+
+data class DateDisplay(
+    val value: Double? = null,
+)
 
 data class ReportState(
     val selectedOption: DisplayOption = DisplayOption.MONTH,
