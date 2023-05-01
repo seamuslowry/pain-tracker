@@ -51,7 +51,7 @@ class ReportViewModel @Inject constructor(
     val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items) {
             s, i ->
         val startingBlanks = List(s.dateRange.start.dayOfWeek.value - 1) { DateDisplay(date = s.dateRange.start.minusDays(it.toLong() + 1), inRange = false) }.reversed()
-        val endingBlanks = List(7 - s.dateRange.endInclusive.dayOfWeek.value) { DateDisplay(date = s.dateRange.endInclusive.plusDays(it.toLong()), inRange = false) }
+        val endingBlanks = List(7 - s.dateRange.endInclusive.dayOfWeek.value) { DateDisplay(date = s.dateRange.endInclusive.plusDays(it.toLong() + 1), inRange = false) }
 
         val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
 

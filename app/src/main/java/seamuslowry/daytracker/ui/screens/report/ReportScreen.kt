@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
@@ -39,6 +38,8 @@ import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.ItemConfiguration
 import seamuslowry.daytracker.ui.shared.ArrowPicker
 import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun ReportScreen(
@@ -67,7 +68,7 @@ fun ReportScreen(
             modifier = Modifier.fillMaxWidth(),
         )
         // TODO maybe use LazyGrid
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(32.dp)) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(32.dp), contentPadding = PaddingValues(vertical = 16.dp)) {
             items(items = groupedItems.entries.toList(), key = { it.key.id }) {
                 DisplayDates(entry = it)
             }
@@ -98,6 +99,20 @@ fun DisplayDates(
         Column(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = entry.key.name, style = MaterialTheme.typography.titleLarge)
             Divider(modifier = Modifier.padding(4.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                entry.value.first().forEach {
+                    Text(
+                        text = it.date.dayOfWeek.getDisplayName(
+                            TextStyle.SHORT,
+                            Locale.getDefault(),
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+
             entry.value.forEach {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     it.forEach {
@@ -136,7 +151,6 @@ fun DisplayDate(
         color = color,
         modifier = modifier
             .fillMaxSize()
-            .clip(CircleShape)
             .aspectRatio(1f),
     ) {
         Box(contentAlignment = Alignment.Center) {
