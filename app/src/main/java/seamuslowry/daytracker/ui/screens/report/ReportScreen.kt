@@ -12,8 +12,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,8 +68,12 @@ fun ReportScreen(
             onSelect = viewModel::select,
             modifier = Modifier.fillMaxWidth(),
         )
-        // TODO maybe use LazyGrid
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(32.dp), contentPadding = PaddingValues(vertical = 16.dp)) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 192.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(16.dp),
+        ) {
             items(items = groupedItems.entries.toList(), key = { it.key.id }) {
                 DisplayDates(entry = it)
             }
@@ -95,7 +100,7 @@ fun DisplayDates(
     entry: Map.Entry<ItemConfiguration, List<List<DateDisplay>>>,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier.padding(horizontal = 16.dp)) {
+    Card(modifier = modifier) {
         Column(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = entry.key.name, style = MaterialTheme.typography.titleLarge)
             Divider(modifier = Modifier.padding(4.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
