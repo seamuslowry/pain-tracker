@@ -66,7 +66,7 @@ class ReportViewModel @Inject constructor(
         i.mapValues { entry ->
             val sequenceDisplays = sequence.map { date -> entry.value.firstOrNull { item -> item.date == date }?.let { item -> DateDisplay(item.value?.toFloat()?.div(entry.key.trackingType.options.size), date) } ?: DateDisplay(date = date) }.toList()
 
-            (startingBlanks + sequenceDisplays + endingBlanks).chunked(7)
+            (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
         }
     }.stateIn(
         scope = viewModelScope,
