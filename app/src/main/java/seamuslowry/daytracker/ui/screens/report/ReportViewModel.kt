@@ -20,6 +20,9 @@ import seamuslowry.daytracker.models.ItemConfiguration
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalField
+import java.time.temporal.WeekFields
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,8 +53,13 @@ class ReportViewModel @Inject constructor(
 
     val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items) {
             s, i ->
-        val startingBlanks = List(s.dateRange.start.dayOfWeek.value - 1) { DateDisplay(date = s.dateRange.start.minusDays(it.toLong() + 1), inRange = false) }.reversed()
-        val endingBlanks = List(7 - s.dateRange.endInclusive.dayOfWeek.value) { DateDisplay(date = s.dateRange.endInclusive.plusDays(it.toLong() + 1), inRange = false) }
+        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
+        val range = s.dateRange.start.range(dayOfWeekField)
+        val blanksFrom = s.dateRange.start.with(dayOfWeekField, range.minimum)
+        val blanksTo = s.dateRange.endInclusive.with(dayOfWeekField, range.maximum)
+
+        val startingBlanks = List(ChronoUnit.DAYS.between(blanksFrom, s.dateRange.start).toInt()) { DateDisplay(date = s.dateRange.start.minusDays(it.toLong() + 1), inRange = false) }.reversed()
+        val endingBlanks = List(ChronoUnit.DAYS.between(s.dateRange.endInclusive, blanksTo).toInt()) { DateDisplay(date = s.dateRange.endInclusive.plusDays(it.toLong() + 1), inRange = false) }
 
         val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
 
@@ -83,9 +91,9 @@ class ReportViewModel @Inject constructor(
     }
 }
 
-enum class DisplayOption(@StringRes val label: Int, val field: ChronoField, val unit: ChronoUnit) {
-    MONTH(R.string.display_month, ChronoField.DAY_OF_MONTH, ChronoUnit.MONTHS),
-    WEEK(R.string.display_week, ChronoField.DAY_OF_WEEK, ChronoUnit.WEEKS),
+enum class DisplayOption(@StringRes val label: Int, val field: (locale: Locale) -> TemporalField, val unit: ChronoUnit) {
+    MONTH(R.string.display_month, { ChronoField.DAY_OF_MONTH }, ChronoUnit.MONTHS),
+    WEEK(R.string.display_week, { WeekFields.of(it).dayOfWeek() }, ChronoUnit.WEEKS),
 }
 
 data class DateDisplay(
@@ -100,7 +108,8 @@ data class ReportState(
 ) {
     val dateRange: ClosedRange<LocalDate>
         get() {
-            val range = anchorDate.range(selectedOption.field)
-            return anchorDate.with(selectedOption.field, range.minimum)..anchorDate.with(selectedOption.field, range.maximum)
+            val temporalField = selectedOption.field(Locale.getDefault())
+            val range = anchorDate.range(temporalField)
+            return anchorDate.with(temporalField, range.minimum)..anchorDate.with(temporalField, range.maximum)
         }
 }
