@@ -39,6 +39,7 @@ import androidx.core.graphics.ColorUtils
 import androidx.hilt.navigation.compose.hiltViewModel
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.ItemConfiguration
+import seamuslowry.daytracker.models.localeFormat
 import seamuslowry.daytracker.ui.shared.ArrowPicker
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -63,7 +64,14 @@ fun ReportScreen(
             incrementResource = R.string.change_date_range,
             decrementResource = R.string.change_date_range,
         ) {
-            Text(text = it.toString(), textAlign = TextAlign.Center)
+            Text(
+                text = stringResource(
+                    id = R.string.date_range,
+                    it.start.localeFormat(),
+                    it.endInclusive.localeFormat(),
+                ),
+                textAlign = TextAlign.Center,
+            )
         }
         DisplaySelection(
             selected = state.selectedOption,
@@ -103,10 +111,20 @@ fun DisplayDates(
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier) {
-        Column(modifier = Modifier.animateContentSize(animationSpec = tween(300)).fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier
+                .animateContentSize(animationSpec = tween(300))
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text(text = entry.key.name, style = MaterialTheme.typography.titleLarge)
             Divider(modifier = Modifier.padding(4.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+            ) {
                 entry.value.first().forEach {
                     Text(
                         text = it.date.dayOfWeek.getDisplayName(
