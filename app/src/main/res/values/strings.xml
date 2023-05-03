@@ -18,4 +18,7 @@
     <string name="confirm_deletion_detail">Deleting this tracked item will delete all tracked items of this type.</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
+    <string name="display_month">Monthly</string>
+    <string name="display_week">Weekly</string>
+    <string name="change_date_range">Change date range</string>
 </resources>

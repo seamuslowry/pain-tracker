@@ -66,7 +66,7 @@ fun EntryScreen(
     val items by viewModel.items.collectAsState()
     val itemsLoading by viewModel.itemsLoading.collectAsState()
     val state = viewModel.state
-    val date = viewModel.date.collectAsState().value
+    val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
 
     LazyColumn(
@@ -81,8 +81,8 @@ fun EntryScreen(
                     LocalDate.now().minusYears(1).toEpochDay(),
                     LocalDate.now().toEpochDay(),
                 ),
-                leftResource = R.string.change_date,
-                rightResource = R.string.change_date,
+                incrementResource = R.string.change_date,
+                decrementResource = R.string.change_date,
             ) {
                 Text(text = LocalDate.ofEpochDay(it).toString(), textAlign = TextAlign.Center)
             }
@@ -318,8 +318,8 @@ fun AddConfigurationContent(
         },
         range = LongRange(0, (TrackingType.values().size - 1).toLong()),
         modifier = Modifier.padding(5.dp),
-        leftResource = R.string.change_tracking_type,
-        rightResource = R.string.change_tracking_type,
+        incrementResource = R.string.change_tracking_type,
+        decrementResource = R.string.change_tracking_type,
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             TrackerEntry(trackerType = TrackingType.values()[it.toInt()], enabled = false)
