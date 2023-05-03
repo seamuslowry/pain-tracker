@@ -1,6 +1,8 @@
 package seamuslowry.daytracker.ui.screens.report
 
 import android.animation.ArgbEvaluator
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -101,7 +103,7 @@ fun DisplayDates(
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier) {
-        Column(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.animateContentSize(animationSpec = tween(300)).fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = entry.key.name, style = MaterialTheme.typography.titleLarge)
             Divider(modifier = Modifier.padding(4.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
