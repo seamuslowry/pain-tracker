@@ -69,9 +69,9 @@ fun Navigation(
                 }
             }
         },
-    ) {
+    ) { paddingValues ->
         NavHost(
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(paddingValues),
             navController = navController,
             startDestination = startDestination,
         ) {
@@ -89,7 +89,9 @@ fun Navigation(
             composable(
                 Screen.Report.identifier,
             ) {
-                ReportScreen()
+                ReportScreen(
+                    onSelectDate = { navController.navigate(Screen.Entry.identifier + "?initialDate=${it.toEpochDay()}") },
+                )
             }
         }
     }
