@@ -41,7 +41,7 @@ class EntryViewModel @Inject constructor(
     var state by mutableStateOf(ConfigurationState())
         private set
 
-    var date = MutableStateFlow(savedStateHandle["initialDate"] ?: LocalDate.now())
+    var date = MutableStateFlow(savedStateHandle.get<Long?>("initialDate")?.let { LocalDate.ofEpochDay(it) } ?: LocalDate.now())
 
     private val configurations: StateFlow<List<ItemConfiguration>> = itemConfigurationRepo.getAll()
         .stateIn(

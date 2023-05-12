@@ -13,13 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.ui.screens.entry.EntryScreen
 import seamuslowry.daytracker.ui.screens.report.ReportScreen
+import java.time.LocalDate
 
 sealed class Screen(val identifier: String) {
     object Entry : Screen("entry")
@@ -53,7 +56,15 @@ fun Navigation(
                     NavigationBarItem(
                         icon = { Icon(it.icon, contentDescription = it.text) },
                         selected = currentRoute == it.screen.identifier,
-                        onClick = { navController.navigate(it.screen.identifier) },
+                        onClick = {
+                            navController.navigate(it.screen.identifier) {
+                                popUpTo(startDestination) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
                     )
                 }
             }
@@ -66,6 +77,12 @@ fun Navigation(
         ) {
             composable(
                 Screen.Entry.identifier,
+                arguments = listOf(
+                    navArgument("initialDate") {
+                        type = NavType.LongType
+                        defaultValue = LocalDate.now().toEpochDay()
+                    },
+                ),
             ) {
                 EntryScreen()
             }
