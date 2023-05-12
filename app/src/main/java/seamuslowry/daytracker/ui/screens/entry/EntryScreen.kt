@@ -55,6 +55,7 @@ import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
 import seamuslowry.daytracker.models.ItemWithConfiguration
 import seamuslowry.daytracker.models.TrackingType
+import seamuslowry.daytracker.models.localeFormat
 import seamuslowry.daytracker.ui.shared.ArrowPicker
 import seamuslowry.daytracker.ui.shared.TrackerEntry
 import java.time.LocalDate
@@ -84,7 +85,7 @@ fun EntryScreen(
                 incrementResource = R.string.change_date,
                 decrementResource = R.string.change_date,
             ) {
-                Text(text = LocalDate.ofEpochDay(it).toString(), textAlign = TextAlign.Center)
+                Text(text = LocalDate.ofEpochDay(it).localeFormat(), textAlign = TextAlign.Center)
             }
         }
         items(items = items, key = { it.item.id }) {
