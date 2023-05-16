@@ -185,6 +185,7 @@ fun DisplayDate(
             .fillMaxSize()
             .aspectRatio(1f),
         onClick = onSelectDate,
+        enabled = date.date <= LocalDate.now(),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(text = date.date.dayOfMonth.toString(), color = textColor, modifier = Modifier.alpha(textAlpha), textAlign = TextAlign.Center)
