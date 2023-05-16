@@ -24,13 +24,18 @@ import seamuslowry.daytracker.ui.screens.entry.EntryScreen
 import seamuslowry.daytracker.ui.screens.report.ReportScreen
 import java.time.LocalDate
 
-sealed class Screen(val identifier: String) {
-    object Entry : Screen("entry")
-    object Report : Screen("report")
+sealed class Screen<DataType>(val identifier: String, private val defaultData: DataType?) {
+    object Entry : Screen<Long>("entry", LocalDate.now().toEpochDay()) {
+        const val initialDate = "initialDate"
+        override fun route(data: Long?) = "$identifier?$initialDate=${data ?: "{$initialDate}"}"
+    }
+    object Report : Screen<Unit>("report", Unit)
+
+    open fun route(data: DataType? = defaultData) = identifier
 }
 
-data class NavBarData(
-    val screen: Screen,
+data class NavBarData<T>(
+    val screen: Screen<out T>,
     val icon: ImageVector,
     val text: String,
 )
@@ -76,9 +81,9 @@ fun Navigation(
             startDestination = startDestination,
         ) {
             composable(
-                Screen.Entry.identifier,
+                Screen.Entry.route(null),
                 arguments = listOf(
-                    navArgument("initialDate") {
+                    navArgument(Screen.Entry.initialDate) {
                         type = NavType.LongType
                         defaultValue = LocalDate.now().toEpochDay()
                     },
@@ -87,10 +92,12 @@ fun Navigation(
                 EntryScreen()
             }
             composable(
-                Screen.Report.identifier,
+                Screen.Report.route(),
             ) {
                 ReportScreen(
-                    onSelectDate = { navController.navigate(Screen.Entry.identifier + "?initialDate=${it.toEpochDay()}") },
+                    onSelectDate = {
+                        navController.navigate(Screen.Entry.route(it.toEpochDay()))
+                    },
                 )
             }
         }
