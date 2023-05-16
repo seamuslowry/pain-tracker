@@ -13,21 +13,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.ui.screens.entry.EntryScreen
 import seamuslowry.daytracker.ui.screens.report.ReportScreen
+import java.time.LocalDate
 
-sealed class Screen(val identifier: String) {
-    object Entry : Screen("entry")
-    object Report : Screen("report")
+sealed class Screen<DataType>(val identifier: String, private val defaultData: DataType?) {
+    object Entry : Screen<Long>("entry", LocalDate.now().toEpochDay()) {
+        const val initialDate = "initialDate"
+        override fun route(data: Long?) = "$identifier?$initialDate=${data ?: "{$initialDate}"}"
+    }
+    object Report : Screen<Unit>("report", Unit)
+
+    open fun route(data: DataType? = defaultData) = identifier
 }
 
-data class NavBarData(
-    val screen: Screen,
+data class NavBarData<T>(
+    val screen: Screen<out T>,
     val icon: ImageVector,
     val text: String,
 )
@@ -53,26 +61,44 @@ fun Navigation(
                     NavigationBarItem(
                         icon = { Icon(it.icon, contentDescription = it.text) },
                         selected = currentRoute == it.screen.identifier,
-                        onClick = { navController.navigate(it.screen.identifier) },
+                        onClick = {
+                            navController.navigate(it.screen.identifier) {
+                                popUpTo(startDestination) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
                     )
                 }
             }
         },
-    ) {
+    ) { paddingValues ->
         NavHost(
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(paddingValues),
             navController = navController,
             startDestination = startDestination,
         ) {
             composable(
-                Screen.Entry.identifier,
+                Screen.Entry.route(null),
+                arguments = listOf(
+                    navArgument(Screen.Entry.initialDate) {
+                        type = NavType.LongType
+                        defaultValue = LocalDate.now().toEpochDay()
+                    },
+                ),
             ) {
                 EntryScreen()
             }
             composable(
-                Screen.Report.identifier,
+                Screen.Report.route(),
             ) {
-                ReportScreen()
+                ReportScreen(
+                    onSelectDate = {
+                        navController.navigate(Screen.Entry.route(it.toEpochDay()))
+                    },
+                )
             }
         }
     }

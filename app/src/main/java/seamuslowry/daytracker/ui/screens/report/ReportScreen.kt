@@ -47,6 +47,7 @@ import java.util.Locale
 
 @Composable
 fun ReportScreen(
+    onSelectDate: (d: LocalDate) -> Unit = {},
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -85,7 +86,7 @@ fun ReportScreen(
             contentPadding = PaddingValues(16.dp),
         ) {
             items(items = groupedItems.entries.toList(), key = { it.key.id }) {
-                DisplayDates(entry = it)
+                DisplayDates(entry = it, onSelectDate = onSelectDate)
             }
         }
     }
@@ -109,6 +110,7 @@ fun DisplaySelection(
 fun DisplayDates(
     entry: Map.Entry<ItemConfiguration, List<List<DateDisplay>>>,
     modifier: Modifier = Modifier,
+    onSelectDate: (d: LocalDate) -> Unit = {},
 ) {
     Card(modifier = modifier) {
         Column(
@@ -141,7 +143,11 @@ fun DisplayDates(
             entry.value.forEach {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     it.forEach {
-                        DisplayDate(date = it, modifier = Modifier.weight(1f))
+                        DisplayDate(
+                            date = it,
+                            modifier = Modifier.weight(1f),
+                            onSelectDate = { onSelectDate(it.date) },
+                        )
                     }
                 }
             }
@@ -153,6 +159,7 @@ fun DisplayDates(
 fun DisplayDate(
     date: DateDisplay,
     modifier: Modifier = Modifier,
+    onSelectDate: () -> Unit = {},
 ) {
     val color = when {
         !date.inRange -> Color.Transparent
@@ -177,6 +184,8 @@ fun DisplayDate(
         modifier = modifier
             .fillMaxSize()
             .aspectRatio(1f),
+        onClick = onSelectDate,
+        enabled = date.date <= LocalDate.now(),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(text = date.date.dayOfMonth.toString(), color = textColor, modifier = Modifier.alpha(textAlpha), textAlign = TextAlign.Center)

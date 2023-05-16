@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,13 +34,18 @@ const val TAG = "EntryViewModel"
 
 @HiltViewModel
 class EntryViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val itemConfigurationRepo: ItemConfigurationRepo,
     private val itemRepo: ItemRepo,
 ) : ViewModel() {
     var state by mutableStateOf(ConfigurationState())
         private set
 
-    var date = MutableStateFlow(LocalDate.now())
+    var date = MutableStateFlow(
+        savedStateHandle.get<Long?>("initialDate")?.let {
+            LocalDate.ofEpochDay(it)
+        } ?: LocalDate.now(),
+    )
 
     private val configurations: StateFlow<List<ItemConfiguration>> = itemConfigurationRepo.getAll()
         .stateIn(
