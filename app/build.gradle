@@ -23,7 +23,7 @@ android {
 
     defaultConfig {
         applicationId "seamuslowry.daytracker"
-        minSdk 29
+        minSdk 33
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -75,6 +75,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     implementation 'androidx.hilt:hilt-work:1.0.0'
     implementation "androidx.hilt:hilt-navigation-compose:1.1.0-alpha01"
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation 'com.google.accompanist:accompanist-placeholder-material3:0.30.1'
