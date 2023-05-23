@@ -56,7 +56,7 @@ class DayTrackerApplication : Application(), Configuration.Provider {
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             EntryReminderWorker.toString(),
-            ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             dailyRequest,
         )
     }
