@@ -46,7 +46,7 @@ class EntryReminderWorker @AssistedInject constructor(
         val intent = Intent(applicationContext, MainActivity::class.java)
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             applicationContext,
-            0,
+            REQUEST_CODE,
             intent,
             PendingIntent.FLAG_IMMUTABLE,
         )
@@ -70,5 +70,6 @@ class EntryReminderWorker @AssistedInject constructor(
     companion object {
         const val NOTIFICATION_CHANNEL = "entry_reminder"
         const val NOTIFICATION_ID = 1
+        const val REQUEST_CODE = 0
     }
 }
