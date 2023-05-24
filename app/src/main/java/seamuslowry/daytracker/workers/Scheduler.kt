@@ -11,12 +11,12 @@ import java.util.concurrent.TimeUnit
 
 fun WorkManager.scheduleReminderWorker(startTime: LocalTime) {
     val now = LocalDateTime.now()
-    val start = LocalDateTime.of(LocalDate.now(), startTime)
+    val todayStart = LocalDateTime.of(LocalDate.now(), startTime)
+    val tomorrowStart = LocalDateTime.of(LocalDate.now().plusDays(1), startTime)
 
-    val laterDate = maxOf(now, start)
-    val earlierDate = minOf(now, start)
-
-    val diff = ChronoUnit.MILLIS.between(earlierDate, laterDate)
+    val diff = listOf(ChronoUnit.MILLIS.between(now, todayStart), ChronoUnit.MILLIS.between(now, tomorrowStart))
+        .filter { it > 0 }
+        .min()
 
     val dailyRequest = PeriodicWorkRequestBuilder<EntryReminderWorker>(1, TimeUnit.DAYS)
         .setInitialDelay(diff, TimeUnit.MILLISECONDS)
