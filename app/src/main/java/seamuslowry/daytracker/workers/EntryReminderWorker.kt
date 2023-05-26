@@ -21,7 +21,7 @@ import seamuslowry.daytracker.data.repos.ItemConfigurationRepo
 import seamuslowry.daytracker.data.repos.ItemRepo
 import java.time.LocalDate
 
-const val TAG = "EntryReminderWorker"
+private const val TAG = "EntryReminderWorker"
 
 @HiltWorker
 class EntryReminderWorker @AssistedInject constructor(

@@ -1,5 +1,6 @@
 package seamuslowry.daytracker.workers
 
+import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -8,6 +9,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
+
+private const val TAG = "Scheduler"
 
 fun WorkManager.scheduleReminderWorker(startTime: LocalTime) {
     val now = LocalDateTime.now()
@@ -22,6 +25,7 @@ fun WorkManager.scheduleReminderWorker(startTime: LocalTime) {
         .setInitialDelay(diff, TimeUnit.MILLISECONDS)
         .build()
 
+    Log.d(TAG, "Scheduling work ${EntryReminderWorker.WORK_ID} to run once per day at ${now.plus(diff, ChronoUnit.MILLIS)}")
     this.enqueueUniquePeriodicWork(
         EntryReminderWorker.WORK_ID,
         ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
