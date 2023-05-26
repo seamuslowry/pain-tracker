@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
@@ -16,19 +17,27 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import seamuslowry.daytracker.MainActivity
 import seamuslowry.daytracker.R
+import seamuslowry.daytracker.data.repos.ItemConfigurationRepo
 import seamuslowry.daytracker.data.repos.ItemRepo
 import java.time.LocalDate
+
+const val TAG = "EntryReminderWorker"
 
 @HiltWorker
 class EntryReminderWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParameters: WorkerParameters,
     private val itemRepo: ItemRepo,
+    private val itemConfigurationRepo: ItemConfigurationRepo,
 ) : CoroutineWorker(context, workerParameters) {
     override suspend fun doWork(): Result {
         return try {
-            val missingItems = itemRepo.getMissing(LocalDate.now())
-            if (missingItems > 0) {
+            val date = LocalDate.now()
+            val completedItems = itemRepo.getCompleted(date)
+            val totalTrackedItems = itemConfigurationRepo.getTotal()
+            Log.d(TAG, "Determining reminder for $date with $totalTrackedItems total configuration items and $completedItems completed items")
+            if (completedItems < totalTrackedItems) {
+                Log.d(TAG, "Sending reminder notification for $date")
                 showNotification()
             }
             Result.success()
