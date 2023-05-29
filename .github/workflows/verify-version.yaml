@@ -21,10 +21,8 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-      - id: get-version
-        run:
-          - echo "versionName=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
-          - echo "versionCode=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
+      - run: echo "versionName=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
+      - run: echo "versionCode=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
   get-source-project-version:
     runs-on: ubuntu-latest
     outputs:
@@ -40,9 +38,8 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-        run:
-          - echo "versionName=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
-          - echo "versionCode=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
+      - run: echo "versionName=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
+      - run: echo "versionCode=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
   ensure-new-version:
     runs-on: ubuntu-latest
     needs: [get-target-project-version, get-source-project-version]
