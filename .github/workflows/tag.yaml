@@ -12,6 +12,8 @@ jobs:
     outputs:
       project-version: ${{ steps.get-version.outputs.version }}
     steps:
+      - id: checkout
+        uses: actions/checkout@v3
       - id: get-version
         run: echo "version=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
   tag-new-version:
