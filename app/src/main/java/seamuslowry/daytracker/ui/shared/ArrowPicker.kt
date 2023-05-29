@@ -2,13 +2,12 @@ package seamuslowry.daytracker.ui.shared
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowLeft
@@ -21,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlin.math.sign
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun <T> ArrowPicker(
     value: T,
@@ -48,7 +46,7 @@ fun <T> ArrowPicker(
             transitionSpec = {
                 val inModifier = compare(targetState, initialState).sign
                 val outModifier = -inModifier
-                slideInHorizontally { height -> height * inModifier } + fadeIn() with slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
+                slideInHorizontally { height -> height * inModifier } + fadeIn() togetherWith slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
             },
         ) { targetType ->
             content(targetType)

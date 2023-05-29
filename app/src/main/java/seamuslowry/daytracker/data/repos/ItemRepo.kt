@@ -8,6 +8,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 interface ItemRepo {
+    fun getCompleted(date: LocalDate): Long
     fun getAll(): Flow<List<Item>>
     fun get(date: LocalDate): Flow<List<Item>>
     fun getEarliest(): Flow<LocalDate>
@@ -17,6 +18,7 @@ interface ItemRepo {
 }
 
 class RoomItemRepo @Inject constructor(private val itemDao: ItemDao) : ItemRepo {
+    override fun getCompleted(date: LocalDate): Long = itemDao.getCompleted(date)
     override fun getAll(): Flow<List<Item>> = itemDao.getAll()
     override fun get(date: LocalDate): Flow<List<Item>> = itemDao.get(date)
     override fun getEarliest(): Flow<LocalDate> = itemDao.getEarliestDate()
