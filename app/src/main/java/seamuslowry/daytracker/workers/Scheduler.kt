@@ -32,3 +32,8 @@ fun WorkManager.scheduleReminderWorker(startTime: LocalTime) {
         dailyRequest,
     )
 }
+
+fun WorkManager.cancelReminderWorker() {
+    Log.d(TAG, "Cancelling work for ${EntryReminderWorker.WORK_ID}")
+    this.cancelUniqueWork(EntryReminderWorker.WORK_ID)
+}

@@ -26,4 +26,7 @@
     <string name="reminder_channel_description">Receive reminder messages</string>
     <string name="reminder_notification_title">Reminder</string>
     <string name="reminder_notification_desc">Be sure to enter data for all your tracked items today.</string>
+    <string name="reminders_section_title">Reminders</string>
+    <string name="enabled">Enabled</string>
+    <string name="time">Time</string>
 </resources>
