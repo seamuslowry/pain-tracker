@@ -3,7 +3,8 @@ name: Tag
 on:
   push:
     branches:
-      - main
+      - chore/tag_with_gradle
+#      - main
 
 jobs:
   tag-new-version:
