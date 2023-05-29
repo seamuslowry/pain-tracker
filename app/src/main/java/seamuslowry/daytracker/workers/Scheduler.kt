@@ -28,7 +28,7 @@ fun WorkManager.scheduleReminderWorker(startTime: LocalTime) {
     Log.d(TAG, "Scheduling work ${EntryReminderWorker.WORK_ID} to run once per day at ${now.plus(diff, ChronoUnit.MILLIS)}")
     this.enqueueUniquePeriodicWork(
         EntryReminderWorker.WORK_ID,
-        ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+        ExistingPeriodicWorkPolicy.UPDATE,
         dailyRequest,
     )
 }
