@@ -11,6 +11,6 @@ jobs:
     uses: seamuslowry/workflows/.github/workflows/tag.yml@chore/tag_improvements
     with:
       custom-tag: 0.0.1.Final
-      dry-run: true
+#      dry-run: true
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
