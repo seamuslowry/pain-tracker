@@ -1,5 +1,9 @@
 package seamuslowry.daytracker.ui.screens.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,8 +27,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.R
@@ -55,7 +62,19 @@ fun ReminderSection(
     onSetReminderTime: (time: LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = onSetReminderEnabled,
+    )
     var pickingTime by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val requiredPermission = Manifest.permission.POST_NOTIFICATIONS
+
+    LaunchedEffect(key1 = reminderEnabled) {
+        if (reminderEnabled && ContextCompat.checkSelfPermission(context, requiredPermission) != PackageManager.PERMISSION_GRANTED) {
+            launcher.launch(requiredPermission)
+        }
+    }
 
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.reminders_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
@@ -91,6 +110,7 @@ fun ReminderTimePicker(
     modifier: Modifier = Modifier,
 ) {
     val time = rememberTimePickerState(initialTime.hour, initialTime.minute, false)
+
     AlertDialog(
         modifier = modifier,
         text = {
