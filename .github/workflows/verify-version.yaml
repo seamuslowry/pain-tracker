@@ -6,47 +6,36 @@ on:
       - main
 
 jobs:
-  get-target-project-version:
-    runs-on: ubuntu-latest
-    outputs:
-      version-name: ${{ steps.get-version.outputs.versionName }}
-      version-code: ${{ steps.get-version.outputs.versionCode }}
-    steps:
-      - id: checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.base_ref }}
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: 17
-      - run: echo "versionName=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
-      - run: echo "versionCode=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
-  get-source-project-version:
-    runs-on: ubuntu-latest
-    outputs:
-      version-name: ${{ steps.get-version.outputs.versionName }}
-      version-code: ${{ steps.get-version.outputs.versionCode }}
-    steps:
-      - id: checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: 17
-      - run: echo "versionName=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
-      - run: echo "versionCode=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
   ensure-new-version:
     runs-on: ubuntu-latest
-    needs: [get-target-project-version, get-source-project-version]
     steps:
+      # set up
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      # target versions
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - run: echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
+        id: target-version-name
+      - run: echo "version-code=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
+        id: target-version-code
+
+      # source versions
+      - uses: actions/checkout@v3
+      - run: echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
+        id: source-version-name
+      - run: echo "version-code=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
+        id: source-version-code
+
+      # comparison
       - uses: madhead/semver-utils@latest
         id: compare
         with:
-          version: ${{ needs.get-source-project-version.outputs.version-name }}
-          compare-to: ${{ needs.get-target-project-version.outputs.version-name }}
+          version: ${{steps.source-version-name.outputs.version-name }}
+          compare-to: ${{ steps.target-version-name.outputs.version-name }}
       - run: '[[ ">" == "${{ steps.comparison.outputs.comparison-result }}" ]]'
