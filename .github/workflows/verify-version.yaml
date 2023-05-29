@@ -44,8 +44,8 @@ jobs:
     steps:
       - name: Compare
         run: |
-          TARGET="${{ needs.get-target-project-version.steps.outputs.project-version }}"
-          SOURCE="${{ needs.get-source-project-version.steps.outputs.project-version }}"
+          TARGET="${{ needs.get-target-project-version.outputs.project-version }}"
+          SOURCE="${{ needs.get-source-project-version.outputs.project-version }}"
           if [ "$TARGET" == "$SOURCE" ]; then
             echo "Failure: Project versions should not remain the same on merging to main"
             exit 1
