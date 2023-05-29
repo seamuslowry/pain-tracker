@@ -7,10 +7,18 @@ on:
 #      - main
 
 jobs:
+  get-project-version:
+    runs-on: ubuntu-latest
+    outputs:
+      project-version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - id: get-version
+        run: echo "version=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
   tag-new-version:
+    needs: get-project-version
     uses: seamuslowry/workflows/.github/workflows/tag.yml@chore/tag_improvements
     with:
-      custom-tag: 0.0.1.Final
-#      dry-run: true
+      custom-tag: ${{ needs.get-project-version.outputs.project-version }}
+      dry-run: true
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
