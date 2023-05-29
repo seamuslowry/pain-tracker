@@ -3,8 +3,7 @@ name: Tag
 on:
   push:
     branches:
-      - chore/tag_with_gradle
-#      - main
+      - main
 
 jobs:
   get-project-version:
@@ -23,9 +22,8 @@ jobs:
         run: echo "version=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
   tag-new-version:
     needs: get-project-version
-    uses: seamuslowry/workflows/.github/workflows/tag.yml@chore/tag_improvements
+    uses: seamuslowry/workflows/.github/workflows/tag.yml@main
     with:
       custom-tag: ${{ needs.get-project-version.outputs.project-version }}
-      dry-run: true
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
