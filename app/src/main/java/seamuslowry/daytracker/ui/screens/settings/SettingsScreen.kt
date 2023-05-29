@@ -34,6 +34,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.R
+import seamuslowry.daytracker.models.localeFormat
 import java.time.LocalTime
 
 @Composable
@@ -85,7 +86,7 @@ fun ReminderSection(
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(R.string.time))
             TextButton(onClick = { pickingTime = true }, enabled = reminderEnabled) {
-                Text(text = reminderTime.toString())
+                Text(text = reminderTime.localeFormat())
             }
         }
     }
