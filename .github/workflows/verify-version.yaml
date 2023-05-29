@@ -47,14 +47,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [get-target-project-version, get-source-project-version]
     steps:
-      - name: Compare
-        run: |
-          TARGET="${{ needs.get-target-project-version.outputs.version-name }}"
-          SOURCE="${{ needs.get-source-project-version.outputs.version-name }}"
-          if [ "$TARGET" == "$SOURCE" ]; then
-            echo "Failure: Project versions should not remain the same on merging to main"
-            exit 1
-          else
-            echo "Success: Project version differs from main"
-            exit 0
-          fi
+      - uses: madhead/semver-utils@latest
+        id: compare
+        with:
+          version: ${{ needs.get-source-project-version.outputs.version-name }}
+          compare-to: ${{ needs.get-target-project-version.outputs.version-name }}
+      - run: '[[ ">" == "${{ steps.comparison.outputs.comparison-result }}" ]]'
