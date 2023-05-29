@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,6 +23,7 @@ import androidx.navigation.navArgument
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.ui.screens.entry.EntryScreen
 import seamuslowry.daytracker.ui.screens.report.ReportScreen
+import seamuslowry.daytracker.ui.screens.settings.SettingsScreen
 import java.time.LocalDate
 
 sealed class Screen<DataType>(val identifier: String, private val defaultData: DataType?) {
@@ -30,6 +32,7 @@ sealed class Screen<DataType>(val identifier: String, private val defaultData: D
         override fun route(data: Long?) = "$identifier?$initialDate=${data ?: "{$initialDate}"}"
     }
     object Report : Screen<Unit>("report", Unit)
+    object Settings : Screen<Unit>("settings", Unit)
 
     open fun route(data: DataType? = defaultData) = identifier
 }
@@ -51,6 +54,7 @@ fun Navigation(
     val navigableScreens = listOf(
         NavBarData(Screen.Entry, Icons.Filled.Assignment, stringResource(R.string.entry)),
         NavBarData(Screen.Report, Icons.Filled.DateRange, stringResource(R.string.report)),
+        NavBarData(Screen.Settings, Icons.Filled.Settings, stringResource(R.string.settings)),
     )
 
     Scaffold(
@@ -60,7 +64,7 @@ fun Navigation(
                 navigableScreens.map {
                     NavigationBarItem(
                         icon = { Icon(it.icon, contentDescription = it.text) },
-                        selected = currentRoute == it.screen.identifier,
+                        selected = currentRoute.orEmpty().startsWith(it.screen.identifier),
                         onClick = {
                             navController.navigate(it.screen.identifier) {
                                 popUpTo(startDestination) {
@@ -99,6 +103,11 @@ fun Navigation(
                         navController.navigate(Screen.Entry.route(it.toEpochDay()))
                     },
                 )
+            }
+            composable(
+                Screen.Settings.route(),
+            ) {
+                SettingsScreen()
             }
         }
     }
