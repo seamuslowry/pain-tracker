@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  get-source-project-version:
+  get-target-project-version:
     runs-on: ubuntu-latest
     outputs:
       project-version: ${{ steps.get-version.outputs.version }}
@@ -22,7 +22,7 @@ jobs:
           java-version: 17
       - id: get-version
         run: echo "version=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
-  get-target-project-version:
+  get-source-project-version:
     runs-on: ubuntu-latest
     outputs:
       project-version: ${{ steps.get-version.outputs.version }}
