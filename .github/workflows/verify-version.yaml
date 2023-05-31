@@ -42,3 +42,7 @@ jobs:
           compare-to: ${{ steps.target-version-name.outputs.version-name }}
       - run: '[[ ">" == "${{ steps.compare.outputs.comparison-result }}" ]]'
       - run: '[[ ${{ ((steps.target-version-code.outputs.version-code + 1) == steps.source-version-code.outputs.version-code) }} ]]'
+      - run: |
+          TARGET=${{ steps.target-version-code.outputs.version-code }}
+          SOURCE=${{ steps.source-version-code.outputs.version-code }}
+          [[ $((TARGET + 1)) == $SOURCE ]]
