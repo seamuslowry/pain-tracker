@@ -1,0 +1,1 @@
+Fixed pixel alignment issues in calendar
