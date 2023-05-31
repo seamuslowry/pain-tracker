@@ -141,7 +141,7 @@ fun DisplayDates(
             }
 
             entry.value.forEach {
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.fillMaxWidth().aspectRatio(7f)) {
                     it.forEach {
                         DisplayDate(
                             date = it,
@@ -182,8 +182,7 @@ fun DisplayDate(
     Surface(
         color = color,
         modifier = modifier
-            .fillMaxSize()
-            .aspectRatio(1f),
+            .fillMaxSize(),
         onClick = onSelectDate,
         enabled = date.date <= LocalDate.now(),
     ) {
