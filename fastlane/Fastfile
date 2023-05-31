@@ -34,10 +34,10 @@ platform :android do
         json_key: ENV["ANDROID_JSON_KEY_FILE"],
         track: "internal",
         skip_upload_metadata: true,
-        skip_upload_changelogs: true,
         skip_upload_images: true,
         skip_upload_screenshots: true,
-        changes_not_sent_for_review: true
+        changes_not_sent_for_review: true,
+        release_status: "draft"
     )
   end
 end
