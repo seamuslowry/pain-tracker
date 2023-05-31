@@ -41,4 +41,4 @@ jobs:
           version: ${{ steps.source-version-name.outputs.version-name }}
           compare-to: ${{ steps.target-version-name.outputs.version-name }}
       - run: '[[ ">" == "${{ steps.compare.outputs.comparison-result }}" ]]'
-      - run: '[[ "$(( ${{steps.target-version-code.outputs.version-code}} + 1 ))" == "${{steps.source-version-code.outputs.version-code}}" ]]'
+      - run: '[[ $(( ${{steps.target-version-code.outputs.version-code}} + 1 )) -eq ${{steps.source-version-code.outputs.version-code}} ]]'
