@@ -95,7 +95,7 @@ fun EntryScreen(
                 onDelete = viewModel::deleteConfiguration,
             )
         }
-        items(items = (0 until itemsLoading).toList(), key = { it }) {
+        items(itemsLoading) {
             ItemEntry()
         }
         item("button") {
@@ -147,7 +147,7 @@ fun ItemEntry(
         TrackerEntry(
             trackerType = configuration.trackingType,
             value = item?.value,
-            onChange = { value -> item?.let { onChange(item.copy(value = value)) } },
+            onChange = { value -> item?.let { onChange(it.copy(value = value)) } },
             modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
         )
     }
