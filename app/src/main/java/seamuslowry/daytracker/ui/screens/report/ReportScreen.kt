@@ -119,6 +119,7 @@ fun DisplayDates(
                 .fillMaxWidth()
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(text = entry.key.name, style = MaterialTheme.typography.titleLarge)
             Divider(modifier = Modifier.padding(4.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -126,6 +127,7 @@ fun DisplayDates(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center,
             ) {
                 entry.value.first().forEach {
                     Text(
@@ -141,7 +143,7 @@ fun DisplayDates(
             }
 
             entry.value.forEach {
-                Row(modifier = Modifier.fillMaxWidth().aspectRatio(7f)) {
+                Row(modifier = Modifier.fillMaxWidth().aspectRatio(7f), horizontalArrangement = Arrangement.Center) {
                     it.forEach {
                         DisplayDate(
                             date = it,
