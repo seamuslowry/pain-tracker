@@ -33,7 +33,7 @@ platform :android do
     upload_to_play_store(
         json_key: ENV["ANDROID_JSON_KEY_FILE"],
         track: "internal",
-        skip_upload_metadata: options[:validate_only],
+        skip_upload_metadata: options[:dry_run],
         skip_upload_images: true,
         skip_upload_screenshots: true,
         changes_not_sent_for_review: true,
