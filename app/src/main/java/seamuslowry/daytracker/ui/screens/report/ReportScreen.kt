@@ -83,7 +83,7 @@ fun ReportScreen(
             columns = GridCells.Adaptive(minSize = 192.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(12.dp),
         ) {
             items(items = groupedItems.entries.toList(), key = { it.key.id }) {
                 DisplayDates(entry = it, onSelectDate = onSelectDate)
