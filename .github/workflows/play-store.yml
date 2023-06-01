@@ -36,6 +36,7 @@ jobs:
           encodedString: ${{ secrets.PLAY_STORE_UPLOAD_KEYSTORE }}
 
       - name: Build & validate Android release
+        id: validate-release
         if: "!contains(github.ref, 'main')"
         run: bundle exec fastlane android deploy dry_run:true
         env:
