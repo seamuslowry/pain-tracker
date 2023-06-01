@@ -22,8 +22,6 @@ jobs:
           ref: ${{ github.base_ref }}
       - run: echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
         id: target-version-name
-      - run: echo "version-code=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
-        id: target-version-code
 
       # source versions
       - uses: actions/checkout@v3
@@ -31,8 +29,6 @@ jobs:
           ref: ${{ github.head_ref }}
       - run: echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
         id: source-version-name
-      - run: echo "version-code=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
-        id: source-version-code
 
       # comparison
       - uses: madhead/semver-utils@latest
@@ -41,4 +37,3 @@ jobs:
           version: ${{ steps.source-version-name.outputs.version-name }}
           compare-to: ${{ steps.target-version-name.outputs.version-name }}
       - run: '[[ ">" == "${{ steps.compare.outputs.comparison-result }}" ]]'
-      - run: '[[ $(( ${{steps.target-version-code.outputs.version-code}} + 1 )) -eq ${{steps.source-version-code.outputs.version-code}} ]]'

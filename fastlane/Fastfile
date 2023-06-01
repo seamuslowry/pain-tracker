@@ -17,7 +17,7 @@ default_platform(:android)
 
 platform :android do
   desc "Deploy a new version to Google Play"
-  lane :deploy do
+  lane :deploy do |options|
     gradle(
         task: "bundle",
         build_type: "release",
@@ -37,7 +37,8 @@ platform :android do
         skip_upload_images: true,
         skip_upload_screenshots: true,
         changes_not_sent_for_review: true,
-        release_status: "completed"
+        release_status: "completed",
+        validate_only: options[:dry_run]
     )
   end
 end
