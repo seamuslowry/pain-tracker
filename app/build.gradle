@@ -105,9 +105,3 @@ task printVersionName {
         println android.defaultConfig.versionName
     }
 }
-
-task printVersionCode {
-    doLast {
-        println android.defaultConfig.versionCode
-    }
-}
