@@ -95,7 +95,7 @@ fun EntryScreen(
                 onDelete = viewModel::deleteConfiguration,
             )
         }
-        items(itemsLoading) {
+        items(itemsLoading.coerceAtLeast(0)) {
             ItemEntry()
         }
         item("button") {

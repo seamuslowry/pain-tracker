@@ -1,12 +1,10 @@
-name: Android Build & Deploy
+name: Play Store
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
-  deploy:
+  play-store:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -37,8 +35,20 @@ jobs:
           fileName: "android_keystore.keystore"
           encodedString: ${{ secrets.PLAY_STORE_UPLOAD_KEYSTORE }}
 
+      - name: Build & validate Android release
+        id: validate-release
+        if: "!contains(github.ref, 'main')"
+        run: bundle exec fastlane android deploy dry_run:true
+        env:
+          STORE_FILE: ${{ steps.android_keystore.outputs.filePath }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS}}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ANDROID_JSON_KEY_FILE: ${{ steps.service_account_json_file.outputs.filePath }}
+
       - name: Build & deploy Android release
-        run: bundle exec fastlane android deploy
+        if: contains(github.ref, 'main')
+        run: bundle exec fastlane android deploy dry_run:false
         env:
           STORE_FILE: ${{ steps.android_keystore.outputs.filePath }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
