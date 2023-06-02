@@ -1,0 +1,1 @@
+Fix spacing issue in calendar views on some screen sizes
