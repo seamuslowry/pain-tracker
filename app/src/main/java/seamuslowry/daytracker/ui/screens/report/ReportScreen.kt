@@ -3,6 +3,8 @@ package seamuslowry.daytracker.ui.screens.report
 import android.animation.ArgbEvaluator
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +13,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -22,7 +24,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -83,7 +84,7 @@ fun ReportScreen(
             columns = GridCells.Adaptive(minSize = 192.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(12.dp),
+            contentPadding = PaddingValues(16.dp),
         ) {
             items(items = groupedItems.entries.toList(), key = { it.key.id }) {
                 DisplayDates(entry = it, onSelectDate = onSelectDate)
@@ -181,15 +182,21 @@ fun DisplayDate(
         else -> MaterialTheme.colorScheme.onBackground
     }
 
-    Surface(
-        color = color,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
-            .fillMaxSize(),
-        onClick = onSelectDate,
-        enabled = date.date <= LocalDate.now(),
+            .background(color)
+            .fillMaxHeight()
+            .clickable(
+                enabled = date.date <= LocalDate.now(),
+                onClick = onSelectDate,
+            ),
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(text = date.date.dayOfMonth.toString(), color = textColor, modifier = Modifier.alpha(textAlpha), textAlign = TextAlign.Center)
-        }
+        Text(
+            text = date.date.dayOfMonth.toString(),
+            color = textColor,
+            modifier = Modifier.alpha(textAlpha),
+            textAlign = TextAlign.Center,
+        )
     }
 }
