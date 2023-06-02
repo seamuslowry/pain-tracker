@@ -1,0 +1,4 @@
+1. Create custom tracker configurations for anything you'd like to be more mindful about
+2. Log the data every day
+3. (Optional) Configure a reminder notification to be sent if data hasn't been entered for the day
+4. See the data as a heat map on calendar view to track it over time.
