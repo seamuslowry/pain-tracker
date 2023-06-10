@@ -31,6 +31,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
@@ -188,6 +190,8 @@ fun DisplayDate(
         else -> null
     }
 
+    val borderColor = MaterialTheme.colorScheme.surface
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -204,6 +208,23 @@ fun DisplayDate(
                 color = textColor,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
+                    .fillMaxHeight(.33f)
+                    .aspectRatio(1f, true)
+                    .drawBehind {
+                        val borderSize = 1.dp.toPx()
+                        drawLine(
+                            color = borderColor,
+                            start = Offset(0f, size.height),
+                            end = Offset(size.width, size.height),
+                            strokeWidth = borderSize,
+                        )
+                        drawLine(
+                            color = borderColor,
+                            start = Offset(0f, 0f),
+                            end = Offset(0f, size.height),
+                            strokeWidth = borderSize,
+                        )
+                    }
                     .padding(horizontal = 4.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
