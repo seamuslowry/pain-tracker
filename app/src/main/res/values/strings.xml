@@ -11,6 +11,8 @@
     <string name="change_date">Change date</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="yes_short">Y</string>
+    <string name="no_short">N</string>
     <string name="tracker_options">Tracker Options</string>
     <string name="default_name">Default</string>
     <string name="delete">Delete</string>
