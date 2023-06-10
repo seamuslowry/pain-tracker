@@ -202,8 +202,11 @@ fun DisplayDate(
             Text(
                 text = smallText,
                 color = textColor,
-                modifier = Modifier.align(Alignment.TopEnd),
-                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(horizontal = 4.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
         Text(
