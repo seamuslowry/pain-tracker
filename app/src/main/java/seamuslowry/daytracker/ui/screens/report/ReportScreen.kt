@@ -182,6 +182,12 @@ fun DisplayDate(
         else -> MaterialTheme.colorScheme.onBackground
     }
 
+    val smallText = when {
+        date.text != null -> stringResource(date.text)
+        date.value != null -> date.value.toString()
+        else -> null
+    }
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -192,6 +198,14 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
+        if (smallText != null) {
+            Text(
+                text = smallText,
+                color = textColor,
+                modifier = Modifier.align(Alignment.TopEnd),
+                textAlign = TextAlign.End,
+            )
+        }
         Text(
             text = date.date.dayOfMonth.toString(),
             color = textColor,
