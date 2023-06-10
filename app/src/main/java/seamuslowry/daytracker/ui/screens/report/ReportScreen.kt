@@ -166,8 +166,8 @@ fun DisplayDate(
 ) {
     val color = when {
         !date.inRange -> Color.Transparent
-        date.percentage == null -> Color.Transparent
-        else -> Color(ArgbEvaluator().evaluate(date.percentage, MaterialTheme.colorScheme.error.toArgb(), MaterialTheme.colorScheme.primary.toArgb()) as Int)
+        date.value == null || date.maxValue == null -> Color.Transparent
+        else -> Color(ArgbEvaluator().evaluate(date.value.toFloat().div(date.maxValue), MaterialTheme.colorScheme.error.toArgb(), MaterialTheme.colorScheme.primary.toArgb()) as Int)
     }
 
     val textAlpha = when {

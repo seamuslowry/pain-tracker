@@ -64,7 +64,12 @@ class ReportViewModel @Inject constructor(
         val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
 
         i.mapValues { entry ->
-            val sequenceDisplays = sequence.map { date -> entry.value.firstOrNull { item -> item.date == date }?.let { item -> DateDisplay(item.value?.toFloat()?.div(entry.key.trackingType.options.size), date) } ?: DateDisplay(date = date) }.toList()
+            val sequenceDisplays = sequence.map { date ->
+                entry.value.firstOrNull { item -> item.date == date }?.let { item ->
+                    val selection = entry.key.trackingType.options.firstOrNull { it.value == item.value }
+                    DateDisplay(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date)
+                } ?: DateDisplay(date = date)
+            }.toList()
 
             (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
         }
@@ -97,7 +102,9 @@ enum class DisplayOption(@StringRes val label: Int, val field: (locale: Locale) 
 }
 
 data class DateDisplay(
-    val percentage: Float? = null,
+    val value: Int? = null,
+    @StringRes val text: Int? = null,
+    val maxValue: Int? = null,
     val date: LocalDate,
     val inRange: Boolean = true,
 )
