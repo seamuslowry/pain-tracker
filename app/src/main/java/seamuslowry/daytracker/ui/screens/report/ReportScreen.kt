@@ -208,10 +208,8 @@ fun DisplayDate(
                 color = textColor,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .fillMaxHeight(.33f)
-                    .aspectRatio(1f, true)
                     .drawBehind {
-                        val borderSize = 1.dp.toPx()
+                        val borderSize = 1.dp.toPx() / 3
                         drawLine(
                             color = borderColor,
                             start = Offset(0f, size.height),
