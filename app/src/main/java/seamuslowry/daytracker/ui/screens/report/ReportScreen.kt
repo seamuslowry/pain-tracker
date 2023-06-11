@@ -31,6 +31,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
@@ -166,8 +168,8 @@ fun DisplayDate(
 ) {
     val color = when {
         !date.inRange -> Color.Transparent
-        date.percentage == null -> Color.Transparent
-        else -> Color(ArgbEvaluator().evaluate(date.percentage, MaterialTheme.colorScheme.error.toArgb(), MaterialTheme.colorScheme.primary.toArgb()) as Int)
+        date.value == null || date.maxValue == null -> Color.Transparent
+        else -> Color(ArgbEvaluator().evaluate(date.value.toFloat().div(date.maxValue), MaterialTheme.colorScheme.error.toArgb(), MaterialTheme.colorScheme.primary.toArgb()) as Int)
     }
 
     val textAlpha = when {
@@ -182,6 +184,14 @@ fun DisplayDate(
         else -> MaterialTheme.colorScheme.onBackground
     }
 
+    val smallText = when {
+        date.text != null -> stringResource(date.text)
+        date.value != null -> date.value.toString()
+        else -> null
+    }
+
+    val borderColor = MaterialTheme.colorScheme.surface
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -192,6 +202,32 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
+        if (date.showValue && smallText != null) {
+            Text(
+                text = smallText,
+                color = textColor,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .drawBehind {
+                        val borderSize = 1.dp.toPx() / 3
+                        drawLine(
+                            color = borderColor,
+                            start = Offset(0f, size.height),
+                            end = Offset(size.width, size.height),
+                            strokeWidth = borderSize,
+                        )
+                        drawLine(
+                            color = borderColor,
+                            start = Offset(0f, 0f),
+                            end = Offset(0f, size.height),
+                            strokeWidth = borderSize,
+                        )
+                    }
+                    .padding(horizontal = 4.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
         Text(
             text = date.date.dayOfMonth.toString(),
             color = textColor,

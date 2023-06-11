@@ -45,13 +45,29 @@ fun SettingsScreen(
 
     val scope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.fillMaxWidth().padding(20.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.SpaceAround) {
         ReminderSection(
             reminderEnabled = state.reminderEnabled,
             reminderTime = state.reminderTime,
             onSetReminderEnabled = { scope.launch { viewModel.setReminderEnabled(it) } },
             onSetReminderTime = { scope.launch { viewModel.setReminderTime(it) } },
         )
+        CalendarSection(showValues = state.showRecordedValues, onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } })
+    }
+}
+
+@Composable
+fun CalendarSection(
+    showValues: Boolean,
+    onSetShowValues: (value: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Text(text = stringResource(R.string.calendar_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
+        Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(text = stringResource(R.string.show_recorded_values))
+            Switch(checked = showValues, onCheckedChange = onSetShowValues)
+        }
     }
 }
 
