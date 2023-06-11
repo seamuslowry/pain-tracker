@@ -23,8 +23,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-//                    Navigation(startDestination = Screen.Entry.route(null))
-                    Navigation(startDestination = Screen.Report.route())
+                    Navigation(startDestination = Screen.Entry.route(null))
                 }
             }
         }
