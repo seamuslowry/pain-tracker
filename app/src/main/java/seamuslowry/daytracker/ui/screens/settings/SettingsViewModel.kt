@@ -35,6 +35,10 @@ class SettingsViewModel @Inject constructor(
         settingsRepo.setReminderTime(value)
     }
 
+    suspend fun setShowRecordedValues(value: Boolean) {
+        settingsRepo.setShowRecordedValues(value)
+    }
+
     private fun scheduleReminder(time: LocalTime) {
         workManager.scheduleReminderWorker(time)
     }

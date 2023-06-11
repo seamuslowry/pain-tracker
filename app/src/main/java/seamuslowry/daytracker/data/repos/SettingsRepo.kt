@@ -21,6 +21,7 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = SETTINGS_STORE)
         val REMINDER_ENABLED = booleanPreferencesKey("REMINDER_ENABLED_KEY")
         val REMINDER_TIME = stringPreferencesKey("REMINDER_TIME")
+        val SHOW_RECORDED_VALUES = booleanPreferencesKey("SHOW_RECORDED_VALUES")
     }
 
     suspend fun setReminderEnabled(enabled: Boolean) {
@@ -35,11 +36,18 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
         }
     }
 
+    suspend fun setShowRecordedValues(show: Boolean) {
+        context.dataStore.edit {
+            it[SHOW_RECORDED_VALUES] = show
+        }
+    }
+
     val settings: Flow<Settings> = context.dataStore.data
         .map {
             Settings(
                 reminderEnabled = it[REMINDER_ENABLED] ?: false,
                 reminderTime = it[REMINDER_TIME]?.let { time -> LocalTime.parse(time) } ?: LocalTime.of(18, 0),
+                showRecordedValues = it[SHOW_RECORDED_VALUES] ?: false,
             )
         }
 }
@@ -47,4 +55,5 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
 data class Settings(
     val reminderEnabled: Boolean = false,
     val reminderTime: LocalTime = LocalTime.of(18, 0),
+    val showRecordedValues: Boolean = false,
 )

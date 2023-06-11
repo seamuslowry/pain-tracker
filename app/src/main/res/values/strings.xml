@@ -31,4 +31,6 @@
     <string name="reminders_section_title">Reminders</string>
     <string name="enabled">Enabled</string>
     <string name="time">Time</string>
+    <string name="calendar_section_title">Calendar</string>
+    <string name="show_recorded_values">Show recorded values</string>
 </resources>
