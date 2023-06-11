@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemRepo
+import seamuslowry.daytracker.data.repos.SettingsRepo
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
 import java.time.LocalDate
@@ -28,9 +29,18 @@ import javax.inject.Inject
 @HiltViewModel
 class ReportViewModel @Inject constructor(
     itemRepo: ItemRepo,
+    settingsRepo: SettingsRepo,
 ) : ViewModel() {
     var state = MutableStateFlow(ReportState())
         private set
+
+    private val showRecordedValues: StateFlow<Boolean> = settingsRepo.settings.map {
+        it.showRecordedValues
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = false,
+        started = SharingStarted.WhileSubscribed(5_000),
+    )
 
     val earliestDate: StateFlow<LocalDate> = itemRepo.getEarliest()
         .stateIn(
@@ -51,8 +61,8 @@ class ReportViewModel @Inject constructor(
             )
         }
 
-    val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items) {
-            s, i ->
+    val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items, showRecordedValues) {
+            s, i, srv ->
         val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
         val range = s.dateRange.start.range(dayOfWeekField)
         val blanksFrom = s.dateRange.start.with(dayOfWeekField, range.minimum)
@@ -67,7 +77,7 @@ class ReportViewModel @Inject constructor(
             val sequenceDisplays = sequence.map { date ->
                 entry.value.firstOrNull { item -> item.date == date }?.let { item ->
                     val selection = entry.key.trackingType.options.firstOrNull { it.value == item.value }
-                    DateDisplay(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date)
+                    DateDisplay(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date, showValue = srv)
                 } ?: DateDisplay(date = date)
             }.toList()
 
@@ -107,6 +117,7 @@ data class DateDisplay(
     val maxValue: Int? = null,
     val date: LocalDate,
     val inRange: Boolean = true,
+    val showValue: Boolean = false,
 )
 
 data class ReportState(

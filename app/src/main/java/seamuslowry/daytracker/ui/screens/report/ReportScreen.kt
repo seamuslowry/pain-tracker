@@ -202,7 +202,7 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
-        if (smallText != null) {
+        if (date.showValue && smallText != null) {
             Text(
                 text = smallText,
                 color = textColor,
