@@ -31,12 +31,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -160,9 +162,14 @@ fun DisplayDates(
     }
 }
 
+class SampleDateProvider : PreviewParameterProvider<DateDisplay> {
+    override val values = sequenceOf(DateDisplay(date = LocalDate.now(), value = 5, maxValue = 10, showValue = true))
+}
+
+@Preview(widthDp = 50, heightDp = 50)
 @Composable
 fun DisplayDate(
-    date: DateDisplay,
+    @PreviewParameter(provider = SampleDateProvider::class) date: DateDisplay,
     modifier: Modifier = Modifier,
     onSelectDate: () -> Unit = {},
 ) {
@@ -184,13 +191,21 @@ fun DisplayDate(
         else -> MaterialTheme.colorScheme.onBackground
     }
 
-    val smallText = when {
+    val value = when {
         date.text != null -> stringResource(date.text)
         date.value != null -> date.value.toString()
         else -> null
     }
 
-    val borderColor = MaterialTheme.colorScheme.surface
+    val smallText = when {
+        date.showValue -> date.date.dayOfMonth.toString()
+        else -> null
+    }
+
+    val largeText = when {
+        date.showValue -> value
+        else -> date.date.dayOfMonth.toString()
+    }
 
     Box(
         contentAlignment = Alignment.Center,
@@ -202,37 +217,28 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
-        if (date.showValue && smallText != null) {
+        if (smallText != null) {
             Text(
                 text = smallText,
                 color = textColor,
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .drawBehind {
-                        val borderSize = 1.dp.toPx() / 3
-                        drawLine(
-                            color = borderColor,
-                            start = Offset(0f, size.height),
-                            end = Offset(size.width, size.height),
-                            strokeWidth = borderSize,
-                        )
-                        drawLine(
-                            color = borderColor,
-                            start = Offset(0f, 0f),
-                            end = Offset(0f, size.height),
-                            strokeWidth = borderSize,
-                        )
-                    }
+                    .align(Alignment.TopStart)
+                    .alpha(textAlpha)
                     .padding(horizontal = 4.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.ExtraLight,
             )
         }
-        Text(
-            text = date.date.dayOfMonth.toString(),
-            color = textColor,
-            modifier = Modifier.alpha(textAlpha),
-            textAlign = TextAlign.Center,
-        )
+        if (largeText != null) {
+            Text(
+                text = largeText,
+                color = textColor,
+                modifier = Modifier.alpha(textAlpha),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Light,
+            )
+        }
     }
 }

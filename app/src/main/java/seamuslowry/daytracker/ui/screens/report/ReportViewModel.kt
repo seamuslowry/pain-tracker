@@ -67,9 +67,10 @@ class ReportViewModel @Inject constructor(
         val range = s.dateRange.start.range(dayOfWeekField)
         val blanksFrom = s.dateRange.start.with(dayOfWeekField, range.minimum)
         val blanksTo = s.dateRange.endInclusive.with(dayOfWeekField, range.maximum)
+        val baseDate = DateDisplay(showValue = srv, date = s.anchorDate)
 
-        val startingBlanks = List(ChronoUnit.DAYS.between(blanksFrom, s.dateRange.start).toInt()) { DateDisplay(date = s.dateRange.start.minusDays(it.toLong() + 1), inRange = false) }.reversed()
-        val endingBlanks = List(ChronoUnit.DAYS.between(s.dateRange.endInclusive, blanksTo).toInt()) { DateDisplay(date = s.dateRange.endInclusive.plusDays(it.toLong() + 1), inRange = false) }
+        val startingBlanks = List(ChronoUnit.DAYS.between(blanksFrom, s.dateRange.start).toInt()) { baseDate.copy(date = s.dateRange.start.minusDays(it.toLong() + 1), inRange = false) }.reversed()
+        val endingBlanks = List(ChronoUnit.DAYS.between(s.dateRange.endInclusive, blanksTo).toInt()) { baseDate.copy(date = s.dateRange.endInclusive.plusDays(it.toLong() + 1), inRange = false) }
 
         val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
 
@@ -77,8 +78,8 @@ class ReportViewModel @Inject constructor(
             val sequenceDisplays = sequence.map { date ->
                 entry.value.firstOrNull { item -> item.date == date }?.let { item ->
                     val selection = entry.key.trackingType.options.firstOrNull { it.value == item.value }
-                    DateDisplay(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date, showValue = srv)
-                } ?: DateDisplay(date = date)
+                    baseDate.copy(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date = date)
+                } ?: baseDate.copy(date = date)
             }.toList()
 
             (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
