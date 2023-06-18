@@ -36,9 +36,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -162,14 +159,9 @@ fun DisplayDates(
     }
 }
 
-class SampleDateProvider : PreviewParameterProvider<DateDisplay> {
-    override val values = sequenceOf(DateDisplay(date = LocalDate.now(), value = 5, maxValue = 10, showValue = true))
-}
-
-@Preview(widthDp = 50, heightDp = 50)
 @Composable
 fun DisplayDate(
-    @PreviewParameter(provider = SampleDateProvider::class) date: DateDisplay,
+    date: DateDisplay,
     modifier: Modifier = Modifier,
     onSelectDate: () -> Unit = {},
 ) {
