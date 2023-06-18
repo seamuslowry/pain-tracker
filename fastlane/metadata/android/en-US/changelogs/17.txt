@@ -1,0 +1,1 @@
+Change behavior of show values setting to make the values big and the dates small
