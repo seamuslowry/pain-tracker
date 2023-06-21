@@ -10,15 +10,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -213,37 +210,34 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
-        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            if (smallText != null) {
-                Text(
-                    text = smallText,
-                    color = textColor,
-                    modifier = Modifier
-                        .alpha(textAlpha),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.ExtraLight,
-                )
-            }
-            if (smallText != null && largeText != null) {
-                Divider(modifier = Modifier.fillMaxHeight().width(5.dp).padding(horizontal = 2.dp))
-            }
-            if (largeText != null) {
-                Text(
-                    text = largeText,
-                    color = textColor,
-                    modifier = Modifier.alpha(textAlpha),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Normal,
-                )
-            }
+        if (smallText != null) {
+            Text(
+                text = smallText,
+                color = textColor,
+                modifier = Modifier
+                    .alpha(textAlpha)
+                    .align(Alignment.TopStart)
+                    .padding(3.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.ExtraLight,
+            )
+        }
+        if (largeText != null) {
+            Text(
+                text = largeText,
+                color = textColor,
+                modifier = Modifier.alpha(textAlpha),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Normal,
+            )
         }
     }
 }
 
 @Composable
-@Preview(widthDp = 35, heightDp = 35)
+@Preview(widthDp = 41, heightDp = 41)
 fun TestDisplayDate() {
     DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now(), inRange = true, showValue = true))
 }
@@ -258,4 +252,10 @@ fun SmallDisplayDate() {
 @Preview(widthDp = 50, heightDp = 50)
 fun NormalDisplayDate() {
     DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now(), inRange = true, showValue = true))
+}
+
+@Composable
+@Preview(widthDp = 50, heightDp = 50)
+fun NormalNoValueDisplayDate() {
+    DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now(), inRange = true, showValue = false))
 }
