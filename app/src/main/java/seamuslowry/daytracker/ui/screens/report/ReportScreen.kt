@@ -6,7 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -200,7 +200,7 @@ fun DisplayDate(
         else -> date.date.dayOfMonth.toString()
     }
 
-    Box(
+    BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .background(color)
@@ -210,7 +210,7 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
-        if (smallText != null) {
+        if (smallText != null && minHeight > 41.dp) {
             Text(
                 text = smallText,
                 color = textColor,
