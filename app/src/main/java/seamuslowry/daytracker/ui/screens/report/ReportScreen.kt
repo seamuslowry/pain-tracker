@@ -83,7 +83,7 @@ fun ReportScreen(
             modifier = Modifier.fillMaxWidth(),
         )
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 231.dp),
+            columns = GridCells.Adaptive(minSize = 204.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(16.dp),
@@ -218,7 +218,7 @@ fun DisplayDate(
                 modifier = Modifier
                     .alpha(textAlpha)
                     .align(Alignment.TopStart)
-                    .padding(2.dp),
+                    .padding(4.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Light,
@@ -230,7 +230,7 @@ fun DisplayDate(
                 color = textColor,
                 modifier = Modifier
                     .alpha(textAlpha)
-                    .then(if (twoValues) Modifier.padding(2.dp).align(Alignment.BottomEnd) else Modifier.align(Alignment.Center)),
+                    .then(if (twoValues) Modifier.padding(4.dp).align(Alignment.BottomEnd) else Modifier.align(Alignment.Center)),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -251,7 +251,7 @@ fun SmallDisplayDate() {
 }
 
 @Composable
-@Preview(widthDp = 33, heightDp = 33)
+@Preview(widthDp = 29, heightDp = 29)
 fun CarolineDisplayDate() {
     DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now().withDayOfMonth(22), inRange = true, showValue = true))
 }
