@@ -83,7 +83,7 @@ fun ReportScreen(
             modifier = Modifier.fillMaxWidth(),
         )
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 204.dp),
+            columns = GridCells.Adaptive(minSize = 288.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(16.dp),
