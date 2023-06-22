@@ -200,8 +200,6 @@ fun DisplayDate(
         else -> date.date.dayOfMonth.toString()
     }
 
-    val twoValues = smallText != null && largeText != null
-
     Box(
         modifier = modifier
             .background(color)
@@ -210,6 +208,7 @@ fun DisplayDate(
                 enabled = date.date <= LocalDate.now(),
                 onClick = onSelectDate,
             ),
+        contentAlignment = Alignment.Center,
     ) {
         if (smallText != null) {
             Text(
@@ -218,7 +217,7 @@ fun DisplayDate(
                 modifier = Modifier
                     .alpha(textAlpha)
                     .align(Alignment.TopStart)
-                    .padding(4.dp),
+                    .padding(3.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Light,
@@ -229,8 +228,7 @@ fun DisplayDate(
                 text = largeText,
                 color = textColor,
                 modifier = Modifier
-                    .alpha(textAlpha)
-                    .then(if (twoValues) Modifier.padding(4.dp).align(Alignment.BottomEnd) else Modifier.align(Alignment.Center)),
+                    .alpha(textAlpha),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
             )
