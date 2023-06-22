@@ -6,7 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -83,7 +83,7 @@ fun ReportScreen(
             modifier = Modifier.fillMaxWidth(),
         )
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 192.dp),
+            columns = GridCells.Adaptive(minSize = 231.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(16.dp),
@@ -200,8 +200,9 @@ fun DisplayDate(
         else -> date.date.dayOfMonth.toString()
     }
 
-    BoxWithConstraints(
-        contentAlignment = Alignment.Center,
+    val twoValues = smallText != null && largeText != null
+
+    Box(
         modifier = modifier
             .background(color)
             .fillMaxHeight()
@@ -210,27 +211,28 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
-        if (smallText != null && minHeight > 41.dp) {
+        if (smallText != null) {
             Text(
                 text = smallText,
                 color = textColor,
                 modifier = Modifier
                     .alpha(textAlpha)
                     .align(Alignment.TopStart)
-                    .padding(3.dp),
+                    .padding(2.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.ExtraLight,
+                fontWeight = FontWeight.Light,
             )
         }
         if (largeText != null) {
             Text(
                 text = largeText,
                 color = textColor,
-                modifier = Modifier.alpha(textAlpha),
+                modifier = Modifier
+                    .alpha(textAlpha)
+                    .then(if (twoValues) Modifier.padding(2.dp).align(Alignment.BottomEnd) else Modifier.align(Alignment.Center)),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Normal,
             )
         }
     }
@@ -246,6 +248,12 @@ fun TestDisplayDate() {
 @Preview(widthDp = 25, heightDp = 25)
 fun SmallDisplayDate() {
     DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now(), inRange = true, showValue = true))
+}
+
+@Composable
+@Preview(widthDp = 33, heightDp = 33)
+fun CarolineDisplayDate() {
+    DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now().withDayOfMonth(22), inRange = true, showValue = true))
 }
 
 @Composable
