@@ -81,6 +81,11 @@ fun CalendarSection(
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(text = "Minimum Calendar Size")
             Slider(value = minCalendarSize ?: calendarSizeRange.start, onValueChange = onSetMinCalendarSize)
+            // TODO add a CalendarGrid component to display what the calendars will be sized like with the current settings
+            // can determine how many columns will be shown with code similar to the following
+            // val density = LocalDensity.current
+            // val screenWidth = LocalConfiguration.current.screenWidthDp
+            // val columns = (screenWidth.value / minItemSize.value).toInt()
         }
     }
 }
