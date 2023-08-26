@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,8 +53,12 @@ fun SettingsScreen(
             onSetReminderEnabled = { scope.launch { viewModel.setReminderEnabled(it) } },
             onSetReminderTime = { scope.launch { viewModel.setReminderTime(it) } },
         )
-        CalendarSection(showValues = state.showRecordedValues, onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } })
-        // TODO add a setting that lets the user control the size of calendars
+        CalendarSection(
+            showValues = state.showRecordedValues,
+            onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } },
+            minCalendarSize = state.minCalendarSize,
+            onSetMinCalendarSize = { scope.launch { viewModel.setMinCalendarSize(it) } },
+        )
     }
 }
 
@@ -61,13 +66,21 @@ fun SettingsScreen(
 fun CalendarSection(
     showValues: Boolean,
     onSetShowValues: (value: Boolean) -> Unit,
+    minCalendarSize: Float?,
+    onSetMinCalendarSize: (value: Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val calendarSizeRange = 1f..100f
+
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.calendar_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
         Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(R.string.show_recorded_values))
             Switch(checked = showValues, onCheckedChange = onSetShowValues)
+        }
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(text = "Minimum Calendar Size")
+            Slider(value = minCalendarSize ?: calendarSizeRange.start, onValueChange = onSetMinCalendarSize)
         }
     }
 }
