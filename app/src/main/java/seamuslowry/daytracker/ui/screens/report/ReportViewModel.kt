@@ -18,6 +18,7 @@ import seamuslowry.daytracker.data.repos.ItemRepo
 import seamuslowry.daytracker.data.repos.SettingsRepo
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
+import seamuslowry.daytracker.ui.shared.DateDisplay
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -111,15 +112,6 @@ enum class DisplayOption(@StringRes val label: Int, val field: (locale: Locale) 
     MONTH(R.string.display_month, { ChronoField.DAY_OF_MONTH }, ChronoUnit.MONTHS),
     WEEK(R.string.display_week, { WeekFields.of(it).dayOfWeek() }, ChronoUnit.WEEKS),
 }
-
-data class DateDisplay(
-    val value: Int? = null,
-    @StringRes val text: Int? = null,
-    val maxValue: Int? = null,
-    val date: LocalDate,
-    val inRange: Boolean = true,
-    val showValue: Boolean = false,
-)
 
 data class ReportState(
     val selectedOption: DisplayOption = DisplayOption.MONTH,
