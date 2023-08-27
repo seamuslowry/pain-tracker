@@ -28,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,8 +36,13 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.R
+import seamuslowry.daytracker.models.ItemConfiguration
 import seamuslowry.daytracker.models.localeFormat
+import seamuslowry.daytracker.ui.shared.CalendarGrid
+import seamuslowry.daytracker.ui.shared.mapToCalendarStructure
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.temporal.ChronoField
 
 @Composable
 fun SettingsScreen(
@@ -70,7 +76,24 @@ fun CalendarSection(
     onSetMinCalendarSize: (value: Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val calendarSizeRange = 1f..100f
+    val calendarSizeRange = 200f..500f
+
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val columns = minCalendarSize?.let { (screenWidth / it).toInt() + 1 } ?: 1
+
+    val now = LocalDate.now()
+    val range = now.range(ChronoField.DAY_OF_MONTH)
+    val dateRange = now.withDayOfMonth(range.minimum.toInt())..now.withDayOfMonth(range.maximum.toInt())
+
+    val calendars = mapToCalendarStructure(
+        dateRange,
+        (0..columns).associate { calenderIndex ->
+            ItemConfiguration(id = calenderIndex.toLong(), name = calenderIndex.toString()) to listOf() // TODO transform dateRange to list of Items
+        },
+        false,
+    )
+
+    val calendarSize = (minCalendarSize ?: 0f).coerceAtLeast(calendarSizeRange.start)
 
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.calendar_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
@@ -80,12 +103,13 @@ fun CalendarSection(
         }
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(text = "Minimum Calendar Size")
-            Slider(value = minCalendarSize ?: calendarSizeRange.start, onValueChange = onSetMinCalendarSize)
-            // TODO add a CalendarGrid component to display what the calendars will be sized like with the current settings
-            // can determine how many columns will be shown with code similar to the following
-            // val density = LocalDensity.current
-            // val screenWidth = LocalConfiguration.current.screenWidthDp
-            // val columns = (screenWidth.value / minItemSize.value).toInt()
+            Slider(value = calendarSize, onValueChange = onSetMinCalendarSize, valueRange = calendarSizeRange)
+            CalendarGrid(
+                groupedItems = calendars,
+                onSelectDate = {},
+                minCalendarSize = calendarSize.dp,
+                spacing = 16.dp,
+            )
         }
     }
 }

@@ -35,9 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
+import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
 import java.time.LocalDate
 import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
+import java.time.temporal.WeekFields
 import java.util.Locale
 
 data class DateDisplay(
@@ -195,6 +198,30 @@ fun DisplayDate(
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
+    }
+}
+
+fun mapToCalendarStructure(dateRange: ClosedRange<LocalDate>, itemsMap: Map<ItemConfiguration, List<Item>>, showRecordedValues: Boolean): Map<ItemConfiguration, List<List<DateDisplay>>> {
+    val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
+    val range = dateRange.start.range(dayOfWeekField)
+    val blanksFrom = dateRange.start.with(dayOfWeekField, range.minimum)
+    val blanksTo = dateRange.endInclusive.with(dayOfWeekField, range.maximum)
+    val baseDate = DateDisplay(showValue = showRecordedValues, date = dateRange.start)
+
+    val startingBlanks = List(ChronoUnit.DAYS.between(blanksFrom, dateRange.start).toInt()) { baseDate.copy(date = dateRange.start.minusDays(it.toLong() + 1), inRange = false) }.reversed()
+    val endingBlanks = List(ChronoUnit.DAYS.between(dateRange.endInclusive, blanksTo).toInt()) { baseDate.copy(date = dateRange.endInclusive.plusDays(it.toLong() + 1), inRange = false) }
+
+    val sequence = generateSequence(dateRange.start) { it.plusDays(1) }.takeWhile { it <= dateRange.endInclusive }
+
+    return itemsMap.mapValues { entry ->
+        val sequenceDisplays = sequence.map { date ->
+            entry.value.firstOrNull { item -> item.date == date }?.let { item ->
+                val selection = entry.key.trackingType.options.firstOrNull { it.value == item.value }
+                baseDate.copy(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date = date)
+            } ?: baseDate.copy(date = date)
+        }.toList()
+
+        (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
     }
 }
 
