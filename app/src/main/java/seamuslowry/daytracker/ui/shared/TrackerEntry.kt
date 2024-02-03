@@ -20,6 +20,8 @@ fun TrackerEntry(
     onChange: (Int) -> Unit = {},
     enabled: Boolean = true,
 ) {
+    // notes: no good for now; 10 options is too many for this to handle well on any screen size
+    // the "10" gets stacked and looks janky. revisit
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         trackerType.options.forEachIndexed { index, option ->
             SegmentedButton(enabled = enabled, selected = option.value == value, icon= {}, onClick = { onChange(option.value) }, shape = SegmentedButtonDefaults.itemShape(index = index, count = trackerType.options.size)) {
