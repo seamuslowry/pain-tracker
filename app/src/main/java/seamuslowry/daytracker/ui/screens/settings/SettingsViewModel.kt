@@ -2,22 +2,20 @@ package seamuslowry.daytracker.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import seamuslowry.daytracker.data.repos.Settings
 import seamuslowry.daytracker.data.repos.SettingsRepo
-import seamuslowry.daytracker.workers.cancelReminderWorker
-import seamuslowry.daytracker.workers.scheduleReminderWorker
+import seamuslowry.daytracker.workers.Scheduler
 import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val settingsRepo: SettingsRepo,
-    private val workManager: WorkManager,
+    private val scheduler: Scheduler,
 ) : ViewModel() {
     val state: StateFlow<Settings> = settingsRepo.settings.stateIn(
         scope = viewModelScope,
@@ -40,10 +38,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun scheduleReminder(time: LocalTime) {
-        workManager.scheduleReminderWorker(time)
+        scheduler.scheduleReminderWorker(time)
     }
 
     private fun cancelReminder() {
-        workManager.cancelReminderWorker()
+        scheduler.cancelReminderWorker()
     }
 }

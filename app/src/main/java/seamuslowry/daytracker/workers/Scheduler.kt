@@ -1,39 +1,44 @@
 package seamuslowry.daytracker.workers
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.util.Log
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private const val TAG = "Scheduler"
 
-fun WorkManager.scheduleReminderWorker(startTime: LocalTime) {
-    val now = LocalDateTime.now()
-    val todayStart = LocalDateTime.of(LocalDate.now(), startTime)
-    val tomorrowStart = LocalDateTime.of(LocalDate.now().plusDays(1), startTime)
+class Scheduler @Inject constructor(@ApplicationContext private val context: Context) {
+    fun scheduleReminderWorker(startTime: LocalTime) {
+        val (alarmManager, pendingIntent) = alarmPieces()
+        val now = LocalDateTime.now()
+        val todayStart = LocalDateTime.of(LocalDate.now(), startTime)
+        val tomorrowStart = LocalDateTime.of(LocalDate.now().plusDays(1), startTime)
 
-    val diff = listOf(ChronoUnit.MILLIS.between(now, todayStart), ChronoUnit.MILLIS.between(now, tomorrowStart))
-        .filter { it > 0 }
-        .min()
+        val diff = listOf(ChronoUnit.MILLIS.between(now, todayStart), ChronoUnit.MILLIS.between(now, tomorrowStart))
+            .filter { it > 0 }
+            .min()
 
-    val dailyRequest = PeriodicWorkRequestBuilder<EntryReminderWorker>(1, TimeUnit.DAYS)
-        .setInitialDelay(diff, TimeUnit.MILLISECONDS)
-        .build()
+        Log.d(TAG, "Scheduling alarm to run once per day at ${now.plus(diff, ChronoUnit.MILLIS)}")
 
-    Log.d(TAG, "Scheduling work ${EntryReminderWorker.WORK_ID} to run once per day at ${now.plus(diff, ChronoUnit.MILLIS)}")
-    this.enqueueUniquePeriodicWork(
-        EntryReminderWorker.WORK_ID,
-        ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-        dailyRequest,
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, diff, AlarmManager.INTERVAL_DAY, pendingIntent)
+    }
+
+    fun cancelReminderWorker() {
+        val (alarmManager, pendingIntent) = alarmPieces()
+        Log.d(TAG, "Cancelling alarm")
+        alarmManager.cancel(pendingIntent)
+    }
+
+    private fun alarmPieces(): Pair<AlarmManager, PendingIntent> = Pair(
+        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager,
+        PendingIntent.getBroadcast(context, 0, Intent(context, ReminderBroadcastReceiver::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT),
+
     )
-}
-
-fun WorkManager.cancelReminderWorker() {
-    Log.d(TAG, "Cancelling work for ${EntryReminderWorker.WORK_ID}")
-    this.cancelUniqueWork(EntryReminderWorker.WORK_ID)
 }
