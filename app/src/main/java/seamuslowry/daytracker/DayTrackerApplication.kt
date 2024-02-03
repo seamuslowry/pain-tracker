@@ -16,7 +16,8 @@ class DayTrackerApplication : Application(), Configuration.Provider {
         this.createReminderNotificationChannel()
     }
 
-    override fun getWorkManagerConfiguration() = Configuration.Builder()
-        .setWorkerFactory(workerFactory)
-        .build()
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }

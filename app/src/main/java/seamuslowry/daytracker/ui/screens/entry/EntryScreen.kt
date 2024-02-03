@@ -236,14 +236,17 @@ fun AddConfigurationButton(
     val cardColor by animateColorAsState(
         targetValue = if (itemConfiguration != null) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
         animationSpec = tween(durationMillis = mainDuration),
+        label = "cardColor",
     )
     val textColor by animateColorAsState(
         targetValue = if (itemConfiguration != null) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
         animationSpec = tween(durationMillis = extraDuration, delayMillis = mainDuration),
+        label = "textColor",
     )
     val corner by animateIntAsState(
         targetValue = if (itemConfiguration != null) 10 else 50,
         animationSpec = tween(durationMillis = mainDuration),
+        label = "corner",
     )
 
     Box(
@@ -315,15 +318,15 @@ fun AddConfigurationContent(
     ArrowPicker(
         value = itemConfiguration.trackingType.ordinal.toLong(),
         onChange = {
-            onChange(itemConfiguration.copy(trackingType = TrackingType.values()[it.toInt()]))
+            onChange(itemConfiguration.copy(trackingType = TrackingType.entries[it.toInt()]))
         },
-        range = LongRange(0, (TrackingType.values().size - 1).toLong()),
+        range = LongRange(0, (TrackingType.entries.size - 1).toLong()),
         modifier = Modifier.padding(5.dp),
         incrementResource = R.string.change_tracking_type,
         decrementResource = R.string.change_tracking_type,
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            TrackerEntry(trackerType = TrackingType.values()[it.toInt()], enabled = false)
+            TrackerEntry(trackerType = TrackingType.entries[it.toInt()], enabled = false)
         }
     }
     Button(

@@ -20,9 +20,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -94,7 +93,7 @@ fun ReportScreen(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DisplaySelection(
     selected: DisplayOption,
@@ -102,7 +101,7 @@ fun DisplaySelection(
     modifier: Modifier = Modifier,
 ) {
     FlowRow(modifier = modifier, horizontalArrangement = Arrangement.Center) {
-        DisplayOption.values().forEach {
+        DisplayOption.entries.forEach {
             FilterChip(selected = selected == it, modifier = Modifier.padding(horizontal = 4.dp), onClick = { onSelect(it) }, label = { Text(text = stringResource(it.label)) })
         }
     }
@@ -124,7 +123,10 @@ fun DisplayDates(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(text = entry.key.name, style = MaterialTheme.typography.titleLarge)
-            Divider(modifier = Modifier.padding(4.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            HorizontalDivider(
+                modifier = Modifier.padding(4.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

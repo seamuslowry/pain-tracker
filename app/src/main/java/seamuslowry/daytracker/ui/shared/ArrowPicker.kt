@@ -10,8 +10,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowLeft
-import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -38,7 +38,7 @@ fun <T> ArrowPicker(
             onClick = { onDecrement(value) },
             enabled = decrementEnabled,
         ) {
-            Icon(Icons.Filled.ArrowLeft, contentDescription = stringResource(incrementResource))
+            Icon(Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = stringResource(incrementResource))
         }
         AnimatedContent(
             modifier = Modifier.weight(1f),
@@ -48,6 +48,7 @@ fun <T> ArrowPicker(
                 val outModifier = -inModifier
                 slideInHorizontally { height -> height * inModifier } + fadeIn() togetherWith slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
             },
+            label = "arrowPickerContent",
         ) { targetType ->
             content(targetType)
         }
@@ -55,7 +56,7 @@ fun <T> ArrowPicker(
             onClick = { onIncrement(value) },
             enabled = incrementEnabled,
         ) {
-            Icon(Icons.Filled.ArrowRight, contentDescription = stringResource(decrementResource))
+            Icon(Icons.AutoMirrored.Filled.ArrowRight, contentDescription = stringResource(decrementResource))
         }
     }
 }
