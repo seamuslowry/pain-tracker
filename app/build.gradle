@@ -84,7 +84,6 @@ dependencies {
     ksp "androidx.room:room-compiler:$room_version"
 
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
-    kapt "androidx.hilt:hilt-compiler:$hilt_ext_version"
 
     testImplementation 'junit:junit:4.13.2'
 

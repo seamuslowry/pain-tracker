@@ -4,7 +4,6 @@ buildscript {
         compose_material_version = '1.2.0-rc01'
         compose_compiler_version = '1.5.8'
         hilt_version = '2.50'
-        hilt_ext_version = '1.1.0'
         room_version = '2.6.1'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
