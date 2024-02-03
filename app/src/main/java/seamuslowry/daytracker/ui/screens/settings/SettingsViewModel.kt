@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import seamuslowry.daytracker.data.repos.Settings
 import seamuslowry.daytracker.data.repos.SettingsRepo
-import seamuslowry.daytracker.workers.Scheduler
+import seamuslowry.daytracker.reminders.Scheduler
 import java.time.LocalTime
 import javax.inject.Inject
 
@@ -38,10 +38,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun scheduleReminder(time: LocalTime) {
-        scheduler.scheduleReminderWorker(time)
+        scheduler.scheduleReminder(time)
     }
 
     private fun cancelReminder() {
-        scheduler.cancelReminderWorker()
+        scheduler.cancelReminder()
     }
 }

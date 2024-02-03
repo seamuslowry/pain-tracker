@@ -1,4 +1,4 @@
-package seamuslowry.daytracker.workers
+package seamuslowry.daytracker.reminders
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -15,7 +15,7 @@ import javax.inject.Inject
 private const val TAG = "Scheduler"
 
 class Scheduler @Inject constructor(@ApplicationContext private val context: Context) {
-    fun scheduleReminderWorker(startTime: LocalTime) {
+    fun scheduleReminder(startTime: LocalTime) {
         val (alarmManager, pendingIntent) = alarmPieces()
         val now = LocalDateTime.now()
         val todayStart = LocalDateTime.of(LocalDate.now(), startTime)
@@ -25,14 +25,14 @@ class Scheduler @Inject constructor(@ApplicationContext private val context: Con
             .filter { it > 0 }
             .min()
 
-        Log.d(TAG, "Scheduling alarm to run once per day at ${now.plus(diff, ChronoUnit.MILLIS)}")
+        Log.d(TAG, "Scheduling reminder to run once per day at ${now.plus(diff, ChronoUnit.MILLIS)}")
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, diff, AlarmManager.INTERVAL_DAY, pendingIntent)
     }
 
-    fun cancelReminderWorker() {
+    fun cancelReminder() {
         val (alarmManager, pendingIntent) = alarmPieces()
-        Log.d(TAG, "Cancelling alarm")
+        Log.d(TAG, "Cancelling reminder")
         alarmManager.cancel(pendingIntent)
     }
 

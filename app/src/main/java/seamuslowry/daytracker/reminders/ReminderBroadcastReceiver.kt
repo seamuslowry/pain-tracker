@@ -1,4 +1,4 @@
-package seamuslowry.daytracker.workers
+package seamuslowry.daytracker.reminders
 
 import android.Manifest
 import android.app.PendingIntent

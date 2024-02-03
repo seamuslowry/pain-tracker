@@ -5,7 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import seamuslowry.daytracker.R
-import seamuslowry.daytracker.workers.ReminderBroadcastReceiver
+import seamuslowry.daytracker.reminders.ReminderBroadcastReceiver
 
 fun Application.createReminderNotificationChannel() {
     val name = getString(R.string.reminders_channel_name)
