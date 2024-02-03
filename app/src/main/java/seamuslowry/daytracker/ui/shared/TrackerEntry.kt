@@ -24,7 +24,7 @@ fun TrackerEntry(
     // the "10" gets stacked and looks janky. revisit
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         trackerType.options.forEachIndexed { index, option ->
-            SegmentedButton(enabled = enabled, selected = option.value == value, icon= {}, onClick = { onChange(option.value) }, shape = SegmentedButtonDefaults.itemShape(index = index, count = trackerType.options.size)) {
+            SegmentedButton(enabled = enabled, selected = option.value == value, icon = {}, onClick = { onChange(option.value) }, shape = SegmentedButtonDefaults.itemShape(index = index, count = trackerType.options.size)) {
                 Text(text = option.text?.let { text -> stringResource(id = text) } ?: option.value.toString())
             }
         }
