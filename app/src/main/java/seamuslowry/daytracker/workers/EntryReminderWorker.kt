@@ -62,7 +62,7 @@ class EntryReminderWorker @AssistedInject constructor(
 
         // Create the notification
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .setContentTitle(context.getString(R.string.reminder_notification_title))
             .setContentText(context.getString(R.string.reminder_notification_desc))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
