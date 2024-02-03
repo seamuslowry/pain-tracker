@@ -6,13 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.graphics.drawable.IconCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -65,7 +62,7 @@ class EntryReminderWorker @AssistedInject constructor(
 
         // Create the notification
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
-            .setSmallIcon(android.R.drawable.ic_menu_edit)
+            .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .setContentTitle(context.getString(R.string.reminder_notification_title))
             .setContentText(context.getString(R.string.reminder_notification_desc))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
