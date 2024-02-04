@@ -9,25 +9,28 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.temporal.ChronoUnit
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 private const val TAG = "Scheduler"
 
 class Scheduler @Inject constructor(@ApplicationContext private val context: Context) {
     fun scheduleReminder(startTime: LocalTime) {
+        // attempt to cancel the reminder
+        cancelReminder()
+
+        // once the old one is cancelled, attempt to schedule the new one
         val (alarmManager, pendingIntent) = alarmPieces()
         val now = LocalDateTime.now()
         val todayStart = LocalDateTime.of(LocalDate.now(), startTime)
         val tomorrowStart = LocalDateTime.of(LocalDate.now().plusDays(1), startTime)
 
-        val diff = listOf(ChronoUnit.MILLIS.between(now, todayStart), ChronoUnit.MILLIS.between(now, tomorrowStart))
-            .filter { it > 0 }
-            .min()
+        val start = listOf(todayStart, tomorrowStart).firstOrNull { it.isAfter(now) } ?: todayStart
+        val epochMilli = start.toInstant(ZonedDateTime.now().offset).toEpochMilli()
 
-        Log.d(TAG, "Scheduling reminder to run once per day at ${now.plus(diff, ChronoUnit.MILLIS)}")
+        Log.d(TAG, "Scheduling reminder to run once per day at $start. Epoch Milli: $epochMilli")
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, diff, AlarmManager.INTERVAL_DAY, pendingIntent)
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, epochMilli, AlarmManager.INTERVAL_DAY, pendingIntent)
     }
 
     fun cancelReminder() {
@@ -39,6 +42,5 @@ class Scheduler @Inject constructor(@ApplicationContext private val context: Con
     private fun alarmPieces(): Pair<AlarmManager, PendingIntent> = Pair(
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager,
         PendingIntent.getBroadcast(context, 0, Intent(context, ReminderBroadcastReceiver::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT),
-
     )
 }

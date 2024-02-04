@@ -12,6 +12,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import seamuslowry.daytracker.MainActivity
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemConfigurationRepo
@@ -27,21 +30,34 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
     @Inject lateinit var itemConfigurationRepo: ItemConfigurationRepo
     override fun onReceive(context: Context?, intent: Intent?) {
-        val date = LocalDate.now()
-        val completedItems = itemRepo.getCompleted(date)
-        val totalTrackedItems = itemConfigurationRepo.getTotal()
-        Log.d(
-            TAG,
-            "Determining reminder for $date with $totalTrackedItems total configuration items and $completedItems completed items",
-        )
-        if (completedItems < totalTrackedItems) {
-            Log.d(TAG, "Sending reminder notification for $date")
-            showNotification(context)
+        Log.d(TAG, "Entering reminder broadcast receiver")
+        context ?: return
+
+        Log.d(TAG, "Processing reminder broadcast receiver")
+
+        val pending = goAsync()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.d(TAG, "Entering reminder broadcast receiver coroutine scope")
+
+            val date = LocalDate.now()
+            val completedItems = itemRepo.getCompleted(date)
+            val totalTrackedItems = itemConfigurationRepo.getTotal()
+            Log.d(
+                TAG,
+                "Determining reminder for $date with $totalTrackedItems total configuration items and $completedItems completed items",
+            )
+            if (completedItems < totalTrackedItems) {
+                Log.d(TAG, "Sending reminder notification for $date")
+                showNotification(context)
+            }
+
+            pending.finish()
         }
     }
 
-    private fun showNotification(context: Context?) {
-        if (context == null || ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+    private fun showNotification(context: Context) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return
         }
 
