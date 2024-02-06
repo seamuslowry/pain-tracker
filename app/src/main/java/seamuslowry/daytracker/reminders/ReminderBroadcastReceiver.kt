@@ -1,7 +1,8 @@
-package seamuslowry.daytracker.workers
+package seamuslowry.daytracker.reminders
 
 import android.Manifest
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,58 +11,67 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
 import androidx.core.app.NotificationManagerCompat
-import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import seamuslowry.daytracker.MainActivity
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemConfigurationRepo
 import seamuslowry.daytracker.data.repos.ItemRepo
 import java.time.LocalDate
+import javax.inject.Inject
 
-private const val TAG = "EntryReminderWorker"
+private const val TAG = "ReminderBroadcastReceiver"
 
-@HiltWorker
-class EntryReminderWorker @AssistedInject constructor(
-    @Assisted private val context: Context,
-    @Assisted workerParameters: WorkerParameters,
-    private val itemRepo: ItemRepo,
-    private val itemConfigurationRepo: ItemConfigurationRepo,
-) : CoroutineWorker(context, workerParameters) {
-    override suspend fun doWork(): Result {
-        return try {
+@AndroidEntryPoint
+class ReminderBroadcastReceiver : BroadcastReceiver() {
+    @Inject lateinit var itemRepo: ItemRepo
+
+    @Inject lateinit var itemConfigurationRepo: ItemConfigurationRepo
+    override fun onReceive(context: Context?, intent: Intent?) {
+        Log.d(TAG, "Entering reminder broadcast receiver")
+        context ?: return
+
+        Log.d(TAG, "Processing reminder broadcast receiver")
+
+        val pending = goAsync()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.d(TAG, "Entering reminder broadcast receiver coroutine scope")
+
             val date = LocalDate.now()
             val completedItems = itemRepo.getCompleted(date)
             val totalTrackedItems = itemConfigurationRepo.getTotal()
-            Log.d(TAG, "Determining reminder for $date with $totalTrackedItems total configuration items and $completedItems completed items")
+            Log.d(
+                TAG,
+                "Determining reminder for $date with $totalTrackedItems total configuration items and $completedItems completed items",
+            )
             if (completedItems < totalTrackedItems) {
                 Log.d(TAG, "Sending reminder notification for $date")
-                showNotification()
+                showNotification(context)
             }
-            Result.success()
-        } catch (e: Exception) {
-            Result.retry()
+
+            pending.finish()
         }
     }
 
-    private fun showNotification() {
+    private fun showNotification(context: Context) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return
         }
 
         // Prepare the intent for notification click action
-        val intent = Intent(applicationContext, MainActivity::class.java)
+        val intent = Intent(context, MainActivity::class.java)
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            applicationContext,
+            context,
             REQUEST_CODE,
             intent,
             PendingIntent.FLAG_IMMUTABLE,
         )
 
         // Create the notification
-        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
             .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .setContentTitle(context.getString(R.string.reminder_notification_title))
             .setContentText(context.getString(R.string.reminder_notification_desc))
@@ -71,13 +81,12 @@ class EntryReminderWorker @AssistedInject constructor(
             .setAutoCancel(true)
 
         // Show the notification
-        with(NotificationManagerCompat.from(applicationContext)) {
+        with(NotificationManagerCompat.from(context)) {
             notify(NOTIFICATION_ID, builder.build())
         }
     }
 
     companion object {
-        const val WORK_ID = "entry_reminder_worker"
         const val NOTIFICATION_CHANNEL = "entry_reminder"
         const val NOTIFICATION_ID = 1
         const val REQUEST_CODE = 0
