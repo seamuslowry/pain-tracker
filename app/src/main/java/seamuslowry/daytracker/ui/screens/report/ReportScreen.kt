@@ -211,7 +211,7 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
-        // specifically allowing this because Caroline likes her phone supporting them this small
+        // specifically allowing this because Caroline likes her phone supporting date displays this small
         val enoughSpaceToLookNice = maxHeight >= 35.dp
         val (smallTextAlignment, largeTextAlignment) = Pair(
             if (enoughSpaceToLookNice) Alignment.TopStart else Alignment.TopCenter,
