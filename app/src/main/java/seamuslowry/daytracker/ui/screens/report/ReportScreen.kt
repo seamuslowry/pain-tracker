@@ -6,7 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -201,7 +201,7 @@ fun DisplayDate(
         else -> date.date.dayOfMonth.toString()
     }
 
-    Box(
+    BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .background(color)
@@ -211,12 +211,19 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
+        // specifically allowing this because Caroline likes her phone supporting date displays this small
+        val enoughSpaceToLookNice = maxHeight >= 35.dp
+        val (smallTextAlignment, largeTextAlignment) = Pair(
+            if (enoughSpaceToLookNice) Alignment.TopStart else Alignment.TopCenter,
+            if (smallText == null || enoughSpaceToLookNice) Alignment.Center else Alignment.BottomCenter,
+        )
+
         if (smallText != null) {
             Text(
                 text = smallText,
                 color = textColor,
                 modifier = Modifier
-                    .align(Alignment.TopStart)
+                    .align(smallTextAlignment)
                     .alpha(textAlpha)
                     .padding(horizontal = 4.dp),
                 textAlign = TextAlign.Center,
@@ -228,7 +235,9 @@ fun DisplayDate(
             Text(
                 text = largeText,
                 color = textColor,
-                modifier = Modifier.alpha(textAlpha),
+                modifier = Modifier
+                    .alpha(textAlpha)
+                    .align(largeTextAlignment),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Light,
