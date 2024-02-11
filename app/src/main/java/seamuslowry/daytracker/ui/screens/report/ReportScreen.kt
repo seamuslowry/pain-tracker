@@ -215,7 +215,7 @@ fun DisplayDate(
         val enoughSpaceToLookNice = maxHeight >= 35.dp
         val (smallTextAlignment, largeTextAlignment) = Pair(
             if (enoughSpaceToLookNice) Alignment.TopStart else Alignment.TopCenter,
-            if (smallText == null || enoughSpaceToLookNice) Alignment.Center else Alignment.BottomCenter
+            if (smallText == null || enoughSpaceToLookNice) Alignment.Center else Alignment.BottomCenter,
         )
 
         if (smallText != null) {
