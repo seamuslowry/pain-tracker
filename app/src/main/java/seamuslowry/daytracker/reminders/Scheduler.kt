@@ -41,6 +41,10 @@ class Scheduler @Inject constructor(@ApplicationContext private val context: Con
 
     private fun alarmPieces(): Pair<AlarmManager, PendingIntent> = Pair(
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager,
-        PendingIntent.getBroadcast(context, 0, Intent(context, ReminderBroadcastReceiver::class.java).apply { action = "seamuslowry.daytracker.REMINDER_ACTION" }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT),
+        PendingIntent.getBroadcast(context, 0, Intent(context, ReminderBroadcastReceiver::class.java).apply { action = ACTION }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT),
     )
+
+    companion object {
+        const val ACTION = "seamuslowry.daytracker.REMINDER_ACTION"
+    }
 }
