@@ -1,5 +1,6 @@
 package seamuslowry.daytracker.reminders
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -22,10 +23,10 @@ class RestartBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var scheduler: Scheduler
 
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.d(TAG, "Entering restart broadcast receiver")
         context ?: return
-        if (intent?.action != Scheduler.ACTION) return
 
         Log.d(TAG, "Processing restart broadcast receiver")
 
