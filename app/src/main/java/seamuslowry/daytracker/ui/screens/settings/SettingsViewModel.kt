@@ -42,6 +42,6 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun cancelReminder() {
-        scheduler.cancelReminder()
+        scheduler.tryCancelReminder()
     }
 }

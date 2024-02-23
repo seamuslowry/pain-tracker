@@ -16,11 +16,9 @@ private const val TAG = "Scheduler"
 
 class Scheduler @Inject constructor(@ApplicationContext private val context: Context) {
     fun scheduleReminder(startTime: LocalTime) {
-        // attempt to cancel the reminder
-        cancelReminder()
+        // attempt to schedule the new reminder over the old one
+        val (alarmManager, pendingIntent) = alarmPieces(PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
-        // once the old one is cancelled, attempt to schedule the new one
-        val (alarmManager, pendingIntent) = alarmPieces()
         val now = LocalDateTime.now()
         val todayStart = LocalDateTime.of(LocalDate.now(), startTime)
         val tomorrowStart = LocalDateTime.of(LocalDate.now().plusDays(1), startTime)
@@ -33,15 +31,17 @@ class Scheduler @Inject constructor(@ApplicationContext private val context: Con
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, epochMilli, AlarmManager.INTERVAL_DAY, pendingIntent)
     }
 
-    fun cancelReminder() {
-        val (alarmManager, pendingIntent) = alarmPieces()
-        Log.d(TAG, "Cancelling reminder")
-        alarmManager.cancel(pendingIntent)
+    fun tryCancelReminder() {
+        val (alarmManager, pendingIntent) = alarmPieces(PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE)
+        if (pendingIntent != null) {
+            Log.d(TAG, "Cancelling reminder")
+            alarmManager.cancel(pendingIntent)
+        }
     }
 
-    private fun alarmPieces(): Pair<AlarmManager, PendingIntent> = Pair(
+    private fun alarmPieces(flags: Int): Pair<AlarmManager, PendingIntent?> = Pair(
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager,
-        PendingIntent.getBroadcast(context, 0, Intent(context, ReminderBroadcastReceiver::class.java).apply { action = ACTION }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT),
+        PendingIntent.getBroadcast(context, 0, Intent(context, ReminderBroadcastReceiver::class.java).apply { action = ACTION }, flags)
     )
 
     companion object {
