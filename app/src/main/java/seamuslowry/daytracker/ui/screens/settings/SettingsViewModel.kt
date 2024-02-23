@@ -17,7 +17,6 @@ class SettingsViewModel @Inject constructor(
     private val settingsRepo: SettingsRepo,
     private val scheduler: Scheduler,
 ) : ViewModel() {
-    // TODO maybe ask the scheduler as well to indicate enabled reminders????
     val state: StateFlow<Settings> = settingsRepo.settings.stateIn(
         scope = viewModelScope,
         initialValue = Settings(),
