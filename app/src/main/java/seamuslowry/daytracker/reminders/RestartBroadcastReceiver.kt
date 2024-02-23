@@ -6,10 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import seamuslowry.daytracker.data.repos.SettingsRepo
 import javax.inject.Inject
 
@@ -30,27 +28,17 @@ class RestartBroadcastReceiver : BroadcastReceiver() {
 
         Log.d(TAG, "Processing restart broadcast receiver")
 
-        // TODO: maybe this shouldn't be async??
-        val pending = goAsync()
+        val settings = runBlocking { settingsRepo.settings.firstOrNull() }
 
-        // TODO: should this just be runBlocking on the settings read?
-        CoroutineScope(Dispatchers.IO).launch {
-            Log.d(TAG, "Entering restart broadcast receiver coroutine scope")
+        // if reminders aren't enabled, exit early and return
+        if (settings?.reminderEnabled != true) {
+            Log.d(TAG, "Exiting early because reminders are not enabled")
 
-            val settings = settingsRepo.settings.firstOrNull()
-
-            // if reminders aren't enabled, exit early and return
-            if (settings?.reminderEnabled != true) {
-                Log.d(TAG, "Exiting early because reminders are not enabled")
-
-                pending.finish()
-                return@launch
-            }
-
-            val reminderTime = settings.reminderTime
-            scheduler.scheduleReminder(reminderTime)
-
-            pending.finish()
+            return
         }
+
+        Log.d(TAG, "Scheduling reminder after ${intent?.action}")
+        val reminderTime = settings.reminderTime
+        scheduler.scheduleReminder(reminderTime)
     }
 }
