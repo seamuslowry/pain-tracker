@@ -28,7 +28,7 @@ class Scheduler @Inject constructor(@ApplicationContext private val context: Con
 
         Log.d(TAG, "Scheduling reminder to run once per day at $start. Epoch Milli: $epochMilli")
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, epochMilli, AlarmManager.INTERVAL_DAY, pendingIntent)
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, epochMilli, AlarmManager.INTERVAL_DAY, pendingIntent!!)
     }
 
     fun tryCancelReminder() {
