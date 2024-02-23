@@ -41,7 +41,7 @@ class Scheduler @Inject constructor(@ApplicationContext private val context: Con
 
     private fun alarmPieces(flags: Int): Pair<AlarmManager, PendingIntent?> = Pair(
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager,
-        PendingIntent.getBroadcast(context, 0, Intent(context, ReminderBroadcastReceiver::class.java).apply { action = ACTION }, flags)
+        PendingIntent.getBroadcast(context, 0, Intent(context, ReminderBroadcastReceiver::class.java).apply { action = ACTION }, flags),
     )
 
     companion object {
