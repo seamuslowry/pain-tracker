@@ -23,10 +23,10 @@ class RescheduleReminderBroadcastReceiver : BroadcastReceiver() {
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d(TAG, "Entering restart broadcast receiver")
+        Log.d(TAG, "Entering reschedule reminder broadcast receiver")
         context ?: return
 
-        Log.d(TAG, "Processing restart broadcast receiver")
+        Log.d(TAG, "Processing reschedule reminder broadcast receiver")
 
         val settings = runBlocking { settingsRepo.settings.firstOrNull() }
 
