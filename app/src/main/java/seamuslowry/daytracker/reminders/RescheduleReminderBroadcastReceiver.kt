@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 import seamuslowry.daytracker.data.repos.SettingsRepo
 import javax.inject.Inject
 
-private const val TAG = "RestartBroadcastReceiver"
+private const val TAG = "RescheduleReminderBroadcastReceiver"
 
 @AndroidEntryPoint
 class RescheduleReminderBroadcastReceiver : BroadcastReceiver() {
