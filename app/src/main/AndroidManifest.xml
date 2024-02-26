@@ -28,7 +28,7 @@
                 <action android:name="seamuslowry.daytracker.REMINDER_ACTION" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".reminders.RestartBroadcastReceiver" android:exported="false" android:enabled="true">
+        <receiver android:name=".reminders.RescheduleReminderBroadcastReceiver" android:exported="false" android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

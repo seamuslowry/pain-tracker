@@ -14,7 +14,7 @@ import javax.inject.Inject
 private const val TAG = "RestartBroadcastReceiver"
 
 @AndroidEntryPoint
-class RestartBroadcastReceiver : BroadcastReceiver() {
+class RescheduleReminderBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var settingsRepo: SettingsRepo
 
