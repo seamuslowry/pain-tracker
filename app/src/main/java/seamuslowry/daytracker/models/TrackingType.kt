@@ -18,9 +18,3 @@ enum class LimitedOptionTrackingType(val options: List<Option>) : TrackingType {
 }
 
 data object TextEntryTrackingType : TrackingType
-
-val TRACKING_TYPES = listOf(
-    LimitedOptionTrackingType.ONE_TO_TEN,
-    LimitedOptionTrackingType.YES_NO,
-    TextEntryTrackingType
-)
