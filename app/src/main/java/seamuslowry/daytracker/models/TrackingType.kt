@@ -17,7 +17,10 @@ enum class LimitedOptionTrackingType(val options: List<Option>) : TrackingType {
     YES_NO(YesNoOption.entries.map { Option(it.value, it.text, it.shortText) }),
 }
 
+data object TextEntryTrackingType : TrackingType
+
 val TRACKING_TYPES = listOf(
     LimitedOptionTrackingType.ONE_TO_TEN,
     LimitedOptionTrackingType.YES_NO,
+    TextEntryTrackingType
 )
