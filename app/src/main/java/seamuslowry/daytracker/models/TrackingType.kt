@@ -12,5 +12,5 @@ data class Option(val value: Int, @StringRes val text: Int? = null, @StringRes v
 
 enum class TrackingType(val options: List<Option>) {
     ONE_TO_TEN((1..10).map { Option(it) }),
-    YES_NO(YesNoOption.values().map { Option(it.value, it.text, it.shortText) }),
+    YES_NO(YesNoOption.entries.map { Option(it.value, it.text, it.shortText) }),
 }
