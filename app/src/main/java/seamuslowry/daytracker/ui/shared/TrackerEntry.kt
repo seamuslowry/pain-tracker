@@ -30,6 +30,6 @@ fun TrackerEntry(
         ) {
             Text(text = it.text?.let { text -> stringResource(id = text) } ?: it.value.toString())
         }
-        is TextEntryTrackingType -> OutlinedTextField(value = "", placeholder = { Text(text = "Free Text Entry")} , onValueChange = {}, enabled = enabled, modifier = modifier)
+        is TextEntryTrackingType -> OutlinedTextField(value = "", placeholder = { Text(text = "Free Text Entry") }, onValueChange = {}, enabled = enabled, modifier = modifier)
     }
 }

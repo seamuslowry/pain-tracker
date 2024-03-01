@@ -61,11 +61,10 @@ import seamuslowry.daytracker.ui.shared.ArrowPicker
 import seamuslowry.daytracker.ui.shared.TrackerEntry
 import java.time.LocalDate
 
-
 val SUPPORTED_TRACKING_TYPES = listOf(
     LimitedOptionTrackingType.ONE_TO_TEN,
     LimitedOptionTrackingType.YES_NO,
-    TextEntryTrackingType
+    TextEntryTrackingType,
 )
 
 @Composable
