@@ -32,7 +32,7 @@ class Scheduler @Inject constructor(@ApplicationContext private val context: Con
 
         Log.d(TAG, "Attempting to set next transition reschedule.")
         val nextTransition = start.zone.rules.nextTransition(start.toInstant())
-        Log.d(TAG, "Next transition in ${start.zone} is ${nextTransition}.")
+        Log.d(TAG, "Next transition in ${start.zone} is $nextTransition.")
 
         if (nextTransition != null) {
             val rescheduleDate = nextTransition.dateTimeAfter.atZone(nextTransition.offsetAfter)
