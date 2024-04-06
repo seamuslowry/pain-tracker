@@ -26,18 +26,18 @@ class Scheduler @Inject constructor(@ApplicationContext private val context: Con
 
         val epochMilli = start.toInstant().toEpochMilli()
 
-        Log.d(TAG, "Scheduling reminder to run once per day starting $start. Epoch Milli: $epochMilli")
+        Log.d(TAG, "Setting reminder to run once per day starting $start. Epoch Milli: $epochMilli")
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, epochMilli, AlarmManager.INTERVAL_DAY, reminderPendingIntent!!)
 
-        Log.d(TAG, "Attempting to schedule next transition reschedule.")
+        Log.d(TAG, "Attempting to set next transition reschedule.")
         val nextTransition = start.zone.rules.nextTransition(start.toInstant())
         Log.d(TAG, "Next transition in ${start.zone} is ${nextTransition}.")
 
         if (nextTransition != null) {
             val rescheduleDate = nextTransition.dateTimeAfter.atZone(nextTransition.offsetAfter)
             val rescheduleMillis = rescheduleDate.toInstant().toEpochMilli()
-            Log.d(TAG, "Scheduling transition reschedule to run once $rescheduleDate. Epoch Milli: $rescheduleMillis")
+            Log.d(TAG, "Setting transition reschedule to run once $rescheduleDate. Epoch Milli: $rescheduleMillis")
 
             alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, rescheduleMillis, reschedulePendingIntent!!)
         } else {
