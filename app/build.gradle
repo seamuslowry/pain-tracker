@@ -11,6 +11,7 @@ spotless {
     kotlin {
         target '**/*.kt'
         ktlint()
+        // TODO editorconfigoverride for composable
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
