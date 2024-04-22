@@ -11,6 +11,9 @@ spotless {
     kotlin {
         target '**/*.kt'
         ktlint()
+            .editorConfigOverride([
+                'ktlint_function_naming_ignore_when_annotated_with': 'Composable',
+            ])
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
@@ -25,9 +28,8 @@ android {
         applicationId "seamuslowry.daytracker"
         minSdk 33
         targetSdk 34
-        versionCode 24
+        versionCode 27
         versionName "0.27.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -75,7 +77,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
     implementation 'androidx.activity:activity-compose:1.8.2'
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    implementation "androidx.hilt:hilt-navigation-compose:1.1.0"
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation 'com.google.accompanist:accompanist-placeholder-material3:0.30.1'
