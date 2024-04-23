@@ -153,8 +153,8 @@ fun ItemEntry(
         }
         TrackerEntry(
             trackerType = configuration.trackingType,
-            value = item?.value,
-            onChange = { value -> item?.let { onChange(it.copy(value = value)) } },
+            item = item,
+            onChange = onChange,
             modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
         )
     }

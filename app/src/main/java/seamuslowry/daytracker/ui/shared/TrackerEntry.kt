@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import seamuslowry.daytracker.models.TextEntryTrackingType
 import seamuslowry.daytracker.models.TrackingType
@@ -15,15 +16,15 @@ import seamuslowry.daytracker.models.TrackingType
 fun TrackerEntry(
     trackerType: TrackingType,
     modifier: Modifier = Modifier,
-    value: Int? = null,
-    onChange: (Int) -> Unit = {},
+    item: Item? = null,
+    onChange: (Item) -> Unit = {},
     enabled: Boolean = true,
 ) {
     when (trackerType) {
         is LimitedOptionTrackingType -> SegmentedButtons(
             values = trackerType.options,
-            value = trackerType.options.find { it.value == value },
-            onChange = { onChange(it.value) },
+            value = trackerType.options.find { it.value == item?.value },
+            onChange = { option -> item?.let { onChange(it.copy(value = option.value)) } },
             enabled = enabled,
             modifier = modifier
                 .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight),
