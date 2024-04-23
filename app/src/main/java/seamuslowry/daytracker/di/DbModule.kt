@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import seamuslowry.daytracker.data.room.DayTrackerDatabase
+import seamuslowry.daytracker.data.room.MIGRATION_6_7
 import seamuslowry.daytracker.data.room.daos.ItemConfigurationDao
 import seamuslowry.daytracker.data.room.daos.ItemDao
 import javax.inject.Singleton
@@ -21,7 +22,7 @@ object DbModule {
         @ApplicationContext context: Context,
     ): DayTrackerDatabase = Room
         .databaseBuilder(context, DayTrackerDatabase::class.java, "day_tracker_database")
-        .fallbackToDestructiveMigration()
+        .addMigrations(MIGRATION_6_7)
         .build()
 
     @Provides
