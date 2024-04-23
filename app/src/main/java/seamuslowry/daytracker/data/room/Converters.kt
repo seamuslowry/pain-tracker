@@ -2,6 +2,7 @@ package seamuslowry.daytracker.data.room
 
 import androidx.room.TypeConverter
 import seamuslowry.daytracker.models.LimitedOptionTrackingType
+import seamuslowry.daytracker.models.TextEntryTrackingType
 import seamuslowry.daytracker.models.TrackingType
 import java.time.LocalDate
 
@@ -20,7 +21,12 @@ class Converters {
     // TrackingType conversions
     @TypeConverter
     fun stringToTrackingType(value: String?): TrackingType? {
-        return value?.let { LimitedOptionTrackingType.valueOf(it) }
+        return when {
+            value == null -> null
+            LimitedOptionTrackingType.entries.any { it.name == value } -> LimitedOptionTrackingType.valueOf(value)
+            value == TextEntryTrackingType.toString() -> TextEntryTrackingType
+            else -> null
+        }
     }
 
     @TypeConverter

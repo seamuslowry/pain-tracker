@@ -33,4 +33,5 @@
     <string name="time">Time</string>
     <string name="calendar_section_title">Calendar</string>
     <string name="show_recorded_values">Show recorded values</string>
+    <string name="text_tracker_placeholder">Dear Day Tracker...</string>
 </resources>

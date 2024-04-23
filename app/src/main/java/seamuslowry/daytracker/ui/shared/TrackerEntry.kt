@@ -1,12 +1,14 @@
 package seamuslowry.daytracker.ui.shared
 
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import seamuslowry.daytracker.models.TextEntryTrackingType
@@ -31,6 +33,13 @@ fun TrackerEntry(
         ) {
             Text(text = it.text?.let { text -> stringResource(id = text) } ?: it.value.toString())
         }
-        is TextEntryTrackingType -> OutlinedTextField(value = "", placeholder = { Text(text = "Free Text Entry") }, onValueChange = {}, enabled = enabled, modifier = modifier)
+        // TODO: why is text entry so janky here
+        is TextEntryTrackingType -> OutlinedTextField(value = item?.comment ?: "", placeholder = {
+            Text(
+                text = stringResource(
+                    R.string.text_tracker_placeholder,
+                ),
+            )
+        }, onValueChange = { text -> item?.let { onChange(it.copy(comment = text)) } }, enabled = enabled, modifier = modifier.fillMaxWidth())
     }
 }
