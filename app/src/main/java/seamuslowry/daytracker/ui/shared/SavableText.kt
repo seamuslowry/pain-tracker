@@ -18,7 +18,7 @@ fun SavableText(
     enabled: Boolean = false,
 ) {
     var text by rememberSaveable { mutableStateOf(value) }
-    
+
     LaunchedEffect(key1 = text) {
         onSave(text)
     }

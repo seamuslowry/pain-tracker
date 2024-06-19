@@ -43,7 +43,7 @@ fun TrackerEntry(
                 )
             },
             modifier = modifier.fillMaxWidth(),
-            enabled = enabled
+            enabled = enabled,
         )
     }
 }
