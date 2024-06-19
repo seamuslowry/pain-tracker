@@ -23,5 +23,11 @@ fun DelayedSaveTextField(
         onSave(text)
     }
 
-    OutlinedTextField(value = text, enabled = enabled, placeholder = placeholder, onValueChange = { text = it }, modifier = modifier)
+    OutlinedTextField(
+        value = text,
+        enabled = enabled,
+        placeholder = placeholder,
+        onValueChange = { text = it },
+        modifier = modifier,
+    )
 }
