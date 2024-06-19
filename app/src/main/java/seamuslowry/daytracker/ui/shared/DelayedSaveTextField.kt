@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
 @Composable
-fun SavableText(
+fun DelayedSaveTextField(
     onSave: (value: String) -> Unit,
     value: String,
     placeholder: @Composable (() -> Unit),
