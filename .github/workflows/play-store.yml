@@ -37,7 +37,7 @@ jobs:
 
       - name: Build & validate Android release
         id: validate-release
-        if: "!contains(github.ref, 'main')"
+        if: github.ref == 'refs/heads/master'
         run: bundle exec fastlane android deploy dry_run:true
         env:
           STORE_FILE: ${{ steps.android_keystore.outputs.filePath }}
