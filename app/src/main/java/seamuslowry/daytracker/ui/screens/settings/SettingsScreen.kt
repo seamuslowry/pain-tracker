@@ -2,6 +2,7 @@ package seamuslowry.daytracker.ui.screens.settings
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color.parseColor
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -202,7 +203,7 @@ private fun ColorTextField(
 
     LaunchedEffect(key1 = textColor) {
         try {
-            onColorChange(Color(textColor.toLong(16).toInt()))
+            onColorChange(Color(parseColor("#$textColor")))
         } catch (e: Exception) {
             onColorChange(Color.Unspecified)
         }
