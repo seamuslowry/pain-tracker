@@ -12,6 +12,6 @@ val MIGRATION_6_7: Migration = object : Migration(6, 7) {
 val MIGRATION_7_8: Migration = object : Migration(7, 8) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE Item_Configuration ADD COLUMN notify INTEGER NOT NULL DEFAULT 0")
-        db.execSQL("UPDATE Item_Configuration SET notify = CASE WHEN tracking_type = 'TextEntryTrackingType' THEN 0 ELSE 1 END")
+        db.execSQL("UPDATE Item_Configuration SET notify = CASE WHEN trackingType = 'TextEntryTrackingType' THEN 0 ELSE 1 END")
     }
 }
