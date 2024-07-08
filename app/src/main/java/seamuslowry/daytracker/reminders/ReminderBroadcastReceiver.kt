@@ -42,12 +42,12 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
             val date = LocalDate.now()
             val completedItems = itemRepo.getCompleted(date)
-            val totalTrackedItems = itemConfigurationRepo.getNotifiableCount()
+            val totalNotifiableItems = itemConfigurationRepo.getNotifiableCount()
             Log.d(
                 TAG,
-                "Determining reminder for $date with $totalTrackedItems total configuration items and $completedItems completed items",
+                "Determining reminder for $date with $totalNotifiableItems notifiable configuration items and $completedItems completed items",
             )
-            if (completedItems < totalTrackedItems) {
+            if (completedItems < totalNotifiableItems) {
                 Log.d(TAG, "Sending reminder notification for $date")
                 showNotification(context)
             }
