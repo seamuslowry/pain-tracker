@@ -14,6 +14,7 @@ import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.MainActivity
 import seamuslowry.daytracker.R
@@ -41,13 +42,13 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
             Log.d(TAG, "Entering reminder broadcast receiver coroutine scope")
 
             val date = LocalDate.now()
-            val completedItems = itemRepo.getCompleted(date)
-            val totalNotifiableItems = itemConfigurationRepo.getNotifiableCount()
+            val completedConfigurationIds = itemRepo.get(date).firstOrNull()?.map { it.configuration }?.toSet() ?: setOf()
+            val notifiableItemConfigurationIds = itemConfigurationRepo.getAll().firstOrNull()?.map { it.id }?.toSet() ?: setOf()
             Log.d(
                 TAG,
-                "Determining reminder for $date with $totalNotifiableItems notifiable configuration items and $completedItems completed items",
+                "Determining reminder for $date with notifiable configuration items $notifiableItemConfigurationIds and completed configurations $completedConfigurationIds",
             )
-            if (completedItems < totalNotifiableItems) {
+            if (!completedConfigurationIds.containsAll(notifiableItemConfigurationIds)) {
                 Log.d(TAG, "Sending reminder notification for $date")
                 showNotification(context)
             }
