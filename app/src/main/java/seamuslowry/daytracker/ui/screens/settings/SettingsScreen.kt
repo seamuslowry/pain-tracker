@@ -213,6 +213,7 @@ private fun ColorTextField(
         value = textColor,
         onValueChange = { textColor = it },
         modifier = modifier,
+        prefix = { Text(text = stringResource(R.string.hex_prefix)) },
         trailingIcon = {
             Box(
                 modifier = Modifier

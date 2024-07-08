@@ -37,4 +37,5 @@
     <string name="high_color">High-value Color</string>
     <string name="show_recorded_values">Show recorded values</string>
     <string name="text_tracker_placeholder">Dear Day Tracker…</string>
+    <string name="hex_prefix">#</string>
 </resources>
