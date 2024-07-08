@@ -209,7 +209,6 @@ private fun ColorTextField(
         }
     }
 
-
     OutlinedTextField(
         value = textColor,
         onValueChange = { textColor = it },
