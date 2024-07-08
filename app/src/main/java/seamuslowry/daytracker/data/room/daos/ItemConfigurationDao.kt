@@ -10,8 +10,8 @@ import seamuslowry.daytracker.models.ItemConfiguration
 
 @Dao
 interface ItemConfigurationDao {
-    @Query("select count(*) from item_configuration")
-    fun getTotal(): Long
+    @Query("select count(*) from item_configuration where notify = 1")
+    fun getNotifiableCount(): Long
 
     @Query("select * from item_configuration")
     fun getAll(): Flow<List<ItemConfiguration>>
