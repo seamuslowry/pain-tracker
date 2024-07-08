@@ -10,4 +10,5 @@ data class ItemConfiguration(
     val name: String = "",
     val trackingType: TrackingType = LimitedOptionTrackingType.ONE_TO_TEN,
     val active: Boolean = true,
+    val notify: Boolean = true,
 )
