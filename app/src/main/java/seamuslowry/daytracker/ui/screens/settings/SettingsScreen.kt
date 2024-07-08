@@ -4,14 +4,20 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,6 +33,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -45,7 +53,15 @@ fun SettingsScreen(
 
     val scope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.SpaceAround) {
+    var lowColor by remember { mutableStateOf(Color.White) }
+    var highColor by remember { mutableStateOf(Color.Black) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp),
+        verticalArrangement = Arrangement.SpaceAround,
+    ) {
         ReminderSection(
             reminderEnabled = state.reminderEnabled,
             reminderTime = state.reminderTime,
@@ -53,6 +69,12 @@ fun SettingsScreen(
             onSetReminderTime = { scope.launch { viewModel.setReminderTime(it) } },
         )
         CalendarSection(showValues = state.showRecordedValues, onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } })
+        ColorSection(
+            lowColor = lowColor,
+            highColor = highColor,
+            onSetLowColor = { lowColor = it },
+            onSetHighColor = { highColor = it },
+        )
     }
 }
 
@@ -64,7 +86,13 @@ fun CalendarSection(
 ) {
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.calendar_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
-        Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
             Text(text = stringResource(R.string.show_recorded_values))
             Switch(checked = showValues, onCheckedChange = onSetShowValues)
         }
@@ -95,11 +123,23 @@ fun ReminderSection(
 
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.reminders_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
-        Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
             Text(text = stringResource(R.string.enabled))
             Switch(checked = reminderEnabled, onCheckedChange = onSetReminderEnabled)
         }
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
             Text(text = stringResource(R.string.time))
             TextButton(onClick = { pickingTime = true }, enabled = reminderEnabled) {
                 Text(text = reminderTime.localeFormat())
@@ -116,6 +156,79 @@ fun ReminderSection(
             onDismiss = { pickingTime = false },
         )
     }
+}
+
+@Composable
+fun ColorSection(
+    lowColor: Color,
+    highColor: Color,
+    onSetLowColor: (c: Color) -> Unit,
+    onSetHighColor: (c: Color) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Text(text = stringResource(R.string.color_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(text = stringResource(R.string.low_color), modifier = Modifier.weight(1f))
+            ColorTextField(color = lowColor, onColorChange = onSetLowColor, modifier = Modifier.weight(1f))
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(text = stringResource(R.string.high_color), modifier = Modifier.weight(1f))
+            ColorTextField(color = highColor, onColorChange = onSetHighColor, modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalStdlibApi::class)
+private fun ColorTextField(
+    color: Color,
+    onColorChange: (c: Color) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var textColor by remember { mutableStateOf(color.toArgb().toHexString(HexFormat.UpperCase)) }
+
+    LaunchedEffect(key1 = textColor) {
+        try {
+            onColorChange(Color(textColor.toLong(16).toInt()))
+        } catch (e: Exception) {
+            onColorChange(Color.Unspecified)
+        }
+    }
+
+
+    OutlinedTextField(
+        value = textColor,
+        onValueChange = { textColor = it },
+        modifier = modifier,
+        trailingIcon = {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(
+                        color = color,
+                        shape = CircleShape,
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = CircleShape,
+                    ),
+            )
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
