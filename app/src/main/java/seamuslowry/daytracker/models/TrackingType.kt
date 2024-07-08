@@ -10,11 +10,19 @@ enum class YesNoOption(val value: Int, @StringRes val text: Int, @StringRes val 
 
 data class Option(val value: Int, @StringRes val text: Int? = null, @StringRes val shortText: Int? = null)
 
-sealed interface TrackingType
-
-enum class LimitedOptionTrackingType(val options: List<Option>) : TrackingType {
-    ONE_TO_TEN((1..10).map { Option(it) }),
-    YES_NO(YesNoOption.entries.map { Option(it.value, it.text, it.shortText) }),
+sealed interface TrackingType {
+    val notifyByDefault: Boolean
 }
 
-data object TextEntryTrackingType : TrackingType
+enum class LimitedOptionTrackingType(
+    val options: List<Option>,
+    override val notifyByDefault: Boolean,
+) : TrackingType {
+    ONE_TO_TEN((1..10).map { Option(it) }, true),
+    YES_NO(YesNoOption.entries.map { Option(it.value, it.text, it.shortText) }, true),
+}
+
+data object TextEntryTrackingType : TrackingType {
+    override val notifyByDefault: Boolean
+        get() = false
+}
