@@ -325,7 +325,8 @@ fun AddConfigurationContent(
     ArrowPicker(
         value = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong(),
         onChange = {
-            onChange(itemConfiguration.copy(trackingType = SUPPORTED_TRACKING_TYPES[it.toInt()]))
+            val trackingType = SUPPORTED_TRACKING_TYPES[it.toInt()]
+            onChange(itemConfiguration.copy(trackingType = trackingType, notify = trackingType.notifyByDefault))
         },
         range = LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()),
         modifier = Modifier.padding(5.dp),
