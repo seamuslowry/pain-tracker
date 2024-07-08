@@ -43,7 +43,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
             val date = LocalDate.now()
             val completedConfigurationIds = itemRepo.get(date).firstOrNull()?.filter { it.value != null }?.map { it.configuration }?.toSet() ?: setOf()
-            val notifiableItemConfigurationIds = itemConfigurationRepo.getAll().firstOrNull()?.map { it.id }?.toSet() ?: setOf()
+            val notifiableItemConfigurationIds = itemConfigurationRepo.getAll().firstOrNull()?.filter { it.trackingType.notify }?.map { it.id }?.toSet() ?: setOf()
             Log.d(
                 TAG,
                 "Determining reminder for $date with notifiable configuration items $notifiableItemConfigurationIds and completed configurations $completedConfigurationIds",
