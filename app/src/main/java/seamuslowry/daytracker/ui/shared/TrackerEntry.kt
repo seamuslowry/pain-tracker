@@ -33,7 +33,7 @@ fun TrackerEntry(
             Text(text = it.text?.let { text -> stringResource(id = text) } ?: it.value.toString())
         }
         is TextEntryTrackingType -> DelayedSaveTextField(
-            onSave = { newText -> item?.let { onChange(it.copy(comment = newText)) } },
+            onSave = { newText -> item?.let { onChange(it.copy(comment = newText, value = -1)) } },
             value = item?.comment ?: "",
             placeholder = {
                 Text(

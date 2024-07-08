@@ -42,7 +42,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
             Log.d(TAG, "Entering reminder broadcast receiver coroutine scope")
 
             val date = LocalDate.now()
-            val completedConfigurationIds = itemRepo.get(date).firstOrNull()?.map { it.configuration }?.toSet() ?: setOf()
+            val completedConfigurationIds = itemRepo.get(date).firstOrNull()?.filter { it.value != null }?.map { it.configuration }?.toSet() ?: setOf()
             val notifiableItemConfigurationIds = itemConfigurationRepo.getAll().firstOrNull()?.map { it.id }?.toSet() ?: setOf()
             Log.d(
                 TAG,
