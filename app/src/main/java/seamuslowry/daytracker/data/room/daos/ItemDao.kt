@@ -12,9 +12,6 @@ import java.time.LocalDate
 
 @Dao
 interface ItemDao {
-    @Query("select count(*) from item where date = :date and value is not NULL")
-    fun getCompleted(date: LocalDate): Long
-
     @Query("select * from item")
     fun getAll(): Flow<List<Item>>
 
