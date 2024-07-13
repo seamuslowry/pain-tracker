@@ -68,8 +68,8 @@ fun SettingsScreen(
         )
         CalendarSection(showValues = state.showRecordedValues, onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } })
         ColorSection(
-            lowColor = state.lowValueColor,
-            highColor = state.highValueColor,
+            lowColor = state.lowValueColor ?: MaterialTheme.colorScheme.error,
+            highColor = state.highValueColor ?: MaterialTheme.colorScheme.primary,
             onSetLowColor = { scope.launch { viewModel.setLowValueArgb(it) } },
             onSetHighColor = { scope.launch { viewModel.setHighValueArgb(it) } },
         )
@@ -158,8 +158,8 @@ fun ReminderSection(
 
 @Composable
 fun ColorSection(
-    lowColor: Color?,
-    highColor: Color?,
+    lowColor: Color,
+    highColor: Color,
     onSetLowColor: (c: Color) -> Unit,
     onSetHighColor: (c: Color) -> Unit,
     modifier: Modifier = Modifier,
@@ -191,11 +191,11 @@ fun ColorSection(
 
 @Composable
 private fun ColorTextField(
-    color: Color?,
+    color: Color,
     onColorChange: (c: Color) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var textColor by remember { mutableStateOf(color?.toHexString() ?: "") }
+    var textColor by remember { mutableStateOf(color.toHexString()) }
 
     LaunchedEffect(key1 = textColor) {
         try {
@@ -204,7 +204,7 @@ private fun ColorTextField(
     }
 
     LaunchedEffect(key1 = color) {
-        textColor = color?.toHexString() ?: ""
+        textColor = color.toHexString()
     }
 
     OutlinedTextField(
@@ -217,7 +217,7 @@ private fun ColorTextField(
                 modifier = Modifier
                     .size(24.dp)
                     .background(
-                        color = color ?: Color.Unspecified,
+                        color = if (color.toHexString() == textColor) color else Color.Unspecified,
                         shape = CircleShape,
                     )
                     .border(

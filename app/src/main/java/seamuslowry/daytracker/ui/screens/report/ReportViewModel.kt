@@ -11,9 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemRepo
 import seamuslowry.daytracker.data.repos.SettingsRepo
@@ -40,7 +42,7 @@ class ReportViewModel @Inject constructor(
         it.showRecordedValues
     }.stateIn(
         scope = viewModelScope,
-        initialValue = false,
+        initialValue = runBlocking { settingsRepo.settings.first().showRecordedValues },
         started = SharingStarted.WhileSubscribed(5_000),
     )
 
@@ -48,7 +50,7 @@ class ReportViewModel @Inject constructor(
         DisplayColors(it.lowValueColor, it.highValueColor)
     }.stateIn(
         scope = viewModelScope,
-        initialValue = DisplayColors(null, null),
+        initialValue = runBlocking { settingsRepo.settings.first().let { DisplayColors(it.lowValueColor, it.highValueColor) } },
         started = SharingStarted.WhileSubscribed(5_000),
     )
 
