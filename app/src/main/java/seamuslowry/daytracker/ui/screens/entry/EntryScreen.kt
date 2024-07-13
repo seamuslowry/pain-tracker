@@ -294,7 +294,7 @@ fun AddConfigurationButton(
                         )
                     }
                 } else {
-                    AddConfigurationContent(
+                    UpsertConfigurationContent(
                         itemConfiguration = itemConfiguration,
                         onChange = onChange,
                         onSave = onSave,
@@ -307,12 +307,15 @@ fun AddConfigurationButton(
 }
 
 @Composable
-fun AddConfigurationContent(
+fun UpsertConfigurationContent(
     itemConfiguration: ItemConfiguration,
     onChange: (itemConfiguration: ItemConfiguration) -> Unit,
     onSave: () -> Unit,
     onDiscard: () -> Unit,
 ) {
+    val creating = itemConfiguration.id == 0L
+    val currentTrackingTypeIndex = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong()
+
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -332,11 +335,11 @@ fun AddConfigurationContent(
         }
     }
     ArrowPicker(
-        value = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong(),
+        value = currentTrackingTypeIndex,
         onChange = {
             onChange(itemConfiguration.copy(trackingType = SUPPORTED_TRACKING_TYPES[it.toInt()]))
         },
-        range = LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()),
+        range = if (creating) LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()) else LongRange(currentTrackingTypeIndex, currentTrackingTypeIndex),
         modifier = Modifier.padding(5.dp),
         incrementResource = R.string.change_tracking_type,
         decrementResource = R.string.change_tracking_type,
