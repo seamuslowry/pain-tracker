@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,7 +101,7 @@ fun EntryScreen(
                 itemWithConfiguration = it,
                 onChange = viewModel::saveItem,
                 onDelete = viewModel::deleteConfiguration,
-                onEdit = viewModel::saveItemConfiguration
+                onEdit = viewModel::saveItemConfiguration,
             )
         }
         items(itemsLoading.coerceAtLeast(0)) {
@@ -136,6 +137,10 @@ fun ItemEntry(
         mutableStateOf(null)
     }
 
+    LaunchedEffect(key1 = configuration) {
+        editingConfiguration = null
+    }
+
     Card(
         modifier = modifier
             .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -152,6 +157,7 @@ fun ItemEntry(
                 onChange = { newConfiguration -> editingConfiguration = newConfiguration },
                 onSave = { onEdit(it) },
                 onDiscard = { editingConfiguration = null },
+                disableSave = configuration == editingConfiguration
             )
         } ?: run {
             Row(
@@ -334,6 +340,7 @@ fun UpsertConfigurationContent(
     onChange: (itemConfiguration: ItemConfiguration) -> Unit,
     onSave: () -> Unit,
     onDiscard: () -> Unit,
+    disableSave: Boolean = false
 ) {
     val creating = itemConfiguration.id == 0L
     val currentTrackingTypeIndex = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong()
@@ -373,7 +380,7 @@ fun UpsertConfigurationContent(
         }
     }
     Button(
-        enabled = itemConfiguration.name.isNotBlank(),
+        enabled = !disableSave && itemConfiguration.name.isNotBlank(),
         onClick = onSave,
         modifier = Modifier
             .fillMaxWidth()
