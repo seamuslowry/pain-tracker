@@ -208,7 +208,7 @@ private fun ColorTextField(
 
     OutlinedTextField(
         value = textColor,
-        onValueChange = { textColor = it },
+        onValueChange = { textColor = it.uppercase() },
         modifier = modifier,
         prefix = { Text(text = stringResource(R.string.hex_prefix)) },
         trailingIcon = {
