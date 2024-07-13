@@ -1,6 +1,7 @@
 package seamuslowry.daytracker.ui.screens.report
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,9 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemRepo
 import seamuslowry.daytracker.data.repos.SettingsRepo
@@ -39,7 +42,15 @@ class ReportViewModel @Inject constructor(
         it.showRecordedValues
     }.stateIn(
         scope = viewModelScope,
-        initialValue = false,
+        initialValue = runBlocking { settingsRepo.settings.first().showRecordedValues },
+        started = SharingStarted.WhileSubscribed(5_000),
+    )
+
+    val colorOverrides: StateFlow<DisplayColors> = settingsRepo.settings.map {
+        DisplayColors(it.lowValueColor, it.highValueColor)
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = runBlocking { settingsRepo.settings.first().let { DisplayColors(it.lowValueColor, it.highValueColor) } },
         started = SharingStarted.WhileSubscribed(5_000),
     )
 
@@ -123,6 +134,11 @@ data class DateDisplay(
     val date: LocalDate,
     val inRange: Boolean = true,
     val showValue: Boolean = false,
+)
+
+data class DisplayColors(
+    val lowValueColor: Color?,
+    val highValueColor: Color?,
 )
 
 data class ReportState(

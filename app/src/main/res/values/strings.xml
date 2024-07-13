@@ -32,6 +32,11 @@
     <string name="enabled">Enabled</string>
     <string name="time">Time</string>
     <string name="calendar_section_title">Calendar</string>
+    <string name="color_section_title">Colors</string>
+    <string name="low_color">Low-value Color</string>
+    <string name="high_color">High-value Color</string>
     <string name="show_recorded_values">Show recorded values</string>
     <string name="text_tracker_placeholder">Dear Day Tracker…</string>
+    <string name="hex_prefix">#</string>
+    <string name="reset_to_defaults">Reset to Defaults</string>
 </resources>

@@ -1,11 +1,14 @@
 package seamuslowry.daytracker.ui.screens.settings
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
 import seamuslowry.daytracker.data.repos.Settings
 import seamuslowry.daytracker.data.repos.SettingsRepo
 import seamuslowry.daytracker.reminders.Scheduler
@@ -19,7 +22,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     val state: StateFlow<Settings> = settingsRepo.settings.stateIn(
         scope = viewModelScope,
-        initialValue = Settings(),
+        initialValue = runBlocking { settingsRepo.settings.first() },
         started = SharingStarted.WhileSubscribed(5_000),
     )
 
@@ -35,6 +38,14 @@ class SettingsViewModel @Inject constructor(
 
     suspend fun setShowRecordedValues(value: Boolean) {
         settingsRepo.setShowRecordedValues(value)
+    }
+
+    suspend fun setLowValueColor(color: Color) {
+        settingsRepo.setLowValueColor(color)
+    }
+
+    suspend fun setHighValueColor(color: Color) {
+        settingsRepo.setHighValueColor(color)
     }
 
     private fun scheduleReminder(time: LocalTime) {
