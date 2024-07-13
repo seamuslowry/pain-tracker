@@ -157,7 +157,7 @@ fun ItemEntry(
                 onChange = { newConfiguration -> editingConfiguration = newConfiguration },
                 onSave = { onEdit(it) },
                 onDiscard = { editingConfiguration = null },
-                disableSave = configuration == editingConfiguration
+                disableSave = configuration == editingConfiguration,
             )
         } ?: run {
             Row(
@@ -340,7 +340,7 @@ fun UpsertConfigurationContent(
     onChange: (itemConfiguration: ItemConfiguration) -> Unit,
     onSave: () -> Unit,
     onDiscard: () -> Unit,
-    disableSave: Boolean = false
+    disableSave: Boolean = false,
 ) {
     val creating = itemConfiguration.id == 0L
     val currentTrackingTypeIndex = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong()
