@@ -1,10 +1,13 @@
 package seamuslowry.daytracker.data.repos
 
 import android.content.Context
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,6 +25,8 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
         val REMINDER_ENABLED = booleanPreferencesKey("REMINDER_ENABLED_KEY")
         val REMINDER_TIME = stringPreferencesKey("REMINDER_TIME")
         val SHOW_RECORDED_VALUES = booleanPreferencesKey("SHOW_RECORDED_VALUES")
+        val LOW_VALUE_ARGB = intPreferencesKey("LOW_VALUE_ARGB")
+        val HIGH_VALUE_ARGB = intPreferencesKey("HIGH_VALUE_ARGB")
     }
 
     suspend fun setReminderEnabled(enabled: Boolean) {
@@ -42,12 +47,38 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
         }
     }
 
+    suspend fun setLowValueArgb(color: Color) {
+        context.dataStore.edit {
+            it[LOW_VALUE_ARGB] = color.toArgb()
+        }
+    }
+
+    suspend fun setHighValueArgb(color: Color) {
+        context.dataStore.edit {
+            it[HIGH_VALUE_ARGB] = color.toArgb()
+        }
+    }
+
     val settings: Flow<Settings> = context.dataStore.data
         .map {
             Settings(
                 reminderEnabled = it[REMINDER_ENABLED] ?: false,
                 reminderTime = it[REMINDER_TIME]?.let { time -> LocalTime.parse(time) } ?: LocalTime.of(18, 0),
                 showRecordedValues = it[SHOW_RECORDED_VALUES] ?: false,
+                lowValueColor = it[LOW_VALUE_ARGB]?.let { argb ->
+                    try {
+                        Color(argb)
+                    } catch (e: Exception) {
+                        null
+                    }
+                },
+                highValueColor = it[HIGH_VALUE_ARGB]?.let { argb ->
+                    try {
+                        Color(argb)
+                    } catch (e: Exception) {
+                        null
+                    }
+                },
             )
         }
 }
@@ -56,4 +87,6 @@ data class Settings(
     val reminderEnabled: Boolean = false,
     val reminderTime: LocalTime = LocalTime.of(18, 0),
     val showRecordedValues: Boolean = false,
+    val lowValueColor: Color? = null,
+    val highValueColor: Color? = null,
 )

@@ -1,6 +1,7 @@
 package seamuslowry.daytracker.ui.screens.report
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +41,14 @@ class ReportViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         initialValue = false,
+        started = SharingStarted.WhileSubscribed(5_000),
+    )
+
+    val colorOverrides: StateFlow<DisplayColors> = settingsRepo.settings.map {
+        DisplayColors(it.lowValueColor, it.highValueColor)
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = DisplayColors(null, null),
         started = SharingStarted.WhileSubscribed(5_000),
     )
 
@@ -123,6 +132,11 @@ data class DateDisplay(
     val date: LocalDate,
     val inRange: Boolean = true,
     val showValue: Boolean = false,
+)
+
+data class DisplayColors(
+    val lowValueColor: Color?,
+    val highValueColor: Color?,
 )
 
 data class ReportState(
