@@ -142,12 +142,15 @@ fun ItemEntry(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 25.dp, top = 10.dp),
         ) {
             Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
             ItemEntryMenu(onEvent = {
                 when (it) {
                     ItemEntryMenuAction.DELETE -> onDelete(configuration)
+                    ItemEntryMenuAction.EDIT -> {  }
                 }
             })
         }
@@ -162,6 +165,7 @@ fun ItemEntry(
 
 enum class ItemEntryMenuAction {
     DELETE,
+    EDIT
 }
 
 @Composable
@@ -226,6 +230,13 @@ fun ItemEntryMenu(
                     deleteConfirmationNeeded = true
                 },
             )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
+                onClick = {
+                    expanded = false
+                    onEvent(ItemEntryMenuAction.EDIT)
+                },
+            )
         }
     }
 }
@@ -237,6 +248,39 @@ fun AddConfigurationButton(
     onSave: () -> Unit,
     onDiscard: () -> Unit,
     modifier: Modifier = Modifier,
+) {
+    AnimateUpsertConfiguration(
+        itemConfiguration = itemConfiguration,
+        onChange = onChange,
+        onSave = onSave,
+        onDiscard = onDiscard,
+        modifier = modifier,
+    ) {
+        TextButton(
+            onClick = { onChange(ItemConfiguration()) },
+            colors = ButtonDefaults.textButtonColors(contentColor = it),
+        ) {
+            Icon(
+                Icons.Filled.Build,
+                contentDescription = stringResource(R.string.add_item_config),
+                modifier = Modifier.scale(0.75f),
+            )
+            Text(
+                text = stringResource(R.string.add_item_config),
+                modifier = Modifier.padding(horizontal = 10.dp),
+            )
+        }
+    }
+}
+
+@Composable
+fun AnimateUpsertConfiguration(
+    itemConfiguration: ItemConfiguration?,
+    onChange: (itemConfiguration: ItemConfiguration) -> Unit,
+    onSave: () -> Unit,
+    onDiscard: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (transitionColor: Color) -> Unit,
 ) {
     val mainDuration = 500
     val extraDuration = 100
@@ -258,7 +302,9 @@ fun AddConfigurationButton(
 
     Box(
         contentAlignment = Alignment.TopCenter,
-        modifier = modifier.padding(20.dp).fillMaxWidth(),
+        modifier = modifier
+            .padding(20.dp)
+            .fillMaxWidth(),
     ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -270,22 +316,9 @@ fun AddConfigurationButton(
                 ),
             ) {
                 if (itemConfiguration == null) {
-                    TextButton(
-                        onClick = { onChange(ItemConfiguration()) },
-                        colors = ButtonDefaults.textButtonColors(contentColor = textColor),
-                    ) {
-                        Icon(
-                            Icons.Filled.Build,
-                            contentDescription = stringResource(R.string.add_item_config),
-                            modifier = Modifier.scale(0.75f),
-                        )
-                        Text(
-                            text = stringResource(R.string.add_item_config),
-                            modifier = Modifier.padding(horizontal = 10.dp),
-                        )
-                    }
+                    content(textColor)
                 } else {
-                    AddConfigurationContent(
+                    UpsertConfigurationContent(
                         itemConfiguration = itemConfiguration,
                         onChange = onChange,
                         onSave = onSave,
@@ -298,12 +331,14 @@ fun AddConfigurationButton(
 }
 
 @Composable
-fun AddConfigurationContent(
+fun UpsertConfigurationContent(
     itemConfiguration: ItemConfiguration,
     onChange: (itemConfiguration: ItemConfiguration) -> Unit,
     onSave: () -> Unit,
     onDiscard: () -> Unit,
 ) {
+    val supportedTrackingTypeIndex = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong()
+
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -312,7 +347,9 @@ fun AddConfigurationContent(
         OutlinedTextField(
             value = itemConfiguration.name,
             onValueChange = { onChange(itemConfiguration.copy(name = it)) },
-            modifier = Modifier.weight(1f).padding(end = 5.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 5.dp),
             label = { Text(text = stringResource(R.string.name)) },
         )
         IconButton(onClick = onDiscard) {
@@ -323,11 +360,11 @@ fun AddConfigurationContent(
         }
     }
     ArrowPicker(
-        value = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong(),
+        value = supportedTrackingTypeIndex,
         onChange = {
             onChange(itemConfiguration.copy(trackingType = SUPPORTED_TRACKING_TYPES[it.toInt()]))
         },
-        range = LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()),
+        range = if (itemConfiguration.id == 0L) LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()) else LongRange(supportedTrackingTypeIndex, supportedTrackingTypeIndex),
         modifier = Modifier.padding(5.dp),
         incrementResource = R.string.change_tracking_type,
         decrementResource = R.string.change_tracking_type,
@@ -339,7 +376,9 @@ fun AddConfigurationContent(
     Button(
         enabled = itemConfiguration.name.isNotBlank(),
         onClick = onSave,
-        modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
     ) {
         Text(
             text = stringResource(R.string.confirm_configuration),
