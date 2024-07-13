@@ -195,7 +195,7 @@ private fun ColorTextField(
     onColorChange: (c: Color) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var textColor by remember { mutableStateOf( color?.toHexString() ?: "") }
+    var textColor by remember { mutableStateOf(color?.toHexString() ?: "") }
 
     LaunchedEffect(key1 = textColor) {
         try {
