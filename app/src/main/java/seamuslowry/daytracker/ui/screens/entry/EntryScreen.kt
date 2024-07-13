@@ -148,6 +148,7 @@ fun ItemEntry(
             ItemEntryMenu(onEvent = {
                 when (it) {
                     ItemEntryMenuAction.DELETE -> onDelete(configuration)
+                    ItemEntryMenuAction.EDIT -> {}
                 }
             })
         }
@@ -162,6 +163,7 @@ fun ItemEntry(
 
 enum class ItemEntryMenuAction {
     DELETE,
+    EDIT,
 }
 
 @Composable
@@ -219,6 +221,13 @@ fun ItemEntryMenu(
             onDismissRequest = { expanded = false },
             modifier = modifier,
         ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
+                onClick = {
+                    expanded = false
+                    onEvent(ItemEntryMenuAction.EDIT)
+                },
+            )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.delete)) },
                 onClick = {
