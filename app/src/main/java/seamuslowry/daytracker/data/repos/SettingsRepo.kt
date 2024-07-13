@@ -25,8 +25,8 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
         val REMINDER_ENABLED = booleanPreferencesKey("REMINDER_ENABLED_KEY")
         val REMINDER_TIME = stringPreferencesKey("REMINDER_TIME")
         val SHOW_RECORDED_VALUES = booleanPreferencesKey("SHOW_RECORDED_VALUES")
-        val LOW_VALUE_ARGB = intPreferencesKey("LOW_VALUE_ARGB")
-        val HIGH_VALUE_ARGB = intPreferencesKey("HIGH_VALUE_ARGB")
+        val LOW_VALUE_COLOR = intPreferencesKey("LOW_VALUE_COLOR")
+        val HIGH_VALUE_COLOR = intPreferencesKey("HIGH_VALUE_COLOR")
     }
 
     suspend fun setReminderEnabled(enabled: Boolean) {
@@ -47,15 +47,15 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
         }
     }
 
-    suspend fun setLowValueArgb(color: Color) {
+    suspend fun setLowValueColor(color: Color) {
         context.dataStore.edit {
-            it[LOW_VALUE_ARGB] = color.toArgb()
+            it[LOW_VALUE_COLOR] = color.toArgb()
         }
     }
 
-    suspend fun setHighValueArgb(color: Color) {
+    suspend fun setHighValueColor(color: Color) {
         context.dataStore.edit {
-            it[HIGH_VALUE_ARGB] = color.toArgb()
+            it[HIGH_VALUE_COLOR] = color.toArgb()
         }
     }
 
@@ -65,16 +65,16 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
                 reminderEnabled = it[REMINDER_ENABLED] ?: false,
                 reminderTime = it[REMINDER_TIME]?.let { time -> LocalTime.parse(time) } ?: LocalTime.of(18, 0),
                 showRecordedValues = it[SHOW_RECORDED_VALUES] ?: false,
-                lowValueColor = it[LOW_VALUE_ARGB]?.let { argb ->
+                lowValueColor = it[LOW_VALUE_COLOR]?.let { colorInt ->
                     try {
-                        Color(argb)
+                        Color(colorInt)
                     } catch (e: Exception) {
                         null
                     }
                 },
-                highValueColor = it[HIGH_VALUE_ARGB]?.let { argb ->
+                highValueColor = it[HIGH_VALUE_COLOR]?.let { colorInt ->
                     try {
-                        Color(argb)
+                        Color(colorInt)
                     } catch (e: Exception) {
                         null
                     }

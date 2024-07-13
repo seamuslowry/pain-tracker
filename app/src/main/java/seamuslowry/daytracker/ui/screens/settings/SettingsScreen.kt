@@ -54,6 +54,9 @@ fun SettingsScreen(
 
     val scope = rememberCoroutineScope()
 
+    val defaultHighColor = MaterialTheme.colorScheme.primary
+    val defaultLowColor = MaterialTheme.colorScheme.error
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,10 +71,10 @@ fun SettingsScreen(
         )
         CalendarSection(showValues = state.showRecordedValues, onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } })
         ColorSection(
-            lowColor = state.lowValueColor ?: MaterialTheme.colorScheme.error,
-            highColor = state.highValueColor ?: MaterialTheme.colorScheme.primary,
-            onSetLowColor = { scope.launch { viewModel.setLowValueArgb(it) } },
-            onSetHighColor = { scope.launch { viewModel.setHighValueArgb(it) } },
+            lowColor = state.lowValueColor ?: defaultLowColor,
+            highColor = state.highValueColor ?: defaultHighColor,
+            onSetLowColor = { scope.launch { viewModel.setLowValueColor(it) } },
+            onSetHighColor = { scope.launch { viewModel.setHighValueColor(it) } },
         )
     }
 }
