@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -44,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.localeFormat
+import seamuslowry.daytracker.models.toHexString
 import java.time.LocalTime
 
 @Composable
@@ -68,8 +68,8 @@ fun SettingsScreen(
         )
         CalendarSection(showValues = state.showRecordedValues, onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } })
         ColorSection(
-            lowColor = state.lowValueColor ?: MaterialTheme.colorScheme.error,
-            highColor = state.highValueColor ?: MaterialTheme.colorScheme.primary,
+            lowColor = state.lowValueColor,
+            highColor = state.highValueColor,
             onSetLowColor = { scope.launch { viewModel.setLowValueArgb(it) } },
             onSetHighColor = { scope.launch { viewModel.setHighValueArgb(it) } },
         )
@@ -158,8 +158,8 @@ fun ReminderSection(
 
 @Composable
 fun ColorSection(
-    lowColor: Color,
-    highColor: Color,
+    lowColor: Color?,
+    highColor: Color?,
     onSetLowColor: (c: Color) -> Unit,
     onSetHighColor: (c: Color) -> Unit,
     modifier: Modifier = Modifier,
@@ -190,25 +190,26 @@ fun ColorSection(
 }
 
 @Composable
-@OptIn(ExperimentalStdlibApi::class)
 private fun ColorTextField(
-    color: Color,
+    color: Color?,
     onColorChange: (c: Color) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var textColor by remember { mutableStateOf(color.toArgb().toHexString(HexFormat.UpperCase)) }
+    var textColor by remember { mutableStateOf( color?.toHexString() ?: "") }
 
     LaunchedEffect(key1 = textColor) {
         try {
             onColorChange(Color(parseColor("#$textColor")))
-        } catch (e: Exception) {
-            onColorChange(Color.Unspecified)
-        }
+        } catch (_: Exception) { }
+    }
+
+    LaunchedEffect(key1 = color) {
+        textColor = color?.toHexString() ?: ""
     }
 
     OutlinedTextField(
         value = textColor,
-        onValueChange = { textColor = it.uppercase() },
+        onValueChange = { textColor = it.uppercase().take(6) },
         modifier = modifier,
         prefix = { Text(text = stringResource(R.string.hex_prefix)) },
         trailingIcon = {
@@ -216,7 +217,7 @@ private fun ColorTextField(
                 modifier = Modifier
                     .size(24.dp)
                     .background(
-                        color = color,
+                        color = color ?: Color.Unspecified,
                         shape = CircleShape,
                     )
                     .border(
