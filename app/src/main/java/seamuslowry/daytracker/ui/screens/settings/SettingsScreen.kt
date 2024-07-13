@@ -176,7 +176,7 @@ fun ColorSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = stringResource(R.string.low_color), modifier = Modifier.weight(1f))
+            Text(text = stringResource(R.string.low_argb), modifier = Modifier.weight(1f))
             ColorTextField(color = lowColor, onColorChange = onSetLowColor, modifier = Modifier.weight(1f))
         }
         Row(
@@ -186,7 +186,7 @@ fun ColorSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = stringResource(R.string.high_color), modifier = Modifier.weight(1f))
+            Text(text = stringResource(R.string.high_argb), modifier = Modifier.weight(1f))
             ColorTextField(color = highColor, onColorChange = onSetHighColor, modifier = Modifier.weight(1f))
         }
     }
