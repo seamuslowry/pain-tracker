@@ -100,6 +100,7 @@ fun EntryScreen(
                 itemWithConfiguration = it,
                 onChange = viewModel::saveItem,
                 onDelete = viewModel::deleteConfiguration,
+                onEdit = viewModel::saveItemConfiguration
             )
         }
         items(itemsLoading.coerceAtLeast(0)) {
@@ -126,9 +127,14 @@ fun ItemEntry(
     itemWithConfiguration: ItemWithConfiguration? = null,
     onChange: (item: Item) -> Unit = {},
     onDelete: (itemConfiguration: ItemConfiguration) -> Unit = {},
+    onEdit: (itemConfiguration: ItemConfiguration) -> Unit = {},
 ) {
     val item = itemWithConfiguration?.item
     val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
+
+    var editingConfiguration: ItemConfiguration? by remember {
+        mutableStateOf(null)
+    }
 
     Card(
         modifier = modifier
@@ -137,27 +143,41 @@ fun ItemEntry(
                 visible = itemWithConfiguration == null,
                 highlight = PlaceholderHighlight.fade(),
                 color = MaterialTheme.colorScheme.surfaceVariant,
-            ),
+            )
+            .animateContentSize(),
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
-        ) {
-            Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
-            ItemEntryMenu(onEvent = {
-                when (it) {
-                    ItemEntryMenuAction.DELETE -> onDelete(configuration)
-                    ItemEntryMenuAction.EDIT -> {}
-                }
-            })
+        editingConfiguration?.let {
+            UpsertConfigurationContent(
+                itemConfiguration = it,
+                onChange = { newConfiguration -> editingConfiguration = newConfiguration },
+                onSave = { onEdit(it) },
+                onDiscard = { editingConfiguration = null },
+            )
+        } ?: run {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 25.dp, top = 10.dp),
+            ) {
+                Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
+                ItemEntryMenu(onEvent = {
+                    when (it) {
+                        ItemEntryMenuAction.DELETE -> onDelete(configuration)
+                        ItemEntryMenuAction.EDIT -> {
+                            editingConfiguration = configuration
+                        }
+                    }
+                })
+            }
+            TrackerEntry(
+                trackerType = configuration.trackingType,
+                item = item,
+                onChange = onChange,
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+            )
         }
-        TrackerEntry(
-            trackerType = configuration.trackingType,
-            item = item,
-            onChange = onChange,
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
-        )
     }
 }
 
@@ -267,7 +287,9 @@ fun AddConfigurationButton(
 
     Box(
         contentAlignment = Alignment.TopCenter,
-        modifier = modifier.padding(20.dp).fillMaxWidth(),
+        modifier = modifier
+            .padding(20.dp)
+            .fillMaxWidth(),
     ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -324,7 +346,9 @@ fun UpsertConfigurationContent(
         OutlinedTextField(
             value = itemConfiguration.name,
             onValueChange = { onChange(itemConfiguration.copy(name = it)) },
-            modifier = Modifier.weight(1f).padding(end = 5.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 5.dp),
             label = { Text(text = stringResource(R.string.name)) },
         )
         IconButton(onClick = onDiscard) {
@@ -351,7 +375,9 @@ fun UpsertConfigurationContent(
     Button(
         enabled = itemConfiguration.name.isNotBlank(),
         onClick = onSave,
-        modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
     ) {
         Text(
             text = stringResource(R.string.confirm_configuration),
