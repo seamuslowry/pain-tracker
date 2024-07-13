@@ -15,8 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -75,6 +79,13 @@ fun SettingsScreen(
             highColor = state.highValueColor ?: defaultHighColor,
             onSetLowColor = { scope.launch { viewModel.setLowValueColor(it) } },
             onSetHighColor = { scope.launch { viewModel.setHighValueColor(it) } },
+            onReset = {
+                scope.launch {
+                    viewModel.setLowValueColor(defaultLowColor)
+                    viewModel.setHighValueColor(defaultHighColor)
+                }
+            },
+            allowReset = state.lowValueColor != defaultLowColor || state.highValueColor != defaultHighColor,
         )
     }
 }
@@ -165,10 +176,28 @@ fun ColorSection(
     highColor: Color,
     onSetLowColor: (c: Color) -> Unit,
     onSetHighColor: (c: Color) -> Unit,
+    onReset: () -> Unit,
+    allowReset: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        Text(text = stringResource(R.string.color_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = stringResource(R.string.color_section_title),
+                modifier = Modifier.padding(vertical = 8.dp),
+                style = MaterialTheme.typography.headlineSmall,
+            )
+            if (allowReset) {
+                IconButton(onClick = onReset) {
+                    Icon(imageVector = Icons.Filled.Restore, contentDescription = stringResource(R.string.reset_to_defaults))
+                }
+            }
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
