@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.LimitedOptionTrackingType
@@ -26,8 +27,7 @@ fun TrackerEntry(
 ) {
     when (trackerType) {
         is LimitedOptionTrackingType ->
-            // notes: no good for now; 10 options is too many for this to handle well on any screen size
-            // the "10" gets stacked and looks janky. revisit
+            // notes: possible... text gets a little cramped. see what can be done about that
             SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
                 trackerType.options.forEachIndexed { index, option ->
                     SegmentedButton(
@@ -43,6 +43,8 @@ fun TrackerEntry(
                         Text(
                             text = option.text?.let { text -> stringResource(id = text) }
                                 ?: option.value.toString(),
+                            softWrap = false,
+                            overflow = TextOverflow.Visible,
                         )
                     }
                 }
