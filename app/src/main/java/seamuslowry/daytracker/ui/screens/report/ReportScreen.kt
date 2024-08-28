@@ -6,7 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -52,6 +52,7 @@ fun ReportScreen(
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    val colorOverrides by viewModel.colorOverrides.collectAsState()
     val groupedItems by viewModel.displayItems.collectAsState()
     val earliestDate by viewModel.earliestDate.collectAsState()
 
@@ -87,7 +88,7 @@ fun ReportScreen(
             contentPadding = PaddingValues(16.dp),
         ) {
             items(items = groupedItems.entries.toList(), key = { it.key.id }) {
-                DisplayDates(entry = it, onSelectDate = onSelectDate)
+                DisplayDates(entry = it, onSelectDate = onSelectDate, colorOverrides = colorOverrides)
             }
         }
     }
@@ -111,6 +112,7 @@ fun DisplaySelection(
 fun DisplayDates(
     entry: Map.Entry<ItemConfiguration, List<List<DateDisplay>>>,
     modifier: Modifier = Modifier,
+    colorOverrides: DisplayColors = DisplayColors(null, null),
     onSelectDate: (d: LocalDate) -> Unit = {},
 ) {
     Card(modifier = modifier) {
@@ -153,6 +155,7 @@ fun DisplayDates(
                             date = it,
                             modifier = Modifier.weight(1f),
                             onSelectDate = { onSelectDate(it.date) },
+                            colorOverrides = colorOverrides,
                         )
                     }
                 }
@@ -165,12 +168,16 @@ fun DisplayDates(
 fun DisplayDate(
     date: DateDisplay,
     modifier: Modifier = Modifier,
+    colorOverrides: DisplayColors = DisplayColors(null, null),
     onSelectDate: () -> Unit = {},
 ) {
+    val lowColor = colorOverrides.lowValueColor ?: MaterialTheme.colorScheme.error
+    val highColor = colorOverrides.highValueColor ?: MaterialTheme.colorScheme.primary
+
     val color = when {
         !date.inRange -> Color.Transparent
         date.value == null || date.maxValue == null -> Color.Transparent
-        else -> Color(ArgbEvaluator().evaluate(date.value.toFloat().div(date.maxValue), MaterialTheme.colorScheme.error.toArgb(), MaterialTheme.colorScheme.primary.toArgb()) as Int)
+        else -> Color(ArgbEvaluator().evaluate(date.value.toFloat().div(date.maxValue), lowColor.toArgb(), highColor.toArgb()) as Int)
     }
 
     val textAlpha = when {
@@ -201,7 +208,7 @@ fun DisplayDate(
         else -> date.date.dayOfMonth.toString()
     }
 
-    Box(
+    BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .background(color)
@@ -211,12 +218,19 @@ fun DisplayDate(
                 onClick = onSelectDate,
             ),
     ) {
+        // specifically allowing this because Caroline likes her phone supporting date displays this small
+        val enoughSpaceToLookNice = maxHeight >= 35.dp
+        val (smallTextAlignment, largeTextAlignment) = Pair(
+            if (enoughSpaceToLookNice) Alignment.TopStart else Alignment.TopCenter,
+            if (smallText == null || enoughSpaceToLookNice) Alignment.Center else Alignment.BottomCenter,
+        )
+
         if (smallText != null) {
             Text(
                 text = smallText,
                 color = textColor,
                 modifier = Modifier
-                    .align(Alignment.TopStart)
+                    .align(smallTextAlignment)
                     .alpha(textAlpha)
                     .padding(horizontal = 4.dp),
                 textAlign = TextAlign.Center,
@@ -228,7 +242,9 @@ fun DisplayDate(
             Text(
                 text = largeText,
                 color = textColor,
-                modifier = Modifier.alpha(textAlpha),
+                modifier = Modifier
+                    .alpha(textAlpha)
+                    .align(largeTextAlignment),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Light,

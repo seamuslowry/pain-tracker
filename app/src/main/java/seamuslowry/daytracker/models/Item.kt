@@ -25,4 +25,5 @@ data class Item(
     @ColumnInfo(index = true)
     val configuration: Long,
     val value: Int? = null,
+    val comment: String? = null,
 )

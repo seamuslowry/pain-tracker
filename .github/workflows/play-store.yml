@@ -7,10 +7,10 @@ jobs:
   play-store:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: 17
@@ -18,7 +18,7 @@ jobs:
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: 3.1.0
           bundler-cache: true
 
       - name: Decode Service Account Key JSON File
@@ -37,7 +37,7 @@ jobs:
 
       - name: Build & validate Android release
         id: validate-release
-        if: "!contains(github.ref, 'main')"
+        if: github.ref != 'refs/heads/main'
         run: bundle exec fastlane android deploy dry_run:true
         env:
           STORE_FILE: ${{ steps.android_keystore.outputs.filePath }}
@@ -47,7 +47,7 @@ jobs:
           ANDROID_JSON_KEY_FILE: ${{ steps.service_account_json_file.outputs.filePath }}
 
       - name: Build & deploy Android release
-        if: contains(github.ref, 'main')
+        if: github.ref == 'refs/heads/main'
         run: bundle exec fastlane android deploy dry_run:false
         env:
           STORE_FILE: ${{ steps.android_keystore.outputs.filePath }}
@@ -57,7 +57,7 @@ jobs:
           ANDROID_JSON_KEY_FILE: ${{ steps.service_account_json_file.outputs.filePath }}
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release_aab
           path: |

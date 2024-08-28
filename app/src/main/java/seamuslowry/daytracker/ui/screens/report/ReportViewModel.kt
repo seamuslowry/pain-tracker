@@ -1,6 +1,7 @@
 package seamuslowry.daytracker.ui.screens.report
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,14 +11,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.data.repos.ItemRepo
 import seamuslowry.daytracker.data.repos.SettingsRepo
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
+import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -38,7 +42,15 @@ class ReportViewModel @Inject constructor(
         it.showRecordedValues
     }.stateIn(
         scope = viewModelScope,
-        initialValue = false,
+        initialValue = runBlocking { settingsRepo.settings.first().showRecordedValues },
+        started = SharingStarted.WhileSubscribed(5_000),
+    )
+
+    val colorOverrides: StateFlow<DisplayColors> = settingsRepo.settings.map {
+        DisplayColors(it.lowValueColor, it.highValueColor)
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = runBlocking { settingsRepo.settings.first().let { DisplayColors(it.lowValueColor, it.highValueColor) } },
         started = SharingStarted.WhileSubscribed(5_000),
     )
 
@@ -74,16 +86,19 @@ class ReportViewModel @Inject constructor(
 
         val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
 
-        i.mapValues { entry ->
-            val sequenceDisplays = sequence.map { date ->
-                entry.value.firstOrNull { item -> item.date == date }?.let { item ->
-                    val selection = entry.key.trackingType.options.firstOrNull { it.value == item.value }
-                    baseDate.copy(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date = date)
-                } ?: baseDate.copy(date = date)
-            }.toList()
+        i
+            .filterKeys { it.trackingType is LimitedOptionTrackingType }
+            .mapValues { entry ->
+                val sequenceDisplays = sequence.map { date ->
+                    entry.value.firstOrNull { item -> item.date == date }?.let { item ->
+                        val trackingType = entry.key.trackingType as LimitedOptionTrackingType
+                        val selection = trackingType.options.firstOrNull { it.value == item.value }
+                        baseDate.copy(value = item.value, text = selection?.shortText, maxValue = trackingType.options.size, date = date)
+                    } ?: baseDate.copy(date = date)
+                }.toList()
 
-            (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
-        }
+                (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
+            }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -119,6 +134,11 @@ data class DateDisplay(
     val date: LocalDate,
     val inRange: Boolean = true,
     val showValue: Boolean = false,
+)
+
+data class DisplayColors(
+    val lowValueColor: Color?,
+    val highValueColor: Color?,
 )
 
 data class ReportState(
