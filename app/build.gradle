@@ -28,8 +28,8 @@ android {
         applicationId "seamuslowry.daytracker"
         minSdk 33
         targetSdk 34
-        versionCode 32
-        versionName "0.28.1"
+        versionCode 33
+        versionName "0.28.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -76,7 +76,7 @@ dependencies {
     implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    implementation 'com.google.accompanist:accompanist-placeholder-material3:0.30.1'
+    implementation "io.github.fornewid:placeholder-material3:2.0.0"
     implementation "androidx.datastore:datastore-preferences:1.1.1"
 
     ksp "androidx.room:room-compiler:$room_version"
