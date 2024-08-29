@@ -1,7 +1,13 @@
 package seamuslowry.daytracker.ui.shared
 
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -27,8 +33,11 @@ fun TrackerEntry(
 ) {
     when (trackerType) {
         is LimitedOptionTrackingType ->
-            // notes: possible... text gets a little cramped. see what can be done about that
-            SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
+            SingleChoiceSegmentedButtonRow(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight),
+            ) {
                 trackerType.options.forEachIndexed { index, option ->
                     SegmentedButton(
                         enabled = enabled,
@@ -39,11 +48,29 @@ fun TrackerEntry(
                             index = index,
                             count = trackerType.options.size,
                         ),
+                        colors = SegmentedButtonDefaults.colors(
+                            // active buttons use the default button colors
+                            activeContainerColor = ButtonDefaults.buttonColors().containerColor,
+                            activeContentColor = ButtonDefaults.buttonColors().contentColor,
+                            disabledActiveContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
+                            disabledActiveContentColor = ButtonDefaults.buttonColors().disabledContentColor,
+                            // inactive buttons use the default outlined button colors
+                            inactiveContainerColor = ButtonDefaults.outlinedButtonColors().containerColor,
+                            inactiveContentColor = ButtonDefaults.outlinedButtonColors().contentColor,
+                            disabledInactiveContainerColor = ButtonDefaults.outlinedButtonColors().disabledContainerColor,
+                            disabledInactiveContentColor = ButtonDefaults.outlinedButtonColors().disabledContentColor,
+                            // all borders use outline
+                            activeBorderColor = MaterialTheme.colorScheme.outline,
+                            inactiveBorderColor = MaterialTheme.colorScheme.outline,
+                            disabledActiveBorderColor = MaterialTheme.colorScheme.outline,
+                            disabledInactiveBorderColor = MaterialTheme.colorScheme.outline,
+                        ),
                     ) {
                         Text(
                             text = option.text?.let { text -> stringResource(id = text) }
                                 ?: option.value.toString(),
                             softWrap = false,
+                            modifier = Modifier.requiredWidth(IntrinsicSize.Max),
                             overflow = TextOverflow.Visible,
                         )
                     }
