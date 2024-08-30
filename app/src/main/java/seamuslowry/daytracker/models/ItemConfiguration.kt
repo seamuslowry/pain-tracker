@@ -10,4 +10,8 @@ data class ItemConfiguration(
     val name: String = "",
     val trackingType: TrackingType = LimitedOptionTrackingType.ONE_TO_TEN,
     val active: Boolean = true,
-)
+): Comparable<ItemConfiguration> {
+    override fun compareTo(other: ItemConfiguration): Int {
+        return id.compareTo(other.id)
+    }
+}

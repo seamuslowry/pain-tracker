@@ -71,6 +71,7 @@ class ReportViewModel @Inject constructor(
                 keySelector = { itemWithConfiguration -> itemWithConfiguration.configuration },
                 valueTransform = { itemWithConfiguration -> itemWithConfiguration.item },
             )
+            .toSortedMap()
         }
 
     val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items, showRecordedValues) {

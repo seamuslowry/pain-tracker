@@ -66,7 +66,7 @@ class EntryViewModel @Inject constructor(
         ) { lastValue, newValue -> Pair(lastValue.second, newValue) }
         .debounce { if (it.second.size > it.first.size) 300 else 0 }
         .map {
-            it.second
+            it.second.sorted()
         }
         .stateIn(
             scope = viewModelScope,
