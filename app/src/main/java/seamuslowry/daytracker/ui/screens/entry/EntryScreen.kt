@@ -1,5 +1,6 @@
 package seamuslowry.daytracker.ui.screens.entry
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
@@ -36,8 +37,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -90,8 +92,9 @@ fun EntryScreen(
     var draggingItemKey: Any? by remember {
         mutableStateOf(null)
     }
-    var delta: Float by remember {
-        mutableFloatStateOf(0f)
+
+    val deltaByIndex = remember {
+        mutableStateMapOf<Int, Float>()
     }
 
     val onMove = fun(from: LazyListItemInfo, to: LazyListItemInfo) {
@@ -99,6 +102,13 @@ fun EntryScreen(
         val toConfiguration = items.find { it.item.id == to.key }?.configuration ?: return
 
         viewModel.swap(fromConfiguration, toConfiguration)
+    }
+
+    // Compute a value based on the remembered field
+    val delta by remember {
+        derivedStateOf {
+            Log.d(TAG, "$deltaByIndex")
+            deltaByIndex.getOrDefault(stateList.layoutInfo.visibleItemsInfo.find { it.key == draggingItemKey }?.index ?: 0, 0f) }
     }
 
     LazyColumn(
@@ -109,11 +119,10 @@ fun EntryScreen(
                 detectDragGesturesAfterLongPress(
                     onDrag = { change, dragAmount ->
                         change.consume()
-                        delta += dragAmount.y
-
                         val currentDraggingItem = stateList.layoutInfo.visibleItemsInfo.find { it.key == draggingItemKey } ?: return@detectDragGesturesAfterLongPress
+                        deltaByIndex[currentDraggingItem.index] = deltaByIndex.getOrDefault(currentDraggingItem.index, 0f) + dragAmount.y
 
-                        val startOffset = currentDraggingItem.offset + delta
+                        val startOffset = currentDraggingItem.offset + deltaByIndex.getOrDefault(currentDraggingItem.index, 0f)
                         val endOffset = startOffset + currentDraggingItem.size
                         val middleOffset = startOffset + (endOffset - startOffset) / 2f
 
@@ -126,20 +135,24 @@ fun EntryScreen(
 
                         targetItem?.let {
                             onMove(currentDraggingItem, it)
-                            delta += currentDraggingItem.offset - targetItem.offset
+                            deltaByIndex[it.index] = deltaByIndex.getOrDefault(currentDraggingItem.index, 0f) + currentDraggingItem.offset - it.offset
                         }
                     },
                     onDragStart = { offset ->
                         draggingItemKey = stateList.layoutInfo.visibleItemsInfo
-                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }?.key
+                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }
+                            ?.also {
+                                Log.d(TAG, "initial offset: ${it.offset}")
+                            }
+                            ?.key
                     },
                     onDragEnd = {
                         draggingItemKey = null
-                        delta = 0f
+                        deltaByIndex.clear()
                     },
                     onDragCancel = {
                         draggingItemKey = null
-                        delta = 0f
+                        deltaByIndex.clear()
                     },
                 )
             },
