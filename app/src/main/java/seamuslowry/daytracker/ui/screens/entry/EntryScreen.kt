@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -86,7 +87,7 @@ fun EntryScreen(
     val scope = rememberCoroutineScope()
 
     val stateList = rememberLazyListState()
-    var draggingItemKey: Any? by remember {
+    var draggingItem: LazyListItemInfo? by remember {
         mutableStateOf(null)
     }
     var delta: Float by remember {
@@ -104,15 +105,15 @@ fun EntryScreen(
                         delta += dragAmount.y
                     },
                     onDragStart = { offset ->
-                        draggingItemKey = stateList.layoutInfo.visibleItemsInfo
-                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }?.key
+                        draggingItem = stateList.layoutInfo.visibleItemsInfo
+                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }
                     },
                     onDragEnd = {
-                        draggingItemKey = null
+                        draggingItem = null
                         delta = 0f
                     },
                     onDragCancel = {
-                        draggingItemKey = null
+                        draggingItem = null
                         delta = 0f
                     },
                 )
@@ -138,7 +139,7 @@ fun EntryScreen(
                 onChange = viewModel::saveItem,
                 onDelete = viewModel::deleteConfiguration,
                 onEdit = viewModel::saveItemConfiguration,
-                modifier = if (element.item.id == draggingItemKey) Modifier.graphicsLayer { translationY = delta } else Modifier,
+                modifier = if (element.item.id == draggingItem?.key) Modifier.graphicsLayer { translationY = delta } else Modifier,
             )
         }
         items(itemsLoading.coerceAtLeast(0)) {
