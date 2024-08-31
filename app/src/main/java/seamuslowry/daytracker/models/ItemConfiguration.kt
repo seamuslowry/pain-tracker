@@ -10,12 +10,10 @@ data class ItemConfiguration(
     val name: String = "",
     val trackingType: TrackingType = LimitedOptionTrackingType.ONE_TO_TEN,
     val active: Boolean = true,
-    val order: Int? = null,
+    val orderOverride: Long? = null,
 ) : Comparable<ItemConfiguration> {
-    override fun compareTo(other: ItemConfiguration): Int = when {
-        order != null && other.order != null -> order.compareTo(other.order)
-        order == null && other.order != null -> -1
-        order != null && other.order == null -> 1
-        else -> id.compareTo(other.id)
-    }
+    override fun compareTo(other: ItemConfiguration): Int = order.compareTo(other.order)
+
+    val order: Long
+        get() = orderOverride ?: id
 }
