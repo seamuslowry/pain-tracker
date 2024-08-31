@@ -87,33 +87,59 @@ fun EntryScreen(
     val scope = rememberCoroutineScope()
 
     val stateList = rememberLazyListState()
-    var draggingItem: LazyListItemInfo? by remember {
+    var draggingItemKey: Any? by remember {
         mutableStateOf(null)
     }
     var delta: Float by remember {
         mutableFloatStateOf(0f)
     }
 
+    val onMove = fun(from: LazyListItemInfo, to: LazyListItemInfo) {
+        val fromConfiguration = items.find { it.item.id == from.key }?.configuration ?: return
+        val toConfiguration = items.find { it.item.id == to.key }?.configuration ?: return
+
+        viewModel.saveItemConfiguration(fromConfiguration.copy(orderOverride = toConfiguration.order))
+        viewModel.saveItemConfiguration(toConfiguration.copy(orderOverride = fromConfiguration.order))
+    }
+
     LazyColumn(
         state = stateList,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
-            .pointerInput(key1 = items) {
+            .pointerInput(key1 = items.map { it.item.id }.toSet()) {
                 detectDragGesturesAfterLongPress(
                     onDrag = { change, dragAmount ->
                         change.consume()
                         delta += dragAmount.y
+
+                        val currentDraggingItem = stateList.layoutInfo.visibleItemsInfo.find { it.key == draggingItemKey } ?: return@detectDragGesturesAfterLongPress
+
+                        val startOffset = currentDraggingItem.offset + delta
+                        val endOffset = startOffset + currentDraggingItem.size
+                        val middleOffset = startOffset + (endOffset - startOffset) / 2f
+
+                        val targetItem =
+                            stateList.layoutInfo.visibleItemsInfo.find { item ->
+                                currentDraggingItem.key != item.key &&
+                                    item.contentType == DRAGGABLE_CONTENT_TYPE &&
+                                    middleOffset.toInt() in item.offset..item.offset + item.size
+                            }
+
+                        targetItem?.let {
+                            onMove(currentDraggingItem, it)
+                            delta += currentDraggingItem.offset - targetItem.offset
+                        }
                     },
                     onDragStart = { offset ->
-                        draggingItem = stateList.layoutInfo.visibleItemsInfo
-                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }
+                        draggingItemKey = stateList.layoutInfo.visibleItemsInfo
+                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }?.key
                     },
                     onDragEnd = {
-                        draggingItem = null
+                        draggingItemKey = null
                         delta = 0f
                     },
                     onDragCancel = {
-                        draggingItem = null
+                        draggingItemKey = null
                         delta = 0f
                     },
                 )
@@ -139,7 +165,7 @@ fun EntryScreen(
                 onChange = viewModel::saveItem,
                 onDelete = viewModel::deleteConfiguration,
                 onEdit = viewModel::saveItemConfiguration,
-                modifier = if (element.item.id == draggingItem?.key) Modifier.graphicsLayer { translationY = delta } else Modifier,
+                modifier = if (element.item.id == draggingItemKey) Modifier.graphicsLayer { translationY = delta } else Modifier,
             )
         }
         items(itemsLoading.coerceAtLeast(0)) {
