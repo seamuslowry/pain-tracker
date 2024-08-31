@@ -5,6 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -78,6 +79,7 @@ val SUPPORTED_TRACKING_TYPES = listOf(
 
 const val DRAGGABLE_CONTENT_TYPE = "DRAGGABLE"
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
@@ -177,7 +179,7 @@ fun EntryScreen(
                 onChange = viewModel::saveItem,
                 onDelete = viewModel::deleteConfiguration,
                 onEdit = viewModel::saveItemConfiguration,
-                modifier = if (element.item.id == draggingItemKey) Modifier.graphicsLayer { translationY = delta } else Modifier,
+                modifier = if (element.item.id == draggingItemKey) Modifier.graphicsLayer { translationY = delta } else Modifier.animateItemPlacement(),
             )
         }
         items(itemsLoading.coerceAtLeast(0)) {
