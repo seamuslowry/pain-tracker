@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -34,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,6 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -68,6 +73,8 @@ val SUPPORTED_TRACKING_TYPES = listOf(
     TextEntryTrackingType,
 )
 
+const val DRAGGABLE_CONTENT_TYPE = "DRAGGABLE"
+
 @Composable
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
@@ -78,9 +85,38 @@ fun EntryScreen(
     val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
 
+    val stateList = rememberLazyListState()
+    var draggingItemKey: Any? by remember {
+        mutableStateOf(null)
+    }
+    var delta: Float by remember {
+        mutableFloatStateOf(0f)
+    }
+
     LazyColumn(
+        state = stateList,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .pointerInput(key1 = items) {
+                detectDragGesturesAfterLongPress(
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        delta += dragAmount.y
+                    },
+                    onDragStart = { offset ->
+                        draggingItemKey = stateList.layoutInfo.visibleItemsInfo
+                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }?.key
+                    },
+                    onDragEnd = {
+                        draggingItemKey = null
+                        delta = 0f
+                    },
+                    onDragCancel = {
+                        draggingItemKey = null
+                        delta = 0f
+                    },
+                )
+            },
     ) {
         item("date") {
             ArrowPicker(
@@ -96,12 +132,13 @@ fun EntryScreen(
                 Text(text = LocalDate.ofEpochDay(it).localeFormat(), textAlign = TextAlign.Center)
             }
         }
-        itemsIndexed(items = items, key = {_, element -> element.item.id }) { _, element ->
+        itemsIndexed(items = items, key = { _, element -> element.item.id }, contentType = { _, _ -> DRAGGABLE_CONTENT_TYPE }) { _, element ->
             ItemEntry(
                 itemWithConfiguration = element,
                 onChange = viewModel::saveItem,
                 onDelete = viewModel::deleteConfiguration,
                 onEdit = viewModel::saveItemConfiguration,
+                modifier = if (element.item.id == draggingItemKey) Modifier.graphicsLayer { translationY = delta } else Modifier,
             )
         }
         items(itemsLoading.coerceAtLeast(0)) {
