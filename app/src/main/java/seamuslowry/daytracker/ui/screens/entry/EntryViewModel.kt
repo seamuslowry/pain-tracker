@@ -124,6 +124,10 @@ class EntryViewModel @Inject constructor(
         runBlocking { itemConfigurationRepo.save(itemConfiguration) }
     }
 
+    fun swap(from: ItemConfiguration, to: ItemConfiguration) {
+        runBlocking { itemConfigurationRepo.updateAll(from.copy(orderOverride = to.order), to.copy(orderOverride = from.order)) }
+    }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }

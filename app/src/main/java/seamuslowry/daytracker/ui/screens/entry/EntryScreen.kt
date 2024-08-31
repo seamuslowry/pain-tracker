@@ -98,8 +98,7 @@ fun EntryScreen(
         val fromConfiguration = items.find { it.item.id == from.key }?.configuration ?: return
         val toConfiguration = items.find { it.item.id == to.key }?.configuration ?: return
 
-        viewModel.saveItemConfiguration(fromConfiguration.copy(orderOverride = toConfiguration.order))
-        viewModel.saveItemConfiguration(toConfiguration.copy(orderOverride = fromConfiguration.order))
+        viewModel.swap(fromConfiguration, toConfiguration)
     }
 
     LazyColumn(
