@@ -1,17 +1,23 @@
 package seamuslowry.daytracker.ui.screens.entry
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -50,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.Item
@@ -60,6 +67,8 @@ import seamuslowry.daytracker.models.TextEntryTrackingType
 import seamuslowry.daytracker.models.localeFormat
 import seamuslowry.daytracker.ui.shared.ArrowPicker
 import seamuslowry.daytracker.ui.shared.TrackerEntry
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDate
 
 val SUPPORTED_TRACKING_TYPES = listOf(
@@ -68,6 +77,7 @@ val SUPPORTED_TRACKING_TYPES = listOf(
     TextEntryTrackingType,
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
@@ -78,9 +88,34 @@ fun EntryScreen(
     val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
 
+    val itemsUpdatedChannel = remember { Channel<Unit>() }
+
+    val lazyColumnState = rememberLazyListState()
+    val reorderableLazyColumnState = rememberReorderableLazyListState(
+        lazyListState = lazyColumnState,
+        scrollThresholdPadding = WindowInsets.systemBars.asPaddingValues()
+    ) { from, to ->
+        val fromConfiguration = items.find { it.item.id == from.key }?.configuration ?: return@rememberReorderableLazyListState
+        val toConfiguration = items.find { it.item.id == to.key }?.configuration ?: return@rememberReorderableLazyListState
+
+        viewModel.swap(fromConfiguration, toConfiguration)
+
+        // wait for the items to update
+        Log.d(TAG,"waiting in swap for from $fromConfiguration")
+        Log.d(TAG,"waiting in swap for to $toConfiguration")
+        itemsUpdatedChannel.receive()
+        Log.d(TAG,"done waiting in swap")
+    }
+
+    LaunchedEffect(items) {
+        // notify the list is updated
+        itemsUpdatedChannel.trySend(Unit)
+    }
+
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
+        state = lazyColumnState
     ) {
         item("date") {
             ArrowPicker(
@@ -97,12 +132,15 @@ fun EntryScreen(
             }
         }
         items(items = items, key = { it.item.id }) {
-            ItemEntry(
-                itemWithConfiguration = it,
-                onChange = viewModel::saveItem,
-                onDelete = viewModel::deleteConfiguration,
-                onEdit = viewModel::saveItemConfiguration,
-            )
+            ReorderableItem(state = reorderableLazyColumnState, key = it.item.id) { _ ->
+                ItemEntry(
+                    itemWithConfiguration = it,
+                    onChange = viewModel::saveItem,
+                    onDelete = viewModel::deleteConfiguration,
+                    onEdit = viewModel::saveItemConfiguration,
+                    modifier = Modifier.longPressDraggableHandle()
+                )
+            }
         }
         items(itemsLoading.coerceAtLeast(0)) {
             ItemEntry()

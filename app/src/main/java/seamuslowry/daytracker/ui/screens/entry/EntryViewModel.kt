@@ -66,7 +66,7 @@ class EntryViewModel @Inject constructor(
         ) { lastValue, newValue -> Pair(lastValue.second, newValue) }
         .debounce { if (it.second.size > it.first.size) 300 else 0 }
         .map {
-            it.second
+            it.second.sorted()
         }
         .stateIn(
             scope = viewModelScope,
@@ -122,6 +122,10 @@ class EntryViewModel @Inject constructor(
 
     fun saveItemConfiguration(itemConfiguration: ItemConfiguration) {
         runBlocking { itemConfigurationRepo.save(itemConfiguration) }
+    }
+
+    fun swap(from: ItemConfiguration, to: ItemConfiguration) {
+        runBlocking { itemConfigurationRepo.updateAll(from.copy(orderOverride = to.order), to.copy(orderOverride = from.order)) }
     }
 
     companion object {

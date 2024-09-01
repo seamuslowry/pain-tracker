@@ -19,6 +19,9 @@ interface ItemConfigurationDao {
     @Update
     suspend fun update(itemConfiguration: ItemConfiguration)
 
+    @Update
+    suspend fun updateAll(vararg itemConfigurations: ItemConfiguration)
+
     // need a custom upsert because OnConflictStrategy.REPLACE does a delete and insert
     suspend fun upsert(itemConfiguration: ItemConfiguration): Long {
         if (itemConfiguration.id > 0) {
