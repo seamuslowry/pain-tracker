@@ -1,5 +1,6 @@
 package seamuslowry.daytracker.ui.screens.entry
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
@@ -118,6 +119,7 @@ fun EntryScreen(
 
     LaunchedEffect(items.map { it.item.id }.toSet()) {
         scrollChannel.consumeAsFlow().collect {
+            Log.d(TAG, "scrolling $it")
             stateList.scrollBy(it)
         }
     }
@@ -149,6 +151,9 @@ fun EntryScreen(
                             onMove(currentDraggingItem, targetItem)
                             deltaByIndex[targetItem.index] = deltaByIndex.getOrDefault(currentDraggingItem.index, 0f) + currentDraggingItem.offset - targetItem.offset
                         } else {
+                            // liststate offets by index are NOT stable; need to account for them shifting during overscroll...somehow...
+                            Log.d(TAG, "delta for index ${currentDraggingItem.index} is ${deltaByIndex.getOrDefault(currentDraggingItem.index, 0f)}")
+                            Log.d(TAG, "list state offset for index ${currentDraggingItem.index} is ${stateList.layoutInfo.visibleItemsInfo[currentDraggingItem.index].offset}")
                             val overscroll = when {
                                 deltaByIndex.getOrDefault(currentDraggingItem.index, 0f) > 0 ->
                                     (endOffset - stateList.layoutInfo.viewportEndOffset).coerceAtLeast(0f)
