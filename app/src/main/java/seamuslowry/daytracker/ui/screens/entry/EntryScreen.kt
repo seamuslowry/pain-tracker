@@ -1,6 +1,5 @@
 package seamuslowry.daytracker.ui.screens.entry
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
@@ -102,10 +101,7 @@ fun EntryScreen(
         viewModel.swap(fromConfiguration, toConfiguration)
 
         // wait for the items to update
-        Log.d(TAG, "waiting in swap for from $fromConfiguration")
-        Log.d(TAG, "waiting in swap for to $toConfiguration")
         itemsUpdatedChannel.receive()
-        Log.d(TAG, "done waiting in swap")
     }
 
     LaunchedEffect(items) {
