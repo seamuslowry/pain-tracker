@@ -1,12 +1,12 @@
 package seamuslowry.daytracker.ui.screens.entry
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +59,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.Item
@@ -106,11 +108,18 @@ fun EntryScreen(
         viewModel.swap(fromConfiguration, toConfiguration)
     }
 
-    // Compute a value based on the remembered field
     val delta by remember {
         derivedStateOf {
-            Log.d(TAG, "$deltaByIndex")
-            deltaByIndex.getOrDefault(stateList.layoutInfo.visibleItemsInfo.find { it.key == draggingItemKey }?.index ?: 0, 0f) }
+            deltaByIndex.getOrDefault(stateList.layoutInfo.visibleItemsInfo.find { it.key == draggingItemKey }?.index ?: 0, 0f)
+        }
+    }
+
+    val scrollChannel = Channel<Float>()
+
+    LaunchedEffect(items.map { it.item.id }.toSet()) {
+        scrollChannel.consumeAsFlow().collect {
+            stateList.scrollBy(it)
+        }
     }
 
     LazyColumn(
@@ -128,6 +137,7 @@ fun EntryScreen(
                         val endOffset = startOffset + currentDraggingItem.size
                         val middleOffset = startOffset + (endOffset - startOffset) / 2f
 
+                        // try a swap
                         val targetItem =
                             stateList.layoutInfo.visibleItemsInfo.find { item ->
                                 currentDraggingItem.key != item.key &&
@@ -135,18 +145,25 @@ fun EntryScreen(
                                     middleOffset.toInt() in item.offset..item.offset + item.size
                             }
 
-                        targetItem?.let {
-                            onMove(currentDraggingItem, it)
-                            deltaByIndex[it.index] = deltaByIndex.getOrDefault(currentDraggingItem.index, 0f) + currentDraggingItem.offset - it.offset
+                        if (targetItem != null) {
+                            onMove(currentDraggingItem, targetItem)
+                            deltaByIndex[targetItem.index] = deltaByIndex.getOrDefault(currentDraggingItem.index, 0f) + currentDraggingItem.offset - targetItem.offset
+                        } else {
+                            val overscroll = when {
+                                deltaByIndex.getOrDefault(currentDraggingItem.index, 0f) > 0 ->
+                                    (endOffset - stateList.layoutInfo.viewportEndOffset).coerceAtLeast(0f)
+                                deltaByIndex.getOrDefault(currentDraggingItem.index, 0f) < 0 ->
+                                    (startOffset - stateList.layoutInfo.viewportStartOffset).coerceAtMost(0f)
+                                else -> 0f
+                            }
+                            if (overscroll != 0f) {
+                                scrollChannel.trySend(overscroll)
+                            }
                         }
                     },
                     onDragStart = { offset ->
                         draggingItemKey = stateList.layoutInfo.visibleItemsInfo
-                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }
-                            ?.also {
-                                Log.d(TAG, "initial offset: ${it.offset}")
-                            }
-                            ?.key
+                            .firstOrNull { item -> item.contentType == DRAGGABLE_CONTENT_TYPE && offset.y.toInt() in item.offset..(item.offset + item.size) }?.key
                     },
                     onDragEnd = {
                         draggingItemKey = null
