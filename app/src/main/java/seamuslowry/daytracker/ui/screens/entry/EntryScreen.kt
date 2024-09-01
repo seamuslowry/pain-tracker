@@ -6,6 +6,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -132,14 +133,16 @@ fun EntryScreen(
             }
         }
         items(items = items, key = { it.item.id }) {
+            val interactionSource = remember { MutableInteractionSource() }
             ReorderableItem(state = reorderableLazyColumnState, key = it.item.id) { _ ->
-                ItemEntry(
-                    itemWithConfiguration = it,
-                    onChange = viewModel::saveItem,
-                    onDelete = viewModel::deleteConfiguration,
-                    onEdit = viewModel::saveItemConfiguration,
-                    modifier = Modifier.longPressDraggableHandle()
-                )
+                    ItemEntry(
+                        itemWithConfiguration = it,
+                        onChange = viewModel::saveItem,
+                        onDelete = viewModel::deleteConfiguration,
+                        onEdit = viewModel::saveItemConfiguration,
+                        modifier = Modifier.longPressDraggableHandle(interactionSource = interactionSource),
+                        interactionSource = interactionSource
+                    )
             }
         }
         items(itemsLoading.coerceAtLeast(0)) {
@@ -167,6 +170,7 @@ fun ItemEntry(
     onChange: (item: Item) -> Unit = {},
     onDelete: (itemConfiguration: ItemConfiguration) -> Unit = {},
     onEdit: (itemConfiguration: ItemConfiguration) -> Unit = {},
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val item = itemWithConfiguration?.item
     val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
@@ -180,6 +184,8 @@ fun ItemEntry(
     }
 
     Card(
+        onClick = {},
+        interactionSource = interactionSource,
         modifier = modifier
             .padding(horizontal = 20.dp, vertical = 10.dp)
             .placeholder(
