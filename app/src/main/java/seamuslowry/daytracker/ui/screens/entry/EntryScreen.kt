@@ -94,7 +94,7 @@ fun EntryScreen(
     val lazyColumnState = rememberLazyListState()
     val reorderableLazyColumnState = rememberReorderableLazyListState(
         lazyListState = lazyColumnState,
-        scrollThresholdPadding = WindowInsets.systemBars.asPaddingValues()
+        scrollThresholdPadding = WindowInsets.systemBars.asPaddingValues(),
     ) { from, to ->
         val fromConfiguration = items.find { it.item.id == from.key }?.configuration ?: return@rememberReorderableLazyListState
         val toConfiguration = items.find { it.item.id == to.key }?.configuration ?: return@rememberReorderableLazyListState
@@ -102,10 +102,10 @@ fun EntryScreen(
         viewModel.swap(fromConfiguration, toConfiguration)
 
         // wait for the items to update
-        Log.d(TAG,"waiting in swap for from $fromConfiguration")
-        Log.d(TAG,"waiting in swap for to $toConfiguration")
+        Log.d(TAG, "waiting in swap for from $fromConfiguration")
+        Log.d(TAG, "waiting in swap for to $toConfiguration")
         itemsUpdatedChannel.receive()
-        Log.d(TAG,"done waiting in swap")
+        Log.d(TAG, "done waiting in swap")
     }
 
     LaunchedEffect(items) {
@@ -116,7 +116,7 @@ fun EntryScreen(
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
-        state = lazyColumnState
+        state = lazyColumnState,
     ) {
         item("date") {
             ArrowPicker(
@@ -135,14 +135,14 @@ fun EntryScreen(
         items(items = items, key = { it.item.id }) {
             val interactionSource = remember { MutableInteractionSource() }
             ReorderableItem(state = reorderableLazyColumnState, key = it.item.id) { _ ->
-                    ItemEntry(
-                        itemWithConfiguration = it,
-                        onChange = viewModel::saveItem,
-                        onDelete = viewModel::deleteConfiguration,
-                        onEdit = viewModel::saveItemConfiguration,
-                        modifier = Modifier.longPressDraggableHandle(interactionSource = interactionSource),
-                        interactionSource = interactionSource
-                    )
+                ItemEntry(
+                    itemWithConfiguration = it,
+                    onChange = viewModel::saveItem,
+                    onDelete = viewModel::deleteConfiguration,
+                    onEdit = viewModel::saveItemConfiguration,
+                    modifier = Modifier.longPressDraggableHandle(interactionSource = interactionSource),
+                    interactionSource = interactionSource,
+                )
             }
         }
         items(itemsLoading.coerceAtLeast(0)) {
@@ -170,7 +170,7 @@ fun ItemEntry(
     onChange: (item: Item) -> Unit = {},
     onDelete: (itemConfiguration: ItemConfiguration) -> Unit = {},
     onEdit: (itemConfiguration: ItemConfiguration) -> Unit = {},
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val item = itemWithConfiguration?.item
     val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
