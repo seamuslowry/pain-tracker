@@ -39,8 +39,7 @@ jobs:
       # update versions
       - name: Update versions
         run: |
-          echo "branch"
-          git branch --show-current
           sed -i'' "s/versionName \"${{ steps.main-branch-version-name.outputs.version-name }}\"/versionName \"${{ needs.determine-new-version.outputs.tag }}\"/" app/build.gradle
           sed -i'' "s/versionCode ${{ steps.main-branch-version-code.outputs.version-code }}/versionCode $(( ${{ steps.main-branch-version-code.outputs.version-code }} + 1 ))/" app/build.gradle
-          echo "$(git --no-pager diff)"
+      # commit to branch
+      - uses: actions4git/add-commit-push@v1
