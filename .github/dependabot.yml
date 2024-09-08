@@ -26,20 +26,7 @@ updates:
       day: "saturday"
       time: "03:00"
       timezone: "America/New_York"
-    target-branch: "staging/dependabot"
     groups:
-      gradle-plugin-dependencies:
+      all-dependencies:
         patterns:
-          - "com.android.application"
-          - "com.android.library"
-      kotlin-dependencies:
-        patterns:
-          - "org.jetbrains.kotlin.android"
-          - "org.jetbrains.kotlin.plugin.compose"
-          - "com.google.devtools.ksp"
-      hilt-dependencies:
-        patterns:
-          - "*hilt*"
-      room-dependencies:
-        patterns:
-          - "*room*"
+          - "*"
