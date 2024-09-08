@@ -276,7 +276,6 @@ fun AddConfigurationButton(
     val mainDuration = 500
     val extraDuration = 100
     val cardColor by animateColorAsState(
-        // TODO: here
         targetValue = if (itemConfiguration != null) CardDefaults.cardColors().containerColor else MaterialTheme.colorScheme.primary,
         animationSpec = tween(durationMillis = mainDuration),
         label = "cardColor",
