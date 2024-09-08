@@ -5,16 +5,28 @@
 
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "03:00"
+      timezone: "America/New_York"
   - package-ecosystem: "bundler" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+      day: "saturday"
+      time: "03:00"
+      timezone: "America/New_York"
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "saturday"
+      time: "03:00"
+      timezone: "America/New_York"
     groups:
-      gradle-plugin-dependencies:
+      all-dependencies:
         patterns:
-          - "com.android.application"
-          - "com.android.library"
+          - "*"

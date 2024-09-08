@@ -187,7 +187,7 @@ fun ItemEntry(
             .placeholder(
                 visible = itemWithConfiguration == null,
                 highlight = PlaceholderHighlight.fade(),
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                color = CardDefaults.cardColors().containerColor,
             )
             .animateContentSize(),
     ) {
@@ -316,7 +316,7 @@ fun AddConfigurationButton(
     val mainDuration = 500
     val extraDuration = 100
     val cardColor by animateColorAsState(
-        targetValue = if (itemConfiguration != null) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
+        targetValue = if (itemConfiguration != null) CardDefaults.cardColors().containerColor else MaterialTheme.colorScheme.primary,
         animationSpec = tween(durationMillis = mainDuration),
         label = "cardColor",
     )
