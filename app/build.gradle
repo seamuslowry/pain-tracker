@@ -99,9 +99,3 @@ tasks.register('printVersionName') {
         println android.defaultConfig.versionName
     }
 }
-
-tasks.register('printVersionCode') {
-    doLast {
-        println android.defaultConfig.versionCode
-    }
-}

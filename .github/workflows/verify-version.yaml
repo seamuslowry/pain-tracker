@@ -1,4 +1,4 @@
-name: Version Update
+name: Version Checks
 
 on:
   pull_request:
@@ -6,17 +6,8 @@ on:
       - main
 
 jobs:
-  determine-new-version:
-    uses: seamuslowry/workflows/.github/workflows/tag.yml@main
-    with:
-      dry-run: true
-    secrets:
-      gh_token: ${{ secrets.GITHUB_TOKEN }}
   ensure-new-version:
     runs-on: ubuntu-latest
-    needs: determine-new-version
-    permissions:
-      contents: write
     steps:
       # set up
       - name: Set up JDK 17
@@ -25,25 +16,24 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      # main branch versions
+      # target versions
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
-      - run: |
-          echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
-        id: main-branch-version-name
-      - run: |
-          echo "version-code=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
-        id: main-branch-version-code
+      - run: echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
+        id: target-version-name
 
-      # checkout to PR branch
+      # source versions
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-      # update versions
-      - name: Update versions
-        run: |
-          sed -i'' "s/versionName \"${{ steps.main-branch-version-name.outputs.version-name }}\"/versionName \"${{ needs.determine-new-version.outputs.tag }}\"/" app/build.gradle
-          sed -i'' "s/versionCode ${{ steps.main-branch-version-code.outputs.version-code }}/versionCode $(( ${{ steps.main-branch-version-code.outputs.version-code }} + 1 ))/" app/build.gradle
-      # commit to branch
-      - uses: actions4git/add-commit-push@v1
+      - run: echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
+        id: source-version-name
+
+      # comparison
+      - uses: madhead/semver-utils@latest
+        id: compare
+        with:
+          version: ${{ steps.source-version-name.outputs.version-name }}
+          compare-to: ${{ steps.target-version-name.outputs.version-name }}
+      - run: '[[ ">" == "${{ steps.compare.outputs.comparison-result }}" ]]'
