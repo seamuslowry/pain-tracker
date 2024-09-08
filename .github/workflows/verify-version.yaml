@@ -29,8 +29,10 @@ jobs:
           ref: ${{ github.base_ref }}
       - run: |
           echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
+        id: main-branch-version-name
+      - run: |
           echo "version-code=$(./gradlew --no-daemon -q printVersionCode)" >> "$GITHUB_OUTPUT"
-        id: main-branch-versions
+        id: main-branch-version-code
 
       # checkout to PR branch
       - uses: actions/checkout@v4
@@ -38,6 +40,6 @@ jobs:
       - name: Update versions
         run: |
           git branch --show-current
-          sed -n "s/versionName \"${{ steps.main-branch-versions.outputs.version-name }}\"/versionName \"${{ needs.determine-new-version.outputs.tag }}\"/" app/build.gradle
-          sed -n "s/versionCode ${{ steps.main-branch-versions.outputs.version-code }}/versionCode $(( ${{ steps.main-branch-versions.outputs.version-code }} + 1 ))/" app/build.gradle
+          sed -n "s/versionName \"${{ steps.main-branch-version-name.outputs.version-name }}\"/versionName \"${{ needs.determine-new-version.outputs.tag }}\"/" app/build.gradle
+          sed -n "s/versionCode ${{ steps.main-branch-version-code.outputs.version-code }}/versionCode $(( ${{ steps.main-branch-version-code.outputs.version-code }} + 1 ))/" app/build.gradle
           git diff
