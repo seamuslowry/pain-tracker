@@ -10,6 +10,7 @@ jobs:
     uses: seamuslowry/workflows/.github/workflows/tag.yml@main
     with:
       dry-run: true
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
   ensure-new-version:
     runs-on: ubuntu-latest
     needs: determine-new-version
