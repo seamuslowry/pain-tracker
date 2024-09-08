@@ -12,6 +12,8 @@ updates:
       day: "saturday"
       time: "03:00"
       timezone: "America/New_York"
+    commit-message:
+      prefix: '#patch'
   - package-ecosystem: "bundler" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
@@ -19,6 +21,8 @@ updates:
       day: "saturday"
       time: "03:00"
       timezone: "America/New_York"
+    commit-message:
+      prefix: '#patch'
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
@@ -26,6 +30,8 @@ updates:
       day: "saturday"
       time: "03:00"
       timezone: "America/New_York"
+    commit-message:
+      prefix: '#patch'
     groups:
       gradle-plugin-dependencies:
         patterns:
