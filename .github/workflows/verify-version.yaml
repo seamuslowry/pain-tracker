@@ -41,5 +41,5 @@ jobs:
         run: |
           echo "$(git branch --show-current)"
           sed -n "s/versionName \"${{ steps.main-branch-version-name.outputs.version-name }}\"/versionName \"${{ needs.determine-new-version.outputs.tag }}\"/" app/build.gradle
-          sed -n "s/versionCode ${{ steps.main-branch-version-code.outputs.version-code }}/versionCode $(( ${{ steps.main-branch-version-code.outputs.version-code }} + 1 ))/" app/build.gradle
+          sed -n "s/versionCode ${{ steps.main-branch-version-code.outputs.version-code }}/versionCode $( ${{ steps.main-branch-version-code.outputs.version-code }} + 1 )/" app/build.gradle
           echo "$(git --no-pager diff)"
