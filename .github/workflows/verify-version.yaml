@@ -38,6 +38,8 @@ jobs:
 
       # checkout to PR branch
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       # update versions
       - name: Update versions
         run: |
