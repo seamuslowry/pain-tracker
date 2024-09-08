@@ -5,10 +5,20 @@
 
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "03:00"
+      timezone: "America/New_York"
   - package-ecosystem: "bundler" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+      day: "saturday"
+      time: "03:00"
+      timezone: "America/New_York"
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
@@ -16,8 +26,17 @@ updates:
       day: "saturday"
       time: "03:00"
       timezone: "America/New_York"
+    target-branch: "staging/dependabot"
     groups:
       gradle-plugin-dependencies:
         patterns:
           - "com.android.application"
           - "com.android.library"
+      kotlin-dependencies:
+        patterns:
+          - "org.jetbrains.kotlin.android"
+          - "org.jetbrains.kotlin.plugin.compose"
+          - "com.google.devtools.ksp"
+      hilt-dependencies:
+        patterns:
+          - "*hilt*"
