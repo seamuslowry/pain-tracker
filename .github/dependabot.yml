@@ -40,3 +40,6 @@ updates:
       hilt-dependencies:
         patterns:
           - "*hilt*"
+      room-dependencies:
+        patterns:
+          - "*room*"
