@@ -14,7 +14,8 @@ val MIGRATION_7_8: Migration = object : Migration(7, 8) {
         db.execSQL("ALTER TABLE Item_Configuration ADD COLUMN orderOverride INTEGER;")
         db.execSQL("ALTER TABLE Item_Configuration ADD COLUMN lastModifiedDate INTEGER NOT NULL DEFAULT(unixepoch('subsec') * 1000);")
         // trigger to update last modified date on updates
-        db.execSQL("""
+        db.execSQL(
+            """
             CREATE TRIGGER update_lastModifiedDate_trigger
             AFTER UPDATE ON Item_Configuration
             FOR EACH ROW
@@ -24,6 +25,7 @@ val MIGRATION_7_8: Migration = object : Migration(7, 8) {
                 SET lastModifiedDate = unixepoch('subsec') * 1000
                 WHERE id = OLD.id;
             END;
-        """)
+        """,
+        )
     }
 }

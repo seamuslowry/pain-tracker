@@ -41,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,7 +58,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.Item
@@ -70,6 +70,7 @@ import seamuslowry.daytracker.ui.shared.ArrowPicker
 import seamuslowry.daytracker.ui.shared.TrackerEntry
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.time.Instant
 import java.time.LocalDate
 
 val SUPPORTED_TRACKING_TYPES = listOf(
@@ -83,33 +84,49 @@ val SUPPORTED_TRACKING_TYPES = listOf(
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
 ) {
-    val items by viewModel.items.collectAsState()
+    val savedItems by viewModel.items.collectAsState()
     val itemsLoading by viewModel.itemsLoading.collectAsState()
     val state = viewModel.state
     val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
 
+    val awaitingSaveItems = remember { mutableStateListOf<ItemWithConfiguration>() }
+
+    var items by remember {
+        mutableStateOf(savedItems)
+    }
+
+    LaunchedEffect(savedItems) {
+        items = mergeItemWithConfigurations(savedItems, awaitingSaveItems)
+    }
+
+    Log.d(TAG, "START - ${savedItems == items}")
+
+    Log.d(TAG, savedItems.toString())
+    Log.d(TAG, awaitingSaveItems.toString())
     Log.d(TAG, items.toString())
 
-    val itemsUpdatedChannel = remember { Channel<Unit>() }
+    Log.d(TAG, "END - ${savedItems == items}")
 
     val lazyColumnState = rememberLazyListState()
     val reorderableLazyColumnState = rememberReorderableLazyListState(
         lazyListState = lazyColumnState,
         scrollThresholdPadding = WindowInsets.systemBars.asPaddingValues(),
     ) { from, to ->
-        val fromConfiguration = items.find { it.item.id == from.key }?.configuration ?: return@rememberReorderableLazyListState
-        val toConfiguration = items.find { it.item.id == to.key }?.configuration ?: return@rememberReorderableLazyListState
+        val fromElement = items.find { it.item.id == from.key } ?: return@rememberReorderableLazyListState
+        val toElement = items.find { it.item.id == to.key } ?: return@rememberReorderableLazyListState
 
-        viewModel.swap(fromConfiguration, toConfiguration)
+        awaitingSaveItems.addAll(
+            listOf(
+                fromElement.copy(configuration = fromElement.configuration.copy(orderOverride = toElement.configuration.order, lastModifiedDate = Instant.now())),
+                toElement.copy(configuration = toElement.configuration.copy(orderOverride = fromElement.configuration.order, lastModifiedDate = Instant.now())),
+            ),
+        )
+        items = mergeItemWithConfigurations(savedItems, awaitingSaveItems)
+        Log.d(TAG, "items immediate $items")
 
-        // wait for the items to update
-        itemsUpdatedChannel.receive()
-    }
-
-    LaunchedEffect(items) {
-        // notify the list is updated
-        itemsUpdatedChannel.trySend(Unit)
+        viewModel.swap(fromElement.configuration, toElement.configuration)
+        Log.d(TAG, "ENDING swap")
     }
 
     LazyColumn(
@@ -161,6 +178,15 @@ fun EntryScreen(
         }
     }
 }
+
+private fun mergeItemWithConfigurations(
+    savedItems: List<ItemWithConfiguration>,
+    awaitingSaveItems: List<ItemWithConfiguration>,
+) = (savedItems + awaitingSaveItems)
+    .groupBy { it.configuration.id }
+    .mapNotNull { (_, values) ->
+        values.maxByOrNull { it.configuration.lastModifiedDate }
+    }.sorted()
 
 @Composable
 fun ItemEntry(
