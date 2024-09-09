@@ -27,6 +27,7 @@ import seamuslowry.daytracker.data.repos.ItemRepo
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
 import seamuslowry.daytracker.models.ItemWithConfiguration
+import java.time.Instant
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -66,7 +67,8 @@ class EntryViewModel @Inject constructor(
         ) { lastValue, newValue -> Pair(lastValue.second, newValue) }
         .debounce { if (it.second.size > it.first.size) 300 else 0 }
         .map {
-            it.second.sorted()
+            state = state.copy(items = mergeItemWithConfigurations(it.second, state.items))
+            state.items
         }
         .stateIn(
             scope = viewModelScope,
@@ -125,6 +127,26 @@ class EntryViewModel @Inject constructor(
     }
 
     fun swap(from: ItemConfiguration, to: ItemConfiguration) {
+        state = state.copy(
+            items = mergeItemWithConfigurations(
+                state.items,
+                listOfNotNull(
+                    state.items.firstOrNull { it.configuration.id == from.id }?.copy(
+                        configuration = from.copy(
+                            orderOverride = to.order,
+                            lastModifiedDate = Instant.now(),
+                        ),
+                    ),
+                    state.items.firstOrNull { it.configuration.id == to.id }?.copy(
+                        configuration = to.copy(
+                            orderOverride = from.order,
+                            lastModifiedDate = Instant.now(),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
         runBlocking { itemConfigurationRepo.updateAll(from.copy(orderOverride = to.order), to.copy(orderOverride = from.order)) }
     }
 
@@ -134,5 +156,16 @@ class EntryViewModel @Inject constructor(
 }
 
 data class ConfigurationState(
+    val items: List<ItemWithConfiguration> = emptyList(),
     val unsavedConfiguration: ItemConfiguration? = null,
 )
+
+private fun mergeItemWithConfigurations(
+    savedItems: List<ItemWithConfiguration>,
+    awaitingSaveItems: List<ItemWithConfiguration>,
+) = (savedItems + awaitingSaveItems)
+    .filter { el -> savedItems.firstOrNull { it.configuration.id == el.configuration.id } != null }
+    .groupBy { it.configuration.id }
+    .mapNotNull { (_, values) ->
+        values.maxByOrNull { it.configuration.lastModifiedDate }
+    }.sorted()

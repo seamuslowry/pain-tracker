@@ -39,9 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,9 +68,7 @@ import seamuslowry.daytracker.ui.shared.ArrowPicker
 import seamuslowry.daytracker.ui.shared.TrackerEntry
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import java.time.Instant
 import java.time.LocalDate
-import kotlin.math.max
 
 val SUPPORTED_TRACKING_TYPES = listOf(
     LimitedOptionTrackingType.ONE_TO_TEN,
@@ -85,27 +81,11 @@ val SUPPORTED_TRACKING_TYPES = listOf(
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
 ) {
-    val savedItems by viewModel.items.collectAsState()
-    val savedItemsLoading by viewModel.itemsLoading.collectAsState()
+    val itemsLoading by viewModel.itemsLoading.collectAsState()
     val state = viewModel.state
     val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
-
-    val awaitingSaveItems = remember { mutableStateListOf<ItemWithConfiguration>() }
-
-    var items by remember {
-        mutableStateOf(savedItems)
-    }
-
-    val itemsLoading by remember {
-        derivedStateOf {
-            max((savedItems.size - items.size).coerceAtLeast(0), savedItemsLoading)
-        }
-    }
-
-    LaunchedEffect(savedItems) {
-        items = mergeItemWithConfigurations(savedItems, awaitingSaveItems)
-    }
+    val items = state.items
 
     val lazyColumnState = rememberLazyListState()
     val reorderableLazyColumnState = rememberReorderableLazyListState(
@@ -114,14 +94,6 @@ fun EntryScreen(
     ) { from, to ->
         val fromElement = items.find { it.item.id == from.key } ?: return@rememberReorderableLazyListState
         val toElement = items.find { it.item.id == to.key } ?: return@rememberReorderableLazyListState
-
-        awaitingSaveItems.addAll(
-            listOf(
-                fromElement.copy(configuration = fromElement.configuration.copy(orderOverride = toElement.configuration.order, lastModifiedDate = Instant.now())),
-                toElement.copy(configuration = toElement.configuration.copy(orderOverride = fromElement.configuration.order, lastModifiedDate = Instant.now())),
-            ),
-        )
-        items = mergeItemWithConfigurations(savedItems, awaitingSaveItems)
 
         viewModel.swap(fromElement.configuration, toElement.configuration)
     }
@@ -449,13 +421,3 @@ fun UpsertConfigurationContent(
         )
     }
 }
-
-private fun mergeItemWithConfigurations(
-    savedItems: List<ItemWithConfiguration>,
-    awaitingSaveItems: List<ItemWithConfiguration>,
-) = (savedItems + awaitingSaveItems)
-    .filter { el -> savedItems.firstOrNull { it.configuration.id == el.configuration.id } != null }
-    .groupBy { it.configuration.id }
-    .mapNotNull { (_, values) ->
-        values.maxByOrNull { it.configuration.lastModifiedDate }
-    }.sorted()
