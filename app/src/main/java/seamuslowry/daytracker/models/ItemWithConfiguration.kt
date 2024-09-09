@@ -11,7 +11,5 @@ data class ItemWithConfiguration(
     )
     val configuration: ItemConfiguration,
 ) : Comparable<ItemWithConfiguration> {
-    override fun compareTo(other: ItemWithConfiguration): Int {
-        return this.configuration.compareTo(other.configuration)
-    }
+    override fun compareTo(other: ItemWithConfiguration) = this.configuration.compareTo(other.configuration)
 }

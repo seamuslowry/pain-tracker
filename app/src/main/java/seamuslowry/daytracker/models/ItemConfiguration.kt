@@ -14,7 +14,7 @@ data class ItemConfiguration(
     val orderOverride: Long? = null,
     val lastModifiedDate: Instant = Instant.now(),
 ) : Comparable<ItemConfiguration> {
-    override fun compareTo(other: ItemConfiguration): Int = order.compareTo(other.order)
+    override fun compareTo(other: ItemConfiguration) = order.compareTo(other.order)
 
     val order: Long
         get() = orderOverride ?: id
