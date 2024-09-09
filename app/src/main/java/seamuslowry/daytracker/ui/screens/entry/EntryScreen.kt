@@ -1,5 +1,6 @@
 package seamuslowry.daytracker.ui.screens.entry
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
@@ -87,6 +88,8 @@ fun EntryScreen(
     val state = viewModel.state
     val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
+
+    Log.d(TAG, items.toString())
 
     val itemsUpdatedChannel = remember { Channel<Unit>() }
 

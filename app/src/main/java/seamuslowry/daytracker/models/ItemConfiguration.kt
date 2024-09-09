@@ -2,6 +2,7 @@ package seamuslowry.daytracker.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.Instant
 
 @Entity(tableName = "item_configuration")
 data class ItemConfiguration(
@@ -11,6 +12,7 @@ data class ItemConfiguration(
     val trackingType: TrackingType = LimitedOptionTrackingType.ONE_TO_TEN,
     val active: Boolean = true,
     val orderOverride: Long? = null,
+    val lastModifiedDate: Instant = Instant.now()
 ) : Comparable<ItemConfiguration> {
     override fun compareTo(other: ItemConfiguration): Int = order.compareTo(other.order)
 
