@@ -9,12 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -55,7 +54,7 @@ class EntryViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val items: StateFlow<List<ItemWithConfiguration>> = date
         .flatMapLatest {
             viewModelScope.launch { ensureItems(date.value) }
@@ -65,8 +64,9 @@ class EntryViewModel @Inject constructor(
         .runningFold(
             Pair(emptyList<ItemWithConfiguration>(), emptyList<ItemWithConfiguration>()),
         ) { lastValue, newValue -> Pair(lastValue.second, newValue) }
-        .debounce { if (it.second.size > it.first.size) 300 else 0 }
         .map {
+            // add a _slight_ delay on adds so it doesn't look jumpy
+            delay(if (it.second.size > it.first.size) 300 else 0)
             state = state.copy(items = mergeItemWithConfigurations(it.second, state.items))
             state.items
         }
