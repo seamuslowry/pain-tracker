@@ -56,7 +56,7 @@ class EntryViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    val items: StateFlow<List<ItemWithConfiguration>> = date
+    private val items: StateFlow<List<ItemWithConfiguration>> = date
         .flatMapLatest {
             viewModelScope.launch { ensureItems(date.value) }
             itemRepo.getFull(it)
