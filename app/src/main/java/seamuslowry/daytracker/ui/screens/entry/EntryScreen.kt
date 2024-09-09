@@ -1,6 +1,5 @@
 package seamuslowry.daytracker.ui.screens.entry
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
@@ -40,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +72,7 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.Instant
 import java.time.LocalDate
+import kotlin.math.max
 
 val SUPPORTED_TRACKING_TYPES = listOf(
     LimitedOptionTrackingType.ONE_TO_TEN,
@@ -85,7 +86,7 @@ fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
 ) {
     val savedItems by viewModel.items.collectAsState()
-    val itemsLoading by viewModel.itemsLoading.collectAsState()
+    val savedItemsLoading by viewModel.itemsLoading.collectAsState()
     val state = viewModel.state
     val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
@@ -96,17 +97,15 @@ fun EntryScreen(
         mutableStateOf(savedItems)
     }
 
+    val itemsLoading by remember {
+        derivedStateOf {
+            max((savedItems.size - items.size).coerceAtLeast(0), savedItemsLoading)
+        }
+    }
+
     LaunchedEffect(savedItems) {
         items = mergeItemWithConfigurations(savedItems, awaitingSaveItems)
     }
-
-    Log.d(TAG, "START - ${savedItems == items}")
-
-    Log.d(TAG, savedItems.toString())
-    Log.d(TAG, awaitingSaveItems.toString())
-    Log.d(TAG, items.toString())
-
-    Log.d(TAG, "END - ${savedItems == items}")
 
     val lazyColumnState = rememberLazyListState()
     val reorderableLazyColumnState = rememberReorderableLazyListState(
@@ -123,10 +122,8 @@ fun EntryScreen(
             ),
         )
         items = mergeItemWithConfigurations(savedItems, awaitingSaveItems)
-        Log.d(TAG, "items immediate $items")
 
         viewModel.swap(fromElement.configuration, toElement.configuration)
-        Log.d(TAG, "ENDING swap")
     }
 
     LazyColumn(
@@ -178,15 +175,6 @@ fun EntryScreen(
         }
     }
 }
-
-private fun mergeItemWithConfigurations(
-    savedItems: List<ItemWithConfiguration>,
-    awaitingSaveItems: List<ItemWithConfiguration>,
-) = (savedItems + awaitingSaveItems)
-    .groupBy { it.configuration.id }
-    .mapNotNull { (_, values) ->
-        values.maxByOrNull { it.configuration.lastModifiedDate }
-    }.sorted()
 
 @Composable
 fun ItemEntry(
@@ -461,3 +449,13 @@ fun UpsertConfigurationContent(
         )
     }
 }
+
+private fun mergeItemWithConfigurations(
+    savedItems: List<ItemWithConfiguration>,
+    awaitingSaveItems: List<ItemWithConfiguration>,
+) = (savedItems + awaitingSaveItems)
+    .filter { el -> savedItems.firstOrNull { it.configuration.id == el.configuration.id } != null }
+    .groupBy { it.configuration.id }
+    .mapNotNull { (_, values) ->
+        values.maxByOrNull { it.configuration.lastModifiedDate }
+    }.sorted()
