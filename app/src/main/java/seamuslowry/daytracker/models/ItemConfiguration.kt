@@ -12,7 +12,7 @@ data class ItemConfiguration(
     val trackingType: TrackingType = LimitedOptionTrackingType.ONE_TO_TEN,
     val active: Boolean = true,
     val orderOverride: Long? = null,
-    val lastModifiedDate: Instant = Instant.now(),
+    val lastModified: Instant = Instant.now(),
 ) : Comparable<ItemConfiguration> {
     override fun compareTo(other: ItemConfiguration) = order.compareTo(other.order)
 

@@ -134,13 +134,13 @@ class EntryViewModel @Inject constructor(
                     state.items.firstOrNull { it.configuration.id == from.id }?.copy(
                         configuration = from.copy(
                             orderOverride = to.order,
-                            lastModifiedDate = Instant.now(),
+                            lastModified = Instant.now(),
                         ),
                     ),
                     state.items.firstOrNull { it.configuration.id == to.id }?.copy(
                         configuration = to.copy(
                             orderOverride = from.order,
-                            lastModifiedDate = Instant.now(),
+                            lastModified = Instant.now(),
                         ),
                     ),
                 ),
@@ -167,5 +167,5 @@ private fun mergeItemWithConfigurations(
     .filter { el -> savedItems.firstOrNull { it.configuration.id == el.configuration.id } != null }
     .groupBy { it.configuration.id }
     .mapNotNull { (_, values) ->
-        values.maxByOrNull { it.configuration.lastModifiedDate }
+        values.maxByOrNull { it.configuration.lastModified }
     }.sorted()
