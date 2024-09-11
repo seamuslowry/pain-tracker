@@ -9,12 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -27,6 +26,7 @@ import seamuslowry.daytracker.data.repos.ItemRepo
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
 import seamuslowry.daytracker.models.ItemWithConfiguration
+import java.time.Instant
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -54,8 +54,8 @@ class EntryViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    val items: StateFlow<List<ItemWithConfiguration>> = date
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val items: StateFlow<List<ItemWithConfiguration>> = date
         .flatMapLatest {
             viewModelScope.launch { ensureItems(date.value) }
             itemRepo.getFull(it)
@@ -64,9 +64,11 @@ class EntryViewModel @Inject constructor(
         .runningFold(
             Pair(emptyList<ItemWithConfiguration>(), emptyList<ItemWithConfiguration>()),
         ) { lastValue, newValue -> Pair(lastValue.second, newValue) }
-        .debounce { if (it.second.size > it.first.size) 300 else 0 }
         .map {
-            it.second
+            // add a _slight_ delay on adds so it doesn't look jumpy
+            delay(if (it.second.size > it.first.size) 300 else 0)
+            state = state.copy(items = mergeItemWithConfigurations(it.second, state.items))
+            state.items
         }
         .stateIn(
             scope = viewModelScope,
@@ -124,11 +126,46 @@ class EntryViewModel @Inject constructor(
         runBlocking { itemConfigurationRepo.save(itemConfiguration) }
     }
 
+    fun swap(from: ItemConfiguration, to: ItemConfiguration) {
+        state = state.copy(
+            items = mergeItemWithConfigurations(
+                state.items,
+                listOfNotNull(
+                    state.items.firstOrNull { it.configuration.id == from.id }?.copy(
+                        configuration = from.copy(
+                            orderOverride = to.order,
+                            lastModified = Instant.now(),
+                        ),
+                    ),
+                    state.items.firstOrNull { it.configuration.id == to.id }?.copy(
+                        configuration = to.copy(
+                            orderOverride = from.order,
+                            lastModified = Instant.now(),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        runBlocking { itemConfigurationRepo.updateAll(from.copy(orderOverride = to.order), to.copy(orderOverride = from.order)) }
+    }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 }
 
 data class ConfigurationState(
+    val items: List<ItemWithConfiguration> = emptyList(),
     val unsavedConfiguration: ItemConfiguration? = null,
 )
+
+private fun mergeItemWithConfigurations(
+    savedItems: List<ItemWithConfiguration>,
+    awaitingSaveItems: List<ItemWithConfiguration>,
+) = (savedItems + awaitingSaveItems)
+    .filter { el -> savedItems.firstOrNull { it.configuration.id == el.configuration.id } != null }
+    .groupBy { it.configuration.id }
+    .mapNotNull { (_, values) ->
+        values.maxByOrNull { it.configuration.lastModified }
+    }.sorted()

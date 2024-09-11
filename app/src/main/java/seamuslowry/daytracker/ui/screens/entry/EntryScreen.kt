@@ -4,18 +4,24 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -60,6 +66,8 @@ import seamuslowry.daytracker.models.TextEntryTrackingType
 import seamuslowry.daytracker.models.localeFormat
 import seamuslowry.daytracker.ui.shared.ArrowPicker
 import seamuslowry.daytracker.ui.shared.TrackerEntry
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDate
 
 val SUPPORTED_TRACKING_TYPES = listOf(
@@ -68,19 +76,32 @@ val SUPPORTED_TRACKING_TYPES = listOf(
     TextEntryTrackingType,
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EntryScreen(
     viewModel: EntryViewModel = hiltViewModel(),
 ) {
-    val items by viewModel.items.collectAsState()
     val itemsLoading by viewModel.itemsLoading.collectAsState()
     val state = viewModel.state
     val date by viewModel.date.collectAsState()
     val scope = rememberCoroutineScope()
+    val items = state.items
+
+    val lazyColumnState = rememberLazyListState()
+    val reorderableLazyColumnState = rememberReorderableLazyListState(
+        lazyListState = lazyColumnState,
+        scrollThresholdPadding = WindowInsets.systemBars.asPaddingValues(),
+    ) { from, to ->
+        val fromElement = items.find { it.item.id == from.key } ?: return@rememberReorderableLazyListState
+        val toElement = items.find { it.item.id == to.key } ?: return@rememberReorderableLazyListState
+
+        viewModel.swap(fromElement.configuration, toElement.configuration)
+    }
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
+        state = lazyColumnState,
     ) {
         item("date") {
             ArrowPicker(
@@ -97,12 +118,17 @@ fun EntryScreen(
             }
         }
         items(items = items, key = { it.item.id }) {
-            ItemEntry(
-                itemWithConfiguration = it,
-                onChange = viewModel::saveItem,
-                onDelete = viewModel::deleteConfiguration,
-                onEdit = viewModel::saveItemConfiguration,
-            )
+            val interactionSource = remember { MutableInteractionSource() }
+            ReorderableItem(state = reorderableLazyColumnState, key = it.item.id) { _ ->
+                ItemEntry(
+                    itemWithConfiguration = it,
+                    onChange = viewModel::saveItem,
+                    onDelete = viewModel::deleteConfiguration,
+                    onEdit = viewModel::saveItemConfiguration,
+                    modifier = Modifier.longPressDraggableHandle(interactionSource = interactionSource),
+                    interactionSource = interactionSource,
+                )
+            }
         }
         items(itemsLoading.coerceAtLeast(0)) {
             ItemEntry()
@@ -129,6 +155,7 @@ fun ItemEntry(
     onChange: (item: Item) -> Unit = {},
     onDelete: (itemConfiguration: ItemConfiguration) -> Unit = {},
     onEdit: (itemConfiguration: ItemConfiguration) -> Unit = {},
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val item = itemWithConfiguration?.item
     val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
@@ -142,6 +169,8 @@ fun ItemEntry(
     }
 
     Card(
+        onClick = {},
+        interactionSource = interactionSource,
         modifier = modifier
             .padding(horizontal = 20.dp, vertical = 10.dp)
             .placeholder(
@@ -360,7 +389,7 @@ fun UpsertConfigurationContent(
         )
         IconButton(onClick = onDiscard) {
             Icon(
-                Icons.Filled.Delete,
+                Icons.Filled.Close,
                 contentDescription = stringResource(R.string.discard_configuration),
             )
         }

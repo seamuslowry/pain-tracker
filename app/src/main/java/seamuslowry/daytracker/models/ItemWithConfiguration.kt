@@ -10,4 +10,6 @@ data class ItemWithConfiguration(
         entityColumn = "id",
     )
     val configuration: ItemConfiguration,
-)
+) : Comparable<ItemWithConfiguration> {
+    override fun compareTo(other: ItemWithConfiguration) = this.configuration.compareTo(other.configuration)
+}
