@@ -129,6 +129,7 @@ fun ReminderSection(
     var pickingTime by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val requiredPermission = Manifest.permission.POST_NOTIFICATIONS
+    val remindersText = stringResource(R.string.reminders_section_title)
 
     LaunchedEffect(key1 = reminderEnabled) {
         if (reminderEnabled && ContextCompat.checkSelfPermission(context, requiredPermission) != PackageManager.PERMISSION_GRANTED) {
@@ -137,7 +138,7 @@ fun ReminderSection(
     }
 
     Column(modifier = modifier) {
-        Text(text = stringResource(R.string.reminders_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
+        Text(text = remindersText, modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -146,7 +147,7 @@ fun ReminderSection(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(text = stringResource(R.string.enabled))
-            Switch(checked = reminderEnabled, onCheckedChange = onSetReminderEnabled)
+            Switch(checked = reminderEnabled, onCheckedChange = onSetReminderEnabled, modifier = Modifier.semantics { contentDescription = remindersText })
         }
         Row(
             modifier = Modifier
