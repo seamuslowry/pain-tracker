@@ -111,8 +111,8 @@ fun EntryScreen(
                     LocalDate.now().minusYears(1).toEpochDay(),
                     LocalDate.now().toEpochDay(),
                 ),
-                incrementLabel = stringResource(R.string.change_date),
-                decrementLabel = stringResource(R.string.change_date),
+                incrementLabel = stringResource(R.string.change_date, date.plusDays(1).localeFormat()),
+                decrementLabel = stringResource(R.string.change_date, date.minusDays(1).localeFormat()),
             ) {
                 Text(text = LocalDate.ofEpochDay(it).localeFormat(), textAlign = TextAlign.Center)
             }
