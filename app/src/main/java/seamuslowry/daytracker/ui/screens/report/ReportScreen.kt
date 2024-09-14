@@ -55,6 +55,7 @@ fun ReportScreen(
     val colorOverrides by viewModel.colorOverrides.collectAsState()
     val groupedItems by viewModel.displayItems.collectAsState()
     val earliestDate by viewModel.earliestDate.collectAsState()
+    val selectedOptionSingularText = stringResource(state.selectedOption.singular)
 
     Column(modifier = Modifier.fillMaxWidth()) {
         ArrowPicker(
@@ -64,8 +65,8 @@ fun ReportScreen(
             compare = { a, b -> a.start.compareTo(b.start) },
             incrementEnabled = state.dateRange.endInclusive < LocalDate.now(),
             decrementEnabled = state.dateRange.start > earliestDate,
-            incrementLabel = stringResource(R.string.change_date_range),
-            decrementLabel = stringResource(R.string.change_date_range),
+            incrementLabel = stringResource(R.string.see_next, selectedOptionSingularText),
+            decrementLabel = stringResource(R.string.see_previous, selectedOptionSingularText),
         ) {
             Text(
                 text = stringResource(

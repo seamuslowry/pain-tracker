@@ -40,4 +40,8 @@
     <string name="text_tracker_placeholder">Dear Day Tracker…</string>
     <string name="hex_prefix">#</string>
     <string name="reset_to_defaults">Reset to Defaults</string>
+    <string name="see_next">See next %1$s</string>
+    <string name="see_previous">See previous %1$s</string>
+    <string name="week">week</string>
+    <string name="month">month</string>
 </resources>
