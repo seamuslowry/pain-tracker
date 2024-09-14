@@ -41,6 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -96,6 +98,7 @@ fun CalendarSection(
     onSetShowValues: (value: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val showRecordedValuesText = stringResource(R.string.show_recorded_values)
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.calendar_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
         Row(
@@ -105,8 +108,8 @@ fun CalendarSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = stringResource(R.string.show_recorded_values))
-            Switch(checked = showValues, onCheckedChange = onSetShowValues)
+            Text(text = showRecordedValuesText)
+            Switch(checked = showValues, onCheckedChange = onSetShowValues, modifier = Modifier.semantics { contentDescription = showRecordedValuesText },)
         }
     }
 }
