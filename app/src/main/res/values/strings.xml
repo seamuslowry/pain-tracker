@@ -7,7 +7,8 @@
     <string name="confirm_configuration">Save</string>
     <string name="discard_configuration">Discard tracker configuration</string>
     <string name="name">Name</string>
-    <string name="change_tracking_type">Change tracking type</string>
+    <string name="change_tracking_type">Change to %1$s tracking type</string>
+    <string name="no_more_tracking_types">No more tracking type</string>
     <string name="change_date">Change date to %1$s</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -43,4 +44,7 @@
     <string name="see_previous">See previous %1$s</string>
     <string name="week">week</string>
     <string name="month">month</string>
+    <string name="one_to_ten">One to Ten</string>
+    <string name="yes_no">Yes or No</string>
+    <string name="free_text">Free Text</string>
 </resources>

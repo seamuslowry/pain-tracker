@@ -401,8 +401,8 @@ fun UpsertConfigurationContent(
         },
         range = if (creating) LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()) else LongRange(currentTrackingTypeIndex, currentTrackingTypeIndex),
         modifier = Modifier.padding(5.dp),
-        incrementLabel = stringResource(R.string.change_tracking_type),
-        decrementLabel = stringResource(R.string.change_tracking_type),
+        incrementLabel = SUPPORTED_TRACKING_TYPES.getOrNull(currentTrackingTypeIndex.toInt() + 1)?.let { stringResource(R.string.change_tracking_type, stringResource(it.label)) } ?: stringResource(R.string.no_more_tracking_types),
+        decrementLabel = SUPPORTED_TRACKING_TYPES.getOrNull(currentTrackingTypeIndex.toInt() - 1)?.let { stringResource(R.string.change_tracking_type, stringResource(it.label)) } ?: stringResource(R.string.no_more_tracking_types),
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             TrackerEntry(trackerType = SUPPORTED_TRACKING_TYPES[it.toInt()], enabled = false)

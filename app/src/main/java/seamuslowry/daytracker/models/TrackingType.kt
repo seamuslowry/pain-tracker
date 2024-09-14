@@ -12,17 +12,24 @@ data class Option(val value: Int, @StringRes val text: Int? = null, @StringRes v
 
 sealed interface TrackingType {
     val notify: Boolean
+
+    @get:StringRes
+    val label: Int
 }
 
 enum class LimitedOptionTrackingType(
     val options: List<Option>,
     override val notify: Boolean,
+    @StringRes
+    override val label: Int,
 ) : TrackingType {
-    ONE_TO_TEN((1..10).map { Option(it) }, true),
-    YES_NO(YesNoOption.entries.map { Option(it.value, it.text, it.shortText) }, true),
+    ONE_TO_TEN((1..10).map { Option(it) }, true, R.string.one_to_ten),
+    YES_NO(YesNoOption.entries.map { Option(it.value, it.text, it.shortText) }, true, R.string.yes_no),
 }
 
 data object TextEntryTrackingType : TrackingType {
     override val notify: Boolean
         get() = false
+    override val label: Int
+        get() = R.string.free_text
 }
