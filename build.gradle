@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        compose_bom_version = '2024.09.00'
+        compose_bom_version = '2024.09.01'
         hilt_version = '2.52'
         room_version = '2.6.1'
     }
