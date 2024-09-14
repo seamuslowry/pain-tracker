@@ -64,8 +64,8 @@ fun ReportScreen(
             compare = { a, b -> a.start.compareTo(b.start) },
             incrementEnabled = state.dateRange.endInclusive < LocalDate.now(),
             decrementEnabled = state.dateRange.start > earliestDate,
-            incrementResource = R.string.change_date_range,
-            decrementResource = R.string.change_date_range,
+            incrementLabel = stringResource(R.string.change_date_range),
+            decrementLabel = stringResource(R.string.change_date_range),
         ) {
             Text(
                 text = stringResource(

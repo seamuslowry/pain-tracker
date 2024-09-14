@@ -111,8 +111,8 @@ fun EntryScreen(
                     LocalDate.now().minusYears(1).toEpochDay(),
                     LocalDate.now().toEpochDay(),
                 ),
-                incrementResource = R.string.change_date,
-                decrementResource = R.string.change_date,
+                incrementLabel = stringResource(R.string.change_date),
+                decrementLabel = stringResource(R.string.change_date),
             ) {
                 Text(text = LocalDate.ofEpochDay(it).localeFormat(), textAlign = TextAlign.Center)
             }
@@ -401,8 +401,8 @@ fun UpsertConfigurationContent(
         },
         range = if (creating) LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()) else LongRange(currentTrackingTypeIndex, currentTrackingTypeIndex),
         modifier = Modifier.padding(5.dp),
-        incrementResource = R.string.change_tracking_type,
-        decrementResource = R.string.change_tracking_type,
+        incrementLabel = stringResource(R.string.change_tracking_type),
+        decrementLabel = stringResource(R.string.change_tracking_type),
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             TrackerEntry(trackerType = SUPPORTED_TRACKING_TYPES[it.toInt()], enabled = false)
