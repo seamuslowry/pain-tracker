@@ -109,7 +109,7 @@ fun CalendarSection(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(text = showRecordedValuesText)
-            Switch(checked = showValues, onCheckedChange = onSetShowValues, modifier = Modifier.semantics { contentDescription = showRecordedValuesText },)
+            Switch(checked = showValues, onCheckedChange = onSetShowValues, modifier = Modifier.semantics { contentDescription = showRecordedValuesText })
         }
     }
 }
