@@ -20,7 +20,6 @@ import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import seamuslowry.daytracker.models.TextEntryTrackingType
 import seamuslowry.daytracker.models.TrackingType
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackerEntry(
     trackerType: TrackingType,
