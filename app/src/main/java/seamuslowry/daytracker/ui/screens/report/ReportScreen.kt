@@ -33,6 +33,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -214,6 +216,9 @@ fun DisplayDate(
         modifier = modifier
             .background(color)
             .fillMaxHeight()
+            .semantics {
+                contentDescription = date.date.localeFormat()
+            }
             .clickable(
                 enabled = date.date <= LocalDate.now(),
                 onClick = onSelectDate,
