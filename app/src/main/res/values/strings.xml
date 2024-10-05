@@ -7,8 +7,9 @@
     <string name="confirm_configuration">Save</string>
     <string name="discard_configuration">Discard tracker configuration</string>
     <string name="name">Name</string>
-    <string name="change_tracking_type">Change tracking type</string>
-    <string name="change_date">Change date</string>
+    <string name="change_tracking_type">Change to %1$s tracking type</string>
+    <string name="no_more_tracking_types">No more tracking types</string>
+    <string name="change_date">Change date to %1$s</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="yes_short">Y</string>
@@ -23,7 +24,6 @@
     <string name="cancel">Cancel</string>
     <string name="display_month">Monthly</string>
     <string name="display_week">Weekly</string>
-    <string name="change_date_range">Change date range</string>
     <string name="date_range">%1$s - %2$s</string>
     <string name="reminders_channel_name">Reminders</string>
     <string name="reminder_channel_description">Receive reminder messages</string>
@@ -40,4 +40,11 @@
     <string name="text_tracker_placeholder">Dear Day Tracker…</string>
     <string name="hex_prefix">#</string>
     <string name="reset_to_defaults">Reset to Defaults</string>
+    <string name="see_next">See next %1$s</string>
+    <string name="see_previous">See previous %1$s</string>
+    <string name="week">week</string>
+    <string name="month">month</string>
+    <string name="one_to_ten">One to Ten</string>
+    <string name="yes_no">Yes or No</string>
+    <string name="free_text">Free Text</string>
 </resources>

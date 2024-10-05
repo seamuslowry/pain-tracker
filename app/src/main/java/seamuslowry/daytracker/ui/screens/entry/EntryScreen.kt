@@ -50,6 +50,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -111,8 +113,8 @@ fun EntryScreen(
                     LocalDate.now().minusYears(1).toEpochDay(),
                     LocalDate.now().toEpochDay(),
                 ),
-                incrementResource = R.string.change_date,
-                decrementResource = R.string.change_date,
+                incrementLabel = stringResource(R.string.change_date, date.plusDays(1).localeFormat()),
+                decrementLabel = stringResource(R.string.change_date, date.minusDays(1).localeFormat()),
             ) {
                 Text(text = LocalDate.ofEpochDay(it).localeFormat(), textAlign = TextAlign.Center)
             }
@@ -210,7 +212,7 @@ fun ItemEntry(
                 trackerType = configuration.trackingType,
                 item = item,
                 onChange = onChange,
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp).semantics { contentDescription = configuration.name },
             )
         }
     }
@@ -401,8 +403,8 @@ fun UpsertConfigurationContent(
         },
         range = if (creating) LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()) else LongRange(currentTrackingTypeIndex, currentTrackingTypeIndex),
         modifier = Modifier.padding(5.dp),
-        incrementResource = R.string.change_tracking_type,
-        decrementResource = R.string.change_tracking_type,
+        incrementLabel = SUPPORTED_TRACKING_TYPES.getOrNull(currentTrackingTypeIndex.toInt() + 1)?.let { stringResource(R.string.change_tracking_type, stringResource(it.label)) } ?: stringResource(R.string.no_more_tracking_types),
+        decrementLabel = SUPPORTED_TRACKING_TYPES.getOrNull(currentTrackingTypeIndex.toInt() - 1)?.let { stringResource(R.string.change_tracking_type, stringResource(it.label)) } ?: stringResource(R.string.no_more_tracking_types),
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             TrackerEntry(trackerType = SUPPORTED_TRACKING_TYPES[it.toInt()], enabled = false)

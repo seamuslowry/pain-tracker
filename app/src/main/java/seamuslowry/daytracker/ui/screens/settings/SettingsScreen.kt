@@ -41,6 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -96,6 +98,7 @@ fun CalendarSection(
     onSetShowValues: (value: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val showRecordedValuesText = stringResource(R.string.show_recorded_values)
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.calendar_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
         Row(
@@ -105,8 +108,8 @@ fun CalendarSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = stringResource(R.string.show_recorded_values))
-            Switch(checked = showValues, onCheckedChange = onSetShowValues)
+            Text(text = showRecordedValuesText)
+            Switch(checked = showValues, onCheckedChange = onSetShowValues, modifier = Modifier.semantics { contentDescription = showRecordedValuesText })
         }
     }
 }
@@ -126,6 +129,7 @@ fun ReminderSection(
     var pickingTime by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val requiredPermission = Manifest.permission.POST_NOTIFICATIONS
+    val remindersText = stringResource(R.string.reminders_section_title)
 
     LaunchedEffect(key1 = reminderEnabled) {
         if (reminderEnabled && ContextCompat.checkSelfPermission(context, requiredPermission) != PackageManager.PERMISSION_GRANTED) {
@@ -134,7 +138,7 @@ fun ReminderSection(
     }
 
     Column(modifier = modifier) {
-        Text(text = stringResource(R.string.reminders_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
+        Text(text = remindersText, modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -143,7 +147,7 @@ fun ReminderSection(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(text = stringResource(R.string.enabled))
-            Switch(checked = reminderEnabled, onCheckedChange = onSetReminderEnabled)
+            Switch(checked = reminderEnabled, onCheckedChange = onSetReminderEnabled, modifier = Modifier.semantics { contentDescription = remindersText })
         }
         Row(
             modifier = Modifier

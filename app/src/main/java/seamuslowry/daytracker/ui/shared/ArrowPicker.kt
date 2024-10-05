@@ -1,6 +1,5 @@
 package seamuslowry.daytracker.ui.shared
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
@@ -17,7 +16,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import kotlin.math.sign
 
 @Composable
@@ -26,8 +24,8 @@ fun <T> ArrowPicker(
     onIncrement: (oldValue: T) -> Unit,
     onDecrement: (oldValue: T) -> Unit,
     compare: (leftValue: T, rightValue: T) -> Int,
-    @StringRes incrementResource: Int,
-    @StringRes decrementResource: Int,
+    incrementLabel: String,
+    decrementLabel: String,
     modifier: Modifier = Modifier,
     incrementEnabled: Boolean = true,
     decrementEnabled: Boolean = true,
@@ -38,7 +36,7 @@ fun <T> ArrowPicker(
             onClick = { onDecrement(value) },
             enabled = decrementEnabled,
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = stringResource(incrementResource))
+            Icon(Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = decrementLabel)
         }
         AnimatedContent(
             modifier = Modifier.weight(1f),
@@ -56,7 +54,7 @@ fun <T> ArrowPicker(
             onClick = { onIncrement(value) },
             enabled = incrementEnabled,
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowRight, contentDescription = stringResource(decrementResource))
+            Icon(Icons.AutoMirrored.Filled.ArrowRight, contentDescription = incrementLabel)
         }
     }
 }
@@ -66,8 +64,8 @@ fun <T : Comparable<T>> ArrowPicker(
     value: T,
     onIncrement: (oldValue: T) -> Unit,
     onDecrement: (oldValue: T) -> Unit,
-    @StringRes incrementResource: Int,
-    @StringRes decrementResource: Int,
+    incrementLabel: String,
+    decrementLabel: String,
     modifier: Modifier = Modifier,
     incrementEnabled: Boolean = true,
     decrementEnabled: Boolean = true,
@@ -77,8 +75,8 @@ fun <T : Comparable<T>> ArrowPicker(
         value = value,
         onIncrement = onIncrement,
         onDecrement = onDecrement,
-        incrementResource = incrementResource,
-        decrementResource = decrementResource,
+        incrementLabel = incrementLabel,
+        decrementLabel = decrementLabel,
         modifier = modifier,
         incrementEnabled = incrementEnabled,
         decrementEnabled = decrementEnabled,
@@ -92,8 +90,8 @@ fun ArrowPicker(
     value: Long,
     onChange: (value: Long) -> Unit,
     range: LongRange,
-    @StringRes incrementResource: Int,
-    @StringRes decrementResource: Int,
+    incrementLabel: String,
+    decrementLabel: String,
     modifier: Modifier = Modifier,
     content: @Composable (value: Long) -> Unit,
 ) {
@@ -103,8 +101,8 @@ fun ArrowPicker(
         onDecrement = { onChange(it.minus(1)) },
         incrementEnabled = value < range.last,
         decrementEnabled = value > range.first,
-        incrementResource = incrementResource,
-        decrementResource = decrementResource,
+        incrementLabel = incrementLabel,
+        decrementLabel = decrementLabel,
         modifier = modifier,
         content = content,
     )

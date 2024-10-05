@@ -122,9 +122,9 @@ class ReportViewModel @Inject constructor(
     }
 }
 
-enum class DisplayOption(@StringRes val label: Int, val field: (locale: Locale) -> TemporalField, val unit: ChronoUnit) {
-    MONTH(R.string.display_month, { ChronoField.DAY_OF_MONTH }, ChronoUnit.MONTHS),
-    WEEK(R.string.display_week, { WeekFields.of(it).dayOfWeek() }, ChronoUnit.WEEKS),
+enum class DisplayOption(@StringRes val label: Int, @StringRes val singular: Int, val field: (locale: Locale) -> TemporalField, val unit: ChronoUnit) {
+    MONTH(R.string.display_month, R.string.month, { ChronoField.DAY_OF_MONTH }, ChronoUnit.MONTHS),
+    WEEK(R.string.display_week, R.string.week, { WeekFields.of(it).dayOfWeek() }, ChronoUnit.WEEKS),
 }
 
 data class DateDisplay(
