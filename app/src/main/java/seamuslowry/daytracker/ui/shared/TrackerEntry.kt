@@ -20,6 +20,7 @@ import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import seamuslowry.daytracker.models.TextEntryTrackingType
 import seamuslowry.daytracker.models.TrackingType
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackerEntry(
     trackerType: TrackingType,
@@ -46,50 +47,6 @@ fun TrackerEntry(
                     )
                 },
             )
-//            SingleChoiceSegmentedButtonRow(
-//                modifier = modifier
-//                    .fillMaxWidth()
-//                    .horizontalScroll(rememberScrollState(Int.MAX_VALUE))
-//                    .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight),
-//            ) {
-//                trackerType.options.forEachIndexed { index, option ->
-//                    SegmentedButton(
-//                        enabled = enabled,
-//                        selected = option.value == item?.value,
-//                        icon = {},
-//                        onClick = { item?.let { onChange(it.copy(value = option.value)) } },
-//                        shape = SegmentedButtonDefaults.itemShape(
-//                            index = index,
-//                            count = trackerType.options.size,
-//                        ),
-//                        colors = SegmentedButtonDefaults.colors(
-//                            // active buttons use the default button colors
-//                            activeContainerColor = ButtonDefaults.buttonColors().containerColor,
-//                            activeContentColor = ButtonDefaults.buttonColors().contentColor,
-//                            disabledActiveContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
-//                            disabledActiveContentColor = ButtonDefaults.buttonColors().disabledContentColor,
-//                            // inactive buttons use the default outlined button colors
-//                            inactiveContainerColor = ButtonDefaults.outlinedButtonColors().containerColor,
-//                            inactiveContentColor = ButtonDefaults.outlinedButtonColors().contentColor,
-//                            disabledInactiveContainerColor = ButtonDefaults.outlinedButtonColors().disabledContainerColor,
-//                            disabledInactiveContentColor = ButtonDefaults.outlinedButtonColors().disabledContentColor,
-//                            // all borders use outline
-//                            activeBorderColor = MaterialTheme.colorScheme.outline,
-//                            inactiveBorderColor = MaterialTheme.colorScheme.outline,
-//                            disabledActiveBorderColor = MaterialTheme.colorScheme.outline,
-//                            disabledInactiveBorderColor = MaterialTheme.colorScheme.outline,
-//                        ),
-//                    ) {
-//                        Text(
-//                            text = option.text?.let { text -> stringResource(id = text) }
-//                                ?: option.value.toString(),
-//                            softWrap = false,
-//                            modifier = Modifier.requiredWidth(IntrinsicSize.Max),
-//                            overflow = TextOverflow.Visible,
-//                        )
-//                    }
-//                }
-//            }
         is TextEntryTrackingType -> DelayedSaveTextField(
             onSave = { newText -> item?.let { onChange(it.copy(comment = newText, value = -1)) } },
             value = item?.comment ?: "",
