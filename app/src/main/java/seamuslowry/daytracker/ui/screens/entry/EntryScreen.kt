@@ -212,7 +212,7 @@ fun ItemEntry(
                 trackerType = configuration.trackingType,
                 item = item,
                 onChange = onChange,
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp).semantics { contentDescription = configuration.name },
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
             )
         }
     }
