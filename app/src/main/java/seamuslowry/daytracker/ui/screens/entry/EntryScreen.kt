@@ -50,8 +50,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -212,7 +210,7 @@ fun ItemEntry(
                 trackerType = configuration.trackingType,
                 item = item,
                 onChange = onChange,
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp).semantics { contentDescription = configuration.name },
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
             )
         }
     }
