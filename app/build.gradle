@@ -22,12 +22,12 @@ spotless {
 
 android {
     namespace 'seamuslowry.daytracker'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "seamuslowry.daytracker"
         minSdk 33
-        targetSdk 34
+        targetSdk 35
         versionCode 44
         versionName "0.31.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
