@@ -73,8 +73,7 @@ class ReportViewModel @Inject constructor(
             ).toSortedMap()
         }
 
-    val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items, showRecordedValues) {
-            s, i, srv ->
+    val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items, showRecordedValues) { s, i, srv ->
         val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
         val range = s.dateRange.start.range(dayOfWeekField)
         val blanksFrom = s.dateRange.start.with(dayOfWeekField, range.minimum)
