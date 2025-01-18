@@ -10,39 +10,27 @@ import java.time.LocalDate
 class Converters {
     // Instant conversions
     @TypeConverter
-    fun epochMillisToInstant(value: Long?): Instant? {
-        return value?.let { Instant.ofEpochMilli(it) }
-    }
+    fun epochMillisToInstant(value: Long?): Instant? = value?.let { Instant.ofEpochMilli(it) }
 
     @TypeConverter
-    fun instantToEpochMillis(instant: Instant?): Long? {
-        return instant?.toEpochMilli()
-    }
+    fun instantToEpochMillis(instant: Instant?): Long? = instant?.toEpochMilli()
 
     // LocalDate conversions
     @TypeConverter
-    fun epochDayToLocalDate(value: Long?): LocalDate? {
-        return value?.let { LocalDate.ofEpochDay(value) }
-    }
+    fun epochDayToLocalDate(value: Long?): LocalDate? = value?.let { LocalDate.ofEpochDay(value) }
 
     @TypeConverter
-    fun localDateToEpochDay(date: LocalDate?): Long? {
-        return date?.toEpochDay()
-    }
+    fun localDateToEpochDay(date: LocalDate?): Long? = date?.toEpochDay()
 
     // TrackingType conversions
     @TypeConverter
-    fun stringToTrackingType(value: String?): TrackingType? {
-        return when {
-            value == null -> null
-            LimitedOptionTrackingType.entries.any { it.name == value } -> LimitedOptionTrackingType.valueOf(value)
-            value == TextEntryTrackingType.toString() -> TextEntryTrackingType
-            else -> null
-        }
+    fun stringToTrackingType(value: String?): TrackingType? = when {
+        value == null -> null
+        LimitedOptionTrackingType.entries.any { it.name == value } -> LimitedOptionTrackingType.valueOf(value)
+        value == TextEntryTrackingType.toString() -> TextEntryTrackingType
+        else -> null
     }
 
     @TypeConverter
-    fun trackingTypeToString(trackingType: TrackingType?): String? {
-        return trackingType?.toString()
-    }
+    fun trackingTypeToString(trackingType: TrackingType?): String? = trackingType?.toString()
 }
